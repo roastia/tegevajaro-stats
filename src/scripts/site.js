@@ -9,25 +9,42 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 try { localStorage.removeItem('theme'); } catch { /* 保存できなくても動く */ }
 
 /* ---------- ページごとのスクロール位置 ----------
-   メニューで初めて開くページは一番上から。一度見たページは、前に見ていた位置から。 */
+   メニューで初めて開くページは、メニューが画面の一番上に来る位置（ページの頭）から。
+   一度見たページは、前に見ていた位置から（ページの頭より上にいたときは、ページの頭から）。 */
 const ss = {
   get: k => { try { return sessionStorage.getItem(k); } catch { return null; } },
   set: (k, v) => { try { v === null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch { /* 保存できなくても動く */ } },
 };
 const posKey = () => 'tg:scroll:' + location.pathname;
 const savePos = () => ss.set(posKey(), String(Math.round(scrollY)));
+const navTopY = () => { const a = document.querySelector('.navtop'); return a ? Math.round(a.getBoundingClientRect().top + scrollY) : 0; };
 document.querySelectorAll('.site-nav a').forEach(a => a.addEventListener('click', () => { savePos(); ss.set('tg:navjump', '1'); }));
 addEventListener('pagehide', savePos);
 {
   const nav = performance.getEntriesByType('navigation')[0];
   if (ss.get('tg:navjump') && (!nav || nav.type === 'navigate')) {
-    const y = Number(ss.get(posKey()) || 0);
-    scrollTo({ top: y, behavior: 'instant' });
-    requestAnimationFrame(() => scrollTo({ top: y, behavior: 'instant' }));
-    // 文字や誕生日の表示でページが伸びたあとに、もう一度合わせる（その前に自分で動かしたら何もしない）
-    addEventListener('load', () => { if (Math.abs(scrollY - y) > 2 && scrollY < y) scrollTo({ top: y, behavior: 'instant' }); }, { once: true });
+    const saved = Number(ss.get(posKey()) || 0);
+    const target = () => Math.max(saved, navTopY());
+    const go = () => scrollTo({ top: target(), behavior: 'instant' });
+    go(); requestAnimationFrame(go);
+    // 文字や誕生日の表示でページの高さが変わったあとに、もう一度合わせる（その間に自分でスクロールしていたら何もしない）
+    let moved = false;
+    const mark = () => { moved = true; };
+    addEventListener('touchstart', mark, { once: true, passive: true });
+    addEventListener('wheel', mark, { once: true, passive: true });
+    addEventListener('load', () => { if (!moved) go(); }, { once: true });
   }
   ss.set('tg:navjump', null);
+}
+
+// メニューの今いるページの項目が、横にはみ出して隠れないようにする
+{
+  const ul = document.querySelector('.site-nav ul'), cur = ul?.querySelector('[aria-current="page"]');
+  if (ul && cur) {
+    const l = cur.offsetLeft - ul.offsetLeft, r = l + cur.offsetWidth;
+    if (r > ul.scrollLeft + ul.clientWidth) ul.scrollLeft = r - ul.clientWidth + 16;
+    else if (l < ul.scrollLeft) ul.scrollLeft = Math.max(0, l - 16);
+  }
 }
 
 /* ---------- 誕生日（日本時間の今日から数える） ---------- */

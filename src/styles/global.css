@@ -377,6 +377,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 /* メニュー・チップは横にだけスクロール（縦にずれない） */
 .site-nav ul { overflow-x: auto; overflow-y: hidden; overscroll-behavior: contain; touch-action: pan-x; }
 .site-nav li { flex: none; }
+.navtop { display: block; height: 0; }
 .site-nav a { margin-bottom: 0; }
 .seg { overscroll-behavior: contain; touch-action: pan-x; }
 

@@ -65,6 +65,7 @@ const nav = [
       </section>
     </div>
   </header>
+  <span class="navtop" aria-hidden="true"></span>
   <nav class="site-nav" aria-label="ページ">
     <ul>
       {nav.map(([p, id, label]) => <li><a class="nw" href={href(p)} aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
