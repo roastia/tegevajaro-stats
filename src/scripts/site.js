@@ -1,4 +1,4 @@
-// すべてのページで動く小さなスクリプト：表示モード・誕生日・紙吹雪・数字のカウントアップ
+// すべてのページで動く小さなスクリプト：スクロール位置・誕生日・紙吹雪・数字のカウントアップ
 import confetti from 'canvas-confetti';
 import { icon, xIntent, X_MARK, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
