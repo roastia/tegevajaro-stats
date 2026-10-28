@@ -365,3 +365,9 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .ages li { grid-template-columns: 1.6rem 2.75rem 1fr auto; }
 /* 誕生日カード（オレンジの上）は台なし・透過のまま黒い線画で */
 .bcard .jersey.on-color { filter: none; width: 2.75rem; height: 2.75rem; }
+/* 「?」はタイトルのすぐ横に（出典ラベルだけ右端） */
+.rec h2 .ttl { flex: 0 1 auto; }
+.rec h2 .info { margin-left: 2px; }
+.rec h2 .src { margin-left: auto; }
+.rec h2 .ttl .nw { white-space: nowrap; }
+.rec h2 .ttl .info { margin-left: 4px; vertical-align: 0.1em; }
