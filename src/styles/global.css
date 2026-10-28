@@ -442,3 +442,5 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .rank li > .dv { flex: 0 0 auto; margin-left: auto; white-space: nowrap; }
 .rank li { min-height: 2.3rem; }
 .vlist .gh { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vlist li { grid-template-columns: minmax(0, 1fr) auto; }
+.rank li > span:nth-child(3), .vlist .gh { display: block; }

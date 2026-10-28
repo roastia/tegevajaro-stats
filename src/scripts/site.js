@@ -135,7 +135,7 @@ addEventListener('pagehide', savePos);
     const lh = n.getBoundingClientRect().height + 'px';  // 文字を小さくしても行の高さは変えない
     while (n.scrollWidth > n.clientWidth + 1 && k > 0.7) { n.style.lineHeight = lh; k -= 0.04; n.style.fontSize = k.toFixed(2) + 'em'; }
   };
-  const ro = new ResizeObserver(es => es.forEach(e => fit(e.target)));
+  const ro = new ResizeObserver(es => es.forEach(e => { const w = Math.round(e.contentRect.width); if (e.target._fitW !== w) { e.target._fitW = w; fit(e.target); } }));
   document.querySelectorAll('.rank li > span:nth-child(3), .vlist .gh').forEach(n => ro.observe(n));
 }
 
