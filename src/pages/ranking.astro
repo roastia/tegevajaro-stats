@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import RankCard from '../components/RankCard.astro';
+import { getData, getShareables } from '../lib/data.js';
+import { icon } from '../lib/util.js';
+const d = getData();
+const tr = d.team_records[0] || {};
+const share = new Map(getShareables().filter(s => s.kind === 'r').map(s => [s.id, s]));
+const ms = [...d.matches].sort((a, b) => Number(a.round) - Number(b.round));
+const last5 = ms.slice(-5);
+const cats = [['', 'すべて'], ['goal', 'ゴール'], ['time', '出場'], ['team', 'チームへの貢献'], ['play', 'プレー'], ['trivia', '豆知識']]
+  .filter(([c]) => !c || d.rankings.some(r => r.meta.cat === c && r.rows.length));
+const tiles = [
+  ['shield', 'リーグ戦無敗', `${tr.unbeaten}試合`, `第${tr.unbeaten_from}節から負けなし`],
+  ['ball', '連続得点', `${tr.scoring}試合`, '毎試合ゴールを奪い続けている'],
+  ['stadium', 'ホーム無敗', `${tr.home_unbeaten}試合`, 'いちごはテゲバの砦'],
+  ['medal', '先制すれば', `${tr.lead_l}敗`, '先に決めれば、もう負けない'],
+  ['party', 'ゴールを決めた選手', `${tr.scorers}人`, '誰もがゴールを狙えるチーム'],
+];
+---
+<Base current="ranking" title="ランキング">
+  <section class="tiles">
+    {tiles.map(([ic, lb, big, sub]) => <div class="card tile reveal"><div class="label"><Fragment set:html={icon(ic)} />{lb}</div><div class="big" data-count>{big}</div><div class="sub">{sub}</div></div>)}
+  </section>
+  <section class="card">
+    <h2>直近5試合</h2>
+    <p class="note">第{last5[0]?.round}節〜第{last5.at(-1)?.round}節</p>
+    <div class="form">
+      {last5.map(m => <div class={m.result === '勝' ? 'w' : m.result === '負' ? 'l' : ''}><b>{m.result}</b>{m.opponent}<br />{m.gf}-{m.ga}</div>)}
+    </div>
+  </section>
+  <div class="controls">
+    <div class="seg" id="recSeg" role="group" aria-label="ランキングの種類">
+      {cats.map(([c, l], i) => <button type="button" data-cat={c} aria-pressed={i === 0 ? 'true' : 'false'}>{l}</button>)}
+    </div>
+  </div>
+  <div class="grid" id="recGrid">
+    {d.rankings.filter(r => r.rows.length).map(({ meta, rows }) => <RankCard meta={meta} rows={rows} share={share.get(meta.id)} />)}
+  </div>
+</Base>
+<script>
+  // カテゴリで絞り込み（URL の #goal などでも開ける）
+  const seg = document.getElementById('recSeg');
+  const set = (cat: string) => {
+    seg?.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === cat)));
+    document.querySelectorAll<HTMLElement>('#recGrid [data-cat]').forEach(c => { c.hidden = !!cat && c.dataset.cat !== cat; });
+  };
+  seg?.addEventListener('click', e => {
+    const b = (e.target as HTMLElement).closest('button');
+    if (!b) return;
+    set(b.dataset.cat || '');
+    history.replaceState(null, '', b.dataset.cat ? '#' + b.dataset.cat : location.pathname);
+  });
+  const h = location.hash.slice(1);
+  if (h && seg?.querySelector(`[data-cat="${CSS.escape(h)}"]`)) set(h);
+</script>

@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import ShareCard from '../components/ShareCard.astro';
+import { getShareables } from '../lib/data.js';
+const items = getShareables().filter(s => s.kind === 't');
+---
+<Base current="topics">
+  <p class="page-lead">データが教えてくれる、今季のテゲバのすごいところ。グッときたらXでポストして、テゲサポ仲間と盛り上がろう！ カードを押すと、ポスト用の画像つきページが開きます。</p>
+  <section class="bday" data-bday hidden></section>
+  <div class="grid">
+    {items.map(item => <ShareCard item={item} />)}
+  </div>
+</Base>

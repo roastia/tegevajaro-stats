@@ -1,0 +1,40 @@
+---
+import PostBox from './PostBox.astro';
+import { icon, href } from '../lib/util.js';
+import { ICON_OF_RECORD, plainTitle } from '../lib/meta.js';
+import { SITE } from '../config/site.js';
+interface Props { meta: any; rows: any[]; share?: any }
+const { meta, rows, share } = Astro.props;
+const champs = rows.filter(r => r._rank === 1);
+const vals = rows.map(r => r.value), lo = Math.min(...vals), hi = Math.max(...vals);
+const width = v => Math.round(meta.asc ? (hi === lo ? 100 : 25 + 75 * (hi - v) / (hi - lo)) : (hi > 0 ? Math.max(4, v / hi * 100) : 4));
+const top = rows.filter(r => r._rank <= 5).slice(0, 5);
+const rest = rows.slice(top.length);
+const pid = `info-${meta.id}`;
+---
+<section class={`card rec reveal vt-r-${meta.id}`} id={`rank-${meta.id}`} data-cat={meta.cat}>
+  <h2>
+    <Fragment set:html={icon(ICON_OF_RECORD[meta.id] || 'star')} />
+    <span>{plainTitle(meta.title)}</span>
+    <button class="info" type="button" popovertarget={pid} aria-label={`${plainTitle(meta.title)}の数え方`}>?</button>
+    <span class="src">{meta.src}</span>
+  </h2>
+  <div class="pop" id={pid} popover>{meta.note}</div>
+  {meta.cheer && <p class="cheer">{meta.cheer}</p>}
+  <div class="champ">
+    <span class="nm">{champs.map(r => r.name).join('・')}</span>
+    <span class="vl">{champs.length > 1 ? `${champs.length}人が並ぶ` : (meta.hideValue ? '' : champs[0].display)}</span>
+  </div>
+  <ol class="rank">
+    {top.map(r => <li class={r._rank === 1 ? 'r1' : ''}><span class={`bar w${width(r.value)}`}></span><span class="rk">{r._rank}</span><span>{r.name}</span><span class="dv">{meta.hideValue ? '' : r.display}</span></li>)}
+  </ol>
+  {rest.length > 0 && (
+    <details class="more">
+      <summary>すべて表示（{rows.length}{meta.pair ? '組' : '人'}）</summary>
+      <ol class="rank" start={top.length + 1}>
+        {rest.map(r => <li><span class={`bar w${width(r.value)}`}></span><span class="rk">{r._rank}</span><span>{r.name}</span><span class="dv">{meta.hideValue ? '' : r.display}</span></li>)}
+      </ol>
+    </details>
+  )}
+  {share && <PostBox what={share.label} text={share.text} url={`${SITE.url}/r/${meta.id}/`} />}
+</section>

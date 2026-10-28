@@ -1,0 +1,88 @@
+---
+import Base from '../layouts/Base.astro';
+import { getData } from '../lib/data.js';
+import { icon, safeUrl } from '../lib/util.js';
+const d = getData();
+const byRound = new Map(d.matches.map(m => [String(m.round), m]));
+const counts = {};
+d.goals.forEach(g => { counts[g.scorer] = (counts[g.scorer] || 0) + 1; });
+const scorers = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+const goals = [...d.goals].sort((a, b) => Number(b.round) - Number(a.round) || Number(b.minute) - Number(a.minute));
+const matches = [...d.matches].sort((a, b) => Number(b.round) - Number(a.round));
+const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェー');
+---
+<Base current="goals" title="ゴール動画">
+  <div class="grid two">
+    <section class="card">
+      <h2>選手別ゴール集</h2>
+      <p class="note">あのゴールをもう一度。ゴールと試合のハイライトへのリンクです（ハイライトに入っていない場面もあります）。</p>
+      <div class="controls gap">
+        <select id="scorerSel" aria-label="選手を選ぶ">
+          <option value="">全員（{d.goals.length}ゴール）</option>
+          {scorers.map(([n, c]) => <option value={n}>{n}（{c}）</option>)}
+        </select>
+        <select id="gOrder" aria-label="並び順"><option value="desc">新しい順</option><option value="asc">古い順</option><option value="min">時間帯順</option></select>
+      </div>
+      <ul class="vlist" id="goalList">
+        {goals.map(g => { const m = byRound.get(String(g.round)) || {}; const v = safeUrl(m.video_url), p = safeUrl(m.match_url); return (
+          <li data-scorer={g.scorer} data-round={g.round} data-minute={g.minute}>
+            <div><b>{g.scorer}</b>　{g.time}</div>
+            <div class="lk">
+              {v && <a class="yt" href={v} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />ハイライト</a>}
+              {p && <a href={p} target="_blank" rel="noopener noreferrer">公式試合ページ</a>}
+            </div>
+            <div class="sub">第{g.round}節 {m.opponent}（{ha(m)}）{m.gf}-{m.ga}</div>
+          </li>); })}
+      </ul>
+    </section>
+    <section class="card">
+      <h2>試合ハイライト</h2>
+      <p class="note">勝った試合も、悔しい試合も、もう一度。「ハイライト」はJリーグ公式ハイライト（YouTube）、動画がない試合は公式試合ページへ。</p>
+      <div class="controls gap">
+        <div class="seg" id="resSeg" role="group" aria-label="結果">
+          {['', '勝', '分', '負'].map((r, i) => <button type="button" data-res={r} aria-pressed={i === 0 ? 'true' : 'false'}>{r || '全て'}</button>)}
+        </div>
+        <select id="mOrder" aria-label="並び順"><option value="desc">新しい順</option><option value="asc">古い順</option></select>
+      </div>
+      <ul class="vlist" id="matchList">
+        {matches.map(m => { const gs = d.goals.filter(g => String(g.round) === String(m.round)).sort((a, b) => Number(a.minute) - Number(b.minute)); const v = safeUrl(m.video_url), p = safeUrl(m.match_url); return (
+          <li data-res={m.result} data-round={m.round}>
+            <div>第{m.round}節 {m.opponent}（{ha(m)}）{m.gf}-{m.ga} <span class={m.result === '勝' ? 'res-w' : m.result === '負' ? 'res-l' : ''}>{m.result}</span></div>
+            <div class="lk">
+              {v && <a class="yt" href={v} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />ハイライト</a>}
+              {p && <a href={p} target="_blank" rel="noopener noreferrer">公式試合ページ</a>}
+            </div>
+            <div class="sub">{m.date.slice(5).replace('-', '/')}　{gs.length ? gs.map(g => `${g.time} ${g.scorer}`).join('、') : '宮崎の得点なし'}</div>
+          </li>); })}
+      </ul>
+    </section>
+  </div>
+</Base>
+<style>
+  .two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+  .gap { margin-bottom: 10px; }
+  .vlist { display: flex; flex-direction: column; }
+</style>
+<script>
+  const $ = (id: string) => document.getElementById(id)!;
+  const gl = [...$('goalList').querySelectorAll<HTMLElement>('li')];
+  const ml = [...$('matchList').querySelectorAll<HTMLElement>('li')];
+  let res = '';
+  const draw = () => {
+    const who = ($('scorerSel') as HTMLSelectElement).value, go = ($('gOrder') as HTMLSelectElement).value;
+    const n = (e: HTMLElement, k: string) => Number(e.dataset[k]);
+    [...gl].sort((a, b) => go === 'min' ? n(a, 'minute') - n(b, 'minute') || n(a, 'round') - n(b, 'round')
+      : (go === 'desc' ? -1 : 1) * (n(a, 'round') - n(b, 'round') || n(a, 'minute') - n(b, 'minute')))
+      .forEach((e, i) => { e.style.order = String(i); e.hidden = !!who && e.dataset.scorer !== who; });
+    const desc = ($('mOrder') as HTMLSelectElement).value === 'desc';
+    [...ml].sort((a, b) => (desc ? -1 : 1) * (n(a, 'round') - n(b, 'round')))
+      .forEach((e, i) => { e.style.order = String(i); e.hidden = !!res && e.dataset.res !== res; });
+  };
+  ['scorerSel', 'gOrder', 'mOrder'].forEach(id => $(id).addEventListener('change', draw));
+  $('resSeg').addEventListener('click', e => {
+    const b = (e.target as HTMLElement).closest('button'); if (!b) return;
+    res = b.dataset.res || '';
+    $('resSeg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    draw();
+  });
+</script>

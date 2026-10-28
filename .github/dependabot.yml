@@ -1,0 +1,13 @@
+# 部品の更新を週1回提案する。出たばかりの版は7日待ってから（乗っ取られた版を避けるため）
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly, day: monday, time: '09:00', timezone: Asia/Tokyo }
+    cooldown: { default-days: 7 }
+    groups:
+      astro: { patterns: ['astro', '@astrojs/*'] }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: monday, time: '09:00', timezone: Asia/Tokyo }
+    cooldown: { default-days: 7 }

@@ -1,0 +1,86 @@
+---
+import '../styles/global.css';
+import { SITE } from '../config/site.js';
+import { getData } from '../lib/data.js';
+import { icon, href } from '../lib/util.js';
+
+interface Props { title?: string; description?: string; image?: string; path?: string; current?: string }
+const { title, description, image = 'og/site.png', path = '', current = '' } = Astro.props;
+const fullTitle = title ? `${title}｜${SITE.short}` : SITE.name;
+const desc = description || `テゲバジャーロ宮崎の今季の記録から作った、テゲサポが語りたくなるランキング（非公式ファンサイト）。${SITE.roundLabel}時点。`;
+const pageUrl = SITE.url + '/' + path;
+const imageUrl = SITE.url + '/' + image;
+const d = getData();
+// 誕生日はブラウザ側で「今日」から数えるので、必要な項目だけ渡す
+const bdays = d.profiles.filter(p => p.birth).map(p => ({ no: p.no, name: p.name, pos: p.pos, birth: p.birth }));
+const nav = [
+  ['', 'topics', '注目トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手の称号'],
+  ['goals/', 'goals', 'ゴール動画'], ['roots/', 'roots', '選手の背景'],
+];
+---
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={desc} />
+  <link rel="canonical" href={pageUrl} />
+  <meta name="theme-color" content="#C8375F" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content={SITE.name} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:image" content={imageUrl} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href={href('favicon.svg')} type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href={href("vt.css")} />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" />
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <div class="row">
+        <span class="badge">非公式ファンサイト</span>
+        <button class="theme-btn" id="themeBtn" type="button" aria-label="表示モードを切り替え（自動・ライト・ダーク）"><Fragment set:html={icon('moon')} /></button>
+      </div>
+      <h1><a href={href('')}>{SITE.name}</a></h1>
+      <p class="lead">数字で見ると、今季のテゲバはもっとアツい。J2{SITE.roundLabel}（{SITE.lastMatch}）までの記録から、テゲサポが語りたくなるランキングを集めました。</p>
+    </div>
+  </header>
+  <nav class="site-nav" aria-label="ページ">
+    <ul>
+      {nav.map(([p, id, label]) => <li><a href={href(p)} aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
+    </ul>
+  </nav>
+  <div class="wrap">
+    <section class="hbd" id="hbd" hidden aria-live="polite"></section>
+  </div>
+  <main class="wrap">
+    <slot />
+  </main>
+  <footer class="site-foot">
+    <div class="wrap">
+      <p>このサイトは個人が運営する<b>非公式のファンサイト</b>です。テゲバジャーロ宮崎、Jリーグ、各データ提供元とは関係ありません。ランキングは公開データをもとに独自に集計したもので、公式記録ではありません。広告・収益化はしていません。</p>
+      <p>選手の写真・クラブのエンブレムは使用していません。選手名からJリーグ公式の選手ページへリンクしています。</p>
+      <p>出典</p>
+      <ul>
+        <li><a href="https://www.jleague.jp/" rel="noopener noreferrer" target="_blank">Jリーグ公式サイト</a>（試合結果・出場記録・選手情報・公式ハイライト）</li>
+        {SITE.footballLab && <li><a href="https://www.football-lab.jp/" rel="noopener noreferrer" target="_blank">Football LAB</a> ©DataStadium Inc.（シュート・ラストパス・ゴール期待値・プレー指標・パス交換）</li>}
+        <li>各メディア・クラブ公式サイト（得点時間・経歴の補足）</li>
+      </ul>
+      <p>フォント：Noto Sans JP（SIL Open Font License 1.1）　データ時点：{SITE.roundLabel}（{SITE.asOf}）</p>
+    </div>
+  </footer>
+  <script type="application/json" id="bday-data" is:inline set:html={JSON.stringify(bdays).replace(/</g, '\\u003c')}></script>
+  <script>
+    import '../scripts/site.js';
+  </script>
+</body>
+</html>

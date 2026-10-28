@@ -1,0 +1,28 @@
+---
+// ポスト用の個別ページ。X ではこのページのリンクに画像カードが付く
+import Base from '../../layouts/Base.astro';
+import ShareCard from '../../components/ShareCard.astro';
+import { getShareables } from '../../lib/data.js';
+import { href } from '../../lib/util.js';
+export function getStaticPaths() {
+  const all = getShareables();
+  return all.map(item => ({ params: { kind: item.kind, id: item.id }, props: { item, more: all.filter(s => s.kind === item.kind && s.id !== item.id).slice(0, 6) } }));
+}
+const { item, more } = Astro.props;
+const back = { t: ['', '注目トピック', 'topics'], r: [`ranking/#rank-${item.id}`, 'ランキング', 'ranking'], b: [`roots/#b-${item.id}`, '選手の背景', 'roots'] }[item.kind];
+---
+<Base title={item.label} description={`${item.headline} ${item.sub || ''}`.trim()} image={`og/${item.kind}/${item.id}.png`} path={`${item.kind}/${item.id}/`} current={back[2]}>
+  <div class="share-page">
+    <p><a class="backlink" href={href(back[0])}>← {back[1]}にもどる</a></p>
+    <ShareCard item={item} link={false} />
+  </div>
+  {more.length > 0 && <section>
+    <h2 class="more-h">ほかにもポストしたくなる話題</h2>
+    <ul class="morelist">{more.map(m => <li><a href={href(`${m.kind}/${m.id}/`)}>{m.headline}</a></li>)}</ul>
+  </section>}
+</Base>
+<style>
+  .more-h { font-size: 1rem; margin: 8px 0; }
+  .morelist { margin: 0; padding-left: 1.2em; }
+  .morelist li { margin: 4px 0; }
+</style>

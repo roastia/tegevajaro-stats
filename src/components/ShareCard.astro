@@ -1,0 +1,19 @@
+---
+import Shot from './Shot.astro';
+import PostBox from './PostBox.astro';
+import { SITE } from '../config/site.js';
+import { CHAR_OF_TOPIC, CHAR_OF_RECORD } from '../lib/meta.js';
+import { href } from '../lib/util.js';
+interface Props { item: any; link?: boolean }
+const { item, link = true } = Astro.props;
+const sharePath = `${item.kind}/${item.id}/`;
+const char = item.kind === 'r' ? CHAR_OF_RECORD[item.id] : CHAR_OF_TOPIC[item.id];
+---
+<article class="share reveal" id={`${item.kind}-${item.id}`}>
+  {link ? <a href={href(sharePath)} class="shotlink" aria-label={`${item.label}の詳細`}><Shot item={item} char={char} /></a> : <Shot item={item} char={char} />}
+  <PostBox what={item.label} text={item.text} url={`${SITE.url}/${sharePath}`} />
+</article>
+<style>
+  .shotlink { color: inherit; text-decoration: none; }
+  .shotlink:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; }
+</style>

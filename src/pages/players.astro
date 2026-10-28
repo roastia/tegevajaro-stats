@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+import { getData } from '../lib/data.js';
+import { icon, playerUrl, href } from '../lib/util.js';
+import { ICON_OF_RECORD, plainTitle } from '../lib/meta.js';
+const d = getData();
+const urlOf = new Map(d.players.map(p => [p.name, p.jl_url]));
+const ageOf = new Map(d.ages.map(a => [a.name, a.age]));
+// ランキング3位以内で称号。見せ方で優劣をつけない（並びはランキングの定義順、装飾は全員同じ）
+const titles = new Map();
+d.rankings.forEach(({ meta, rows }, idx) => {
+  if (meta.pair) return;
+  for (const r of rows) {
+    const list = titles.get(r.name) || titles.set(r.name, []).get(r.name);
+    if (meta.warn) { if (r.value >= 3) list.push({ text: plainTitle(meta.title), cls: 'w', id: meta.id, order: 999 }); continue; }
+    if (r._rank <= 3) list.push({ text: `${plainTitle(meta.title)} ${r._rank}位`, cls: '', id: meta.id, order: idx, anchor: `ranking/#rank-${meta.id}` });
+  }
+});
+const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
+---
+<Base current="players" title="選手の称号">
+  <section class="card">
+    <h2>選手の称号</h2>
+    <p class="note">ランキングで3位以内に入ると称号ゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>
+    <div class="controls">
+      <input id="pq" type="search" placeholder="選手名で検索" aria-label="選手名で検索" />
+      <div class="seg" id="posSeg" role="group" aria-label="ポジション">
+        {['', 'GK', 'DF', 'MF', 'FW'].map((p, i) => <button type="button" data-pos={p} aria-pressed={i === 0 ? 'true' : 'false'}>{p || '全員'}</button>)}
+      </div>
+      <select id="pOrder" aria-label="並び順"><option value="no">背番号順</option><option value="age">若い順</option><option value="kana">名前順</option></select>
+    </div>
+    <div class="legend legend-gap">
+      {['GK', 'DF', 'MF', 'FW'].map(p => <span class={`pos-${p}`}><i></i>{p}</span>)}
+      <span>大きな数字は背番号</span>
+    </div>
+  </section>
+  <div class="grid" id="pGrid">
+    {players.map(p => {
+      const ts = (titles.get(p.name) || []).sort((a, b) => a.order - b.order);
+      const u = playerUrl(urlOf.get(p.name));
+      const age = ageOf.get(p.name);
+      return (
+        <section class={`card pcard reveal pos-${['GK','DF','MF','FW'].includes(p.pos) ? p.pos : 'x'}`} data-name={p.name} data-pos={p.pos} data-no={p.no} data-birth={p.birth || undefined} data-age-out={p.birth ? `age-${p.no}` : undefined}>
+          <div class="pband">
+            <span class="pnum" aria-label={`背番号${p.no}`}>{p.no}</span>
+            <div>
+              <div class="pname">{u ? <a href={u} target="_blank" rel="noopener noreferrer">{p.name}</a> : p.name}</div>
+              <div class="pmeta">{p.pos}{age !== '' && age != null && <>・<span id={`age-${p.no}`}>{age}</span>歳</>}{p.birthplace && `・${p.birthplace}出身`}</div>
+            </div>
+            <span data-bslot="bchip"></span>
+          </div>
+          <div class="pbody">
+            {(p.hs_or_youth || p.university) && <div class="chips">{[p.hs_or_youth, p.university].filter(Boolean).map(s => <span class="chip prof"><Fragment set:html={icon('cap')} />{s}</span>)}</div>}
+            {ts.length > 0 && <div class="chips">{ts.map(t => t.anchor
+              ? <a class={`chip ${t.cls}`} href={href(t.anchor)}><Fragment set:html={icon(ICON_OF_RECORD[t.id] || 'star')} />{t.text}</a>
+              : <span class={`chip ${t.cls}`}><Fragment set:html={icon(ICON_OF_RECORD[t.id] || 'star')} />{t.text}</span>)}</div>}
+          </div>
+        </section>
+      );
+    })}
+  </div>
+</Base>
+<style>
+  .legend-gap { margin-top: 10px; }
+  a.chip { color: inherit; text-decoration: none; }
+  a.chip:hover { border-color: var(--brand); color: var(--ink); }
+</style>
+<script>
+  const grid = document.getElementById('pGrid')!;
+  const cards = [...grid.querySelectorAll<HTMLElement>('.pcard')];
+  const q = document.getElementById('pq') as HTMLInputElement;
+  const ord = document.getElementById('pOrder') as HTMLSelectElement;
+  const seg = document.getElementById('posSeg')!;
+  let pos = '';
+  const draw = () => {
+    const s = q.value.trim();
+    const sorted = [...cards].sort((a, b) => {
+      if (ord.value === 'age') return (a.dataset.birth ? -1 : 1) - (b.dataset.birth ? -1 : 1) || String(b.dataset.birth).localeCompare(String(a.dataset.birth)) || Number(a.dataset.no) - Number(b.dataset.no);
+      if (ord.value === 'kana') return String(a.dataset.name).localeCompare(String(b.dataset.name), 'ja');
+      return Number(a.dataset.no) - Number(b.dataset.no);
+    });
+    sorted.forEach((c, i) => { c.style.order = String(i); c.hidden = (!!s && !String(c.dataset.name).includes(s)) || (!!pos && c.dataset.pos !== pos); });
+  };
+  q.addEventListener('input', draw); ord.addEventListener('change', draw);
+  seg.addEventListener('click', e => {
+    const b = (e.target as HTMLElement).closest('button'); if (!b) return;
+    pos = b.dataset.pos || '';
+    seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    draw();
+  });
+</script>
