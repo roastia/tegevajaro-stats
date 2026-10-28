@@ -47,6 +47,41 @@ addEventListener('pagehide', savePos);
   }
 }
 
+/* ---------- ポストに画像を添付（スマホの共有メニュー） ----------
+   X の投稿画面を開くリンクでは画像を添付できないので、共有メニューで画像ファイルごと X アプリに渡す。
+   使えない端末（パソコンなど）や、うまくいかないときは、今までどおり X の投稿画面を開く。 */
+{
+  const touch = matchMedia('(pointer: coarse)').matches;
+  const probe = (() => { try { return new File([new Uint8Array(1)], 'x.png', { type: 'image/png' }); } catch { return null; } })();
+  const canShareFiles = touch && probe && typeof navigator.canShare === 'function' && navigator.canShare({ files: [probe] });
+  if (canShareFiles) {
+    const files = new Map(); // 画像URL → File（先に読み込んでおき、押した瞬間に渡す）
+    const load = a => {
+      const u = a.dataset.img;
+      if (!u || files.has(u)) return files.get(u);
+      const p = fetch(u).then(r => r.ok ? r.blob() : Promise.reject(new Error(String(r.status))))
+        .then(b => { const f = new File([b], a.dataset.name || 'tegesta.png', { type: 'image/png' }); files.set(u, f); return f; })
+        .catch(() => { files.delete(u); return null; });
+      files.set(u, p);
+      return p;
+    };
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { load(e.target); io.unobserve(e.target); } }), { rootMargin: '300px 0px' });
+    document.querySelectorAll('a.postbtn[data-img]').forEach(a => { io.observe(a); a.addEventListener('pointerdown', () => load(a), { passive: true }); });
+    const openX = a => { if (!window.open(a.href, '_blank', 'noopener,noreferrer')) location.href = a.href; };
+    document.addEventListener('click', async e => {
+      const a = e.target instanceof Element ? e.target.closest('a.postbtn[data-img]') : null;
+      if (!a) return;
+      e.preventDefault();
+      let f = files.get(a.dataset.img);
+      if (!(f instanceof File)) f = await load(a);
+      if (!(f instanceof File)) { openX(a); return; }
+      const text = `${a.dataset.text || ''}${a.dataset.url ? '\n' + a.dataset.url : ''}`;
+      try { await navigator.share({ files: [f], text }); }
+      catch (err) { if (!(err && err.name === 'AbortError')) openX(a); } // 閉じただけなら何もしない
+    });
+  }
+}
+
 /* ---------- 誕生日（日本時間の今日から数える） ---------- */
 function todayJst() {
   const [y, m, d] = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-').map(Number);
