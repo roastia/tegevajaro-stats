@@ -25,7 +25,7 @@
    - `suspension.csv`：累積警告
    - Football LAB 由来：`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列
    - 選手の加入・退団があれば `profiles.csv`（経歴は「宮崎に来る直前まで」を `→` でつなぐ）
-2. `src/config/site.js` の `asOf`・`roundLabel`・`lastMatch` を書き換える。
+2. `src/config/site.js` の `asOf`・`roundLabel`・`lastMatch`・`rank`（Jリーグ公式の順位表の現在順位）を書き換える。
 3. `npm test` で検算する（出場時間の合計・スコアとゴール数・勝敗・ポスト文の長さなど）。失敗したらデータを直す。
 4. `npm run build` → `npm run preview` で表示を確認する。
 5. 変更をコミットする（**push は人が行う**）。コミットメッセージは「第14節（11/1 大分戦）を反映」のように。

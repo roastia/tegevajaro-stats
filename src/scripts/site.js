@@ -139,9 +139,9 @@ function openBday(birth) {
   bdPop.append(ul);
   if (same.length === 1) bdPop.append(h('p', 'note', `チームで${m}月${d}日生まれは${same[0].name}選手だけ！`));
   if (month.length) bdPop.append(h('div', 'k', `同じ${m}月生まれのチームメイト`), h('p', null, month.map(p => `${p.name}（${m}/${Number(p.birth.slice(8))}）`).join('、')));
-  const wiki = h('a', 'wiki', `${m}月${d}日生まれの有名人を見る（Wikipedia）`);
+  const wiki = h('a', 'wiki'); wiki.innerHTML = icon('star'); wiki.append(`${m}月${d}日生まれの有名人を見る`);
   wiki.href = `https://ja.wikipedia.org/wiki/${m}%E6%9C%88${d}%E6%97%A5#%E8%AA%95%E7%94%9F%E6%97%A5`; wiki.target = '_blank'; wiki.rel = 'noopener noreferrer';
-  bdPop.append(wiki, h('div', 'k', `あなたも${m}月${d}日生まれ？`));
+  bdPop.append(h('div', 'k', '同じ誕生日の有名人'), wiki, h('span', 'wsrc', `Wikipedia「${m}月${d}日」の誕生日の一覧が開きます`), h('div', 'k', `あなたも${m}月${d}日生まれ？`));
   const who = same.map(p => `${p.name}選手`).join('・');
   const a = h('a', 'postbtn'); a.target = '_blank'; a.rel = 'noopener noreferrer';
   a.href = xIntent(`私も${who}と同じ${m}月${d}日生まれ！🎂\n同じ誕生日の選手を応援しよう！\n${SITE.hashtags}`, SITE.url + '/roots/');

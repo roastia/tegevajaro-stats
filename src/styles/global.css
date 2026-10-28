@@ -350,3 +350,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .bcard .jno b { font-size: .95rem; }
 .bcard .nm > span:last-child { white-space: nowrap; }
 .bcard > .bpost { font-size: .72rem; padding: 3px 10px; }
+.bdpop .wiki { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 9px 12px; border-radius: 999px; border: 1px solid var(--brand); color: var(--ink); background: var(--tint); font-weight: 700; text-decoration: none; margin-top: 0; }
+.bdpop .wsrc { font-size: .65rem; color: var(--muted); text-align: center; }
+.season-rec .rank { font-weight: 700; background: rgba(255,255,255,.16); border-radius: 10px; padding: 0 10px; }
+.season-rec .rank b { font-size: clamp(1.8rem, 7vw, 2.4rem); line-height: 1.1; margin: 0 2px 0 4px; color: #FFF4C2; }
