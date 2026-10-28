@@ -7,8 +7,8 @@ import { seasonRecord } from '../lib/form.js';
 
 interface Props { title?: string; description?: string; image?: string; path?: string; current?: string }
 const { title, description, image = 'og/site.png', path = '', current = '' } = Astro.props;
-const fullTitle = title ? `${title}｜${SITE.short}` : `${SITE.name} ${SITE.tagline}（非公式ファンサイト）`;
-const desc = description || `テゲスタ！ テゲバジャーロ宮崎の今季の記録から作った、テゲサポが語りたくなるランキング（非公式ファンサイト）。${SITE.roundLabel}時点。`;
+const fullTitle = title ? `${title}｜${SITE.short}` : `${SITE.name} ${SITE.tagline}（非公式サポーターサイト）`;
+const desc = description || `テゲスタ！ テゲバジャーロ宮崎の今季の記録から作った、テゲサポが語りたくなるランキング（非公式サポーターサイト）。${SITE.roundLabel}時点。`;
 const pageUrl = SITE.url + '/' + path;
 const imageUrl = SITE.url + '/' + image;
 const d = getData();
@@ -49,7 +49,7 @@ const nav = [
   <header class="site-head">
     <div class="wrap">
       <div class="row">
-        <span class="badge">非公式ファンサイト</span>
+        <span class="badge">非公式サポーターサイト</span>
         <button class="theme-btn" id="themeBtn" type="button" aria-label="表示モードを切り替え（自動・ライト・ダーク）"><Fragment set:html={icon('moon')} /></button>
       </div>
       <h1><a href={href('')}>{SITE.name}</a><span class="tagline">{SITE.tagline}</span></h1>
@@ -78,7 +78,7 @@ const nav = [
   </main>
   <footer class="site-foot">
     <div class="wrap">
-      <p>このサイトは個人が運営する<b>非公式のファンサイト</b>です。テゲバジャーロ宮崎、Jリーグ、各データ提供元とは関係ありません。ランキングは公開データをもとに独自に集計したもので、公式記録ではありません。広告・収益化はしていません。</p>
+      <p>このサイトは個人が運営する<b>非公式のサポーターサイト</b>です。テゲバジャーロ宮崎、Jリーグ、各データ提供元とは関係ありません。ランキングは公開データをもとに独自に集計したもので、公式記録ではありません。広告・収益化はしていません。</p>
       <p>選手の写真・クラブのエンブレムは使用していません。選手名からJリーグ公式の選手ページへリンクしています。</p>
       <p>出典</p>
       <ul>

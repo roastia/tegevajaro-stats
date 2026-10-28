@@ -52,7 +52,7 @@ export function ogTree(item) {
       extra ? para({ fontSize: 24, opacity: 0.9, marginTop: 4 }, cut(extra, 50)) : null,
       item.cheer ? para({ fontSize: 30, fontWeight: 700, marginTop: 8 }, cut(item.cheer, 34)) : null),
     h('div', { position: 'absolute', left: 60, top: 572, width: 1080, display: 'flex', justifyContent: 'space-between', fontSize: 20, color: 'rgba(255,255,255,0.8)', borderTop: '2px solid rgba(255,255,255,0.25)', paddingTop: 10 },
-      h('span', {}, `${SITE.short}（非公式ファンサイト）`), h('span', {}, `${SITE.roundLabel}時点`)),
+      h('span', {}, `${SITE.short}（非公式サポーターサイト）`), h('span', {}, `${SITE.roundLabel}時点`)),
   );
 }
 
