@@ -1,4 +1,4 @@
-/* ===== テゲバ非公式ランキング：全体のスタイル ===== */
+/* ===== テゲスタ！：全体のスタイル ===== */
 @property --spin { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 
 :root {
@@ -385,3 +385,8 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .site-nav li { flex: none; }
 .site-nav a { margin-bottom: 0; }
 .seg { overscroll-behavior: contain; touch-action: pan-x; }
+
+/* サイト名「テゲスタ！」とサブタイトル */
+.site-head h1 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; font-size: clamp(1.8rem, 7vw, 2.6rem); letter-spacing: .02em; }
+.site-head h1 a { color: var(--ink); }
+.site-head .tagline { font-size: .95rem; font-weight: 700; color: var(--muted); letter-spacing: .04em; }

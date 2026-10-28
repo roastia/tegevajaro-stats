@@ -7,8 +7,8 @@ import { seasonRecord } from '../lib/form.js';
 
 interface Props { title?: string; description?: string; image?: string; path?: string; current?: string }
 const { title, description, image = 'og/site.png', path = '', current = '' } = Astro.props;
-const fullTitle = title ? `${title}｜${SITE.short}` : SITE.name;
-const desc = description || `テゲバジャーロ宮崎の今季の記録から作った、テゲサポが語りたくなるランキング（非公式ファンサイト）。${SITE.roundLabel}時点。`;
+const fullTitle = title ? `${title}｜${SITE.short}` : `${SITE.name} ${SITE.tagline}（非公式ファンサイト）`;
+const desc = description || `テゲスタ！ テゲバジャーロ宮崎の今季の記録から作った、テゲサポが語りたくなるランキング（非公式ファンサイト）。${SITE.roundLabel}時点。`;
 const pageUrl = SITE.url + '/' + path;
 const imageUrl = SITE.url + '/' + image;
 const d = getData();
@@ -31,7 +31,7 @@ const nav = [
   <meta name="theme-color" content="#C8375F" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content={SITE.name} />
+  <meta property="og:site_name" content={`${SITE.name} ${SITE.tagline}`} />
   <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={desc} />
   <meta property="og:url" content={pageUrl} />
@@ -52,7 +52,7 @@ const nav = [
         <span class="badge">非公式ファンサイト</span>
         <button class="theme-btn" id="themeBtn" type="button" aria-label="表示モードを切り替え（自動・ライト・ダーク）"><Fragment set:html={icon('moon')} /></button>
       </div>
-      <h1><a href={href('')}>{SITE.name}</a></h1>
+      <h1><a href={href('')}>{SITE.name}</a><span class="tagline">{SITE.tagline}</span></h1>
       <p class="lead">数字で見ると、今季のテゲバはもっとアツい。テゲサポが語りたくなるランキングを集めました。</p>
       <section class="season" aria-label="今季の成績">
         <div class="season-h"><span class="season-k">今季の成績</span><span class="season-when">J2 {SITE.roundLabel}時点（{SITE.lastMatch}まで）</span></div>

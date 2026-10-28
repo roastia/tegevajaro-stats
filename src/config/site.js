@@ -1,7 +1,8 @@
 // サイト全体の設定。試合ごとの更新では、ここの「時点」の項目も書き換える（CLAUDE.md 参照）。
 export const SITE = {
-  name: 'テゲバジャーロ宮崎 26/27 ランキング',
-  short: 'テゲバ非公式ランキング',
+  name: 'テゲスタ！',
+  tagline: 'テゲバのスタッツ',
+  short: 'テゲスタ！',
   url: 'https://roastia.github.io/tegevajaro-stats',
   // データの時点
   asOf: '2026-10-27',          // 年齢を数える基準日（最新の更新日）
