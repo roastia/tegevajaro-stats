@@ -186,11 +186,11 @@ dash.calc('records', {
     players.forEach(p => {
       const m = n(p.minutes), g = n(p.goals), a = n(p.assists);
       if (g + a > 0) add('ga', p.name, g + a, `${g + a}（${g}得点・${a}アシスト）`);
-      if (m > 0 && !isGK(p.name)) add('iron', p.name, m, `${m.toLocaleString()}分・出場率${Math.round(m / (R * 90) * 100)}%`);
-      if (n(p.apps) === R && R > 0 && !isGK(p.name)) add('allgames', p.name, n(p.starts), `全${R}試合（先発${n(p.starts)}）`);
+      if (m > 0 && !isGK(p.name)) add('iron', p.name, m, `${m.toLocaleString()}分（出場率${Math.round(m / (R * 90) * 100)}%）`);
+      if (n(p.apps) === R && R > 0 && !isGK(p.name)) add('allgames', p.name, n(p.starts), `先発${n(p.starts)}試合（全${R}試合に出場）`);
       if (g >= 2) add('per_goal', p.name, Math.round(m / g), `${Math.round(m / g)}分に1点`);
-      if (n(p.subs) > 0) add('super_sub', p.name, n(p.subs) * 100 + g, `途中出場${n(p.subs)}回・${g}得点`);
-      if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) <= 23 && m > 0 && !isGK(p.name)) add('young', p.name, m, `${ageOf[p.name]}歳・${m.toLocaleString()}分`);
+      if (n(p.subs) > 0) add('super_sub', p.name, n(p.subs) * 100 + g, `途中出場${n(p.subs)}回（${g}得点）`);
+      if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) <= 23 && m > 0 && !isGK(p.name)) add('young', p.name, m, `${m.toLocaleString()}分（${ageOf[p.name]}歳）`);
       if (n(p.shots) > 0) add('shooter', p.name, n(p.shots), `${n(p.shots)}本`);
       if (n(p.shots) >= 10) add('finisher', p.name, g / n(p.shots), `${(g / n(p.shots) * 100).toFixed(1)}%`);
       if (n(p.last_passes) > 0) add('creator', p.name, n(p.last_passes), `${n(p.last_passes)}本`);
@@ -198,7 +198,7 @@ dash.calc('records', {
     xg.forEach(x => { const d = n(x.goals) - n(x.xg); add('xg_over', x.name, d, `${d >= 0 ? '+' : ''}${d.toFixed(1)}点`); });
     cbp.forEach(c => { if (n(c.win) > 0) add('ball', c.name, n(c.win), '奪取ポイント'); });
     pass_pairs.forEach(p => add('combo', `${p.from} → ${p.to}`, n(p.count), `${n(p.count)}本`));
-    suspension.forEach(s => { if (n(s.yellow_counted) > 0) add('reach', s.name, n(s.yellow_counted), n(s.yellow_counted) >= 3 ? `累積${n(s.yellow_counted)}枚・次で停止` : `累積${n(s.yellow_counted)}枚`); });
+    suspension.forEach(s => { if (n(s.yellow_counted) > 0) add('reach', s.name, n(s.yellow_counted), n(s.yellow_counted) >= 3 ? `累積${n(s.yellow_counted)}枚（次で出場停止）` : `累積${n(s.yellow_counted)}枚`); });
 
     // 稼いだ勝ち点：そのゴールがなければ失っていた勝ち点
     const pts = {};
@@ -218,7 +218,7 @@ dash.calc('records', {
       if (list.length < 2) return;
       const w = list.filter(m => m.result === '勝').length, d = list.filter(m => m.result === '分').length, l = list.length - w - d;
       const ppg = (w * 3 + d) / list.length;
-      add('scored_record', nm, Math.round(ppg * 100) * 100 + list.length, `決めた${list.length}試合 ${w}勝${d}分${l}敗`);
+      add('scored_record', nm, Math.round(ppg * 100) * 100 + list.length, `${w}勝${d}分${l}敗（ゴールを決めた${list.length}試合）`);
     });
 
     // 後半のゴール、チーム得点に占める割合
@@ -233,8 +233,8 @@ dash.calc('records', {
       const ga = n(p.goals) + n(p.assists);
       if (ga > 0) add('ga90', p.name, ga / m * 90, `90分あたり${(ga / m * 90).toFixed(2)}`);
       if (n(p.shots) > 0) add('shot90', p.name, n(p.shots) / m * 90, `90分あたり${(n(p.shots) / m * 90).toFixed(1)}本`);
-      if (n(p.yellow) === 0 && n(p.red) === 0 && !isGK(p.name)) add('clean', p.name, m, `${m.toLocaleString()}分で警告ゼロ`);
-      if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) >= 28 && !isGK(p.name)) add('veteran', p.name, m, `${ageOf[p.name]}歳・${m.toLocaleString()}分`);
+      if (n(p.yellow) === 0 && n(p.red) === 0 && !isGK(p.name)) add('clean', p.name, m, `${m.toLocaleString()}分（警告ゼロ）`);
+      if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) >= 28 && !isGK(p.name)) add('veteran', p.name, m, `${m.toLocaleString()}分（${ageOf[p.name]}歳）`);
     });
 
     // シュート1本の質（xG÷シュート）
@@ -244,18 +244,18 @@ dash.calc('records', {
     // パス回しの中心
     const hub = {};
     pass_pairs.forEach(p => { [p.from, p.to].forEach(nm => { hub[nm] = (hub[nm] || 0) + n(p.count); }); });
-    Object.entries(hub).forEach(([nm, v]) => add('hub', nm, v, `上位コンビに${v}本関与`));
+    Object.entries(hub).forEach(([nm, v]) => add('hub', nm, v, `${v}本（よくつながるパス上位10組への関与）`));
 
     // トリビア
     const LL = { 北海道: [43.06, 141.35], 青森: [40.82, 140.74], 宮城: [38.27, 140.87], 東京: [35.69, 139.69], 神奈川: [35.45, 139.64], 千葉: [35.61, 140.12], 埼玉: [35.86, 139.65], 栃木: [36.57, 139.88], 群馬: [36.39, 139.06], 茨城: [36.34, 140.45], 新潟: [37.90, 139.02], 静岡: [34.98, 138.38], 愛知: [35.18, 136.91], 京都: [35.02, 135.76], 大阪: [34.69, 135.52], 兵庫: [34.69, 135.18], 奈良: [34.69, 135.83], 広島: [34.40, 132.46], 山口: [34.19, 131.47], 福岡: [33.61, 130.42], 佐賀: [33.25, 130.30], 長崎: [32.74, 129.87], 熊本: [32.79, 130.74], 大分: [33.24, 131.61], 宮崎: [31.91, 131.42], 鹿児島: [31.56, 130.56], 沖縄: [26.21, 127.68] };
     const km = (a, b) => { const r = Math.PI / 180, x = Math.sin((b[0] - a[0]) * r / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin((b[1] - a[1]) * r / 2) ** 2; return 2 * 6371 * Math.asin(Math.sqrt(x)); };
     profiles.forEach(p => {
-      if (LL[p.birthplace]) { const d = Math.round(km(LL[p.birthplace], LL['宮崎']) / 10) * 10; add('distance', p.name, d, `${p.birthplace}から約${d.toLocaleString()}km`); }
+      if (LL[p.birthplace]) { const d = Math.round(km(LL[p.birthplace], LL['宮崎']) / 10) * 10; add('distance', p.name, d, `約${d.toLocaleString()}km（${p.birthplace}から）`); }
       const steps = String(p.career || '').split('→').map(s => s.trim()).filter(Boolean);
       const tc = teamCount(p.career);
       if (tc) add('career_len', p.name, tc, `${tc}チーム・学校`);
       const mp = miyazakiPath(p.career);
-      if (mp.kind === 'loan_to_perm') add('chose', p.name, mp.loans, `期限付き${mp.loans}シーズン → 完全移籍`);
+      if (mp.kind === 'loan_to_perm') add('chose', p.name, mp.loans, `期限付き${mp.loans}シーズン（そのあと完全移籍）`);
       if (mp.kind === 'return') add('returnee', p.name, 1, '以前にも在籍');
       if (n(p.height) > 0) add('tall', p.name, n(p.height), `${n(p.height)}cm`);
     });
@@ -277,14 +277,14 @@ dash.calc('records', {
           ga += c;
           if (c === 0 && n(a.minutes) >= 90) cs++;
         });
-        if (mins >= 180) add('keeper', nm, ga / mins * 90, `出場${list.length}試合・90分あたり失点${(ga / mins * 90).toFixed(2)}・無失点${cs}試合`);
+        if (mins >= 180) add('keeper', nm, ga / mins * 90, `90分あたり失点${(ga / mins * 90).toFixed(2)}（出場${list.length}試合・無失点${cs}試合）`);
         return;
       }
       const all = rec3(list.map(a => resOf[String(a.round)]));
-      if (list.length >= 5) add('lucky', nm, Math.round(all.ppg * 100) * 100 + list.length, `出場${list.length}試合 ${all.w}勝${all.d}分${all.l}敗`);
+      if (list.length >= 5) add('lucky', nm, Math.round(all.ppg * 100) * 100 + list.length, `${all.w}勝${all.d}分${all.l}敗（出場${list.length}試合）`);
       const st = list.filter(a => n(a.started) === 1);
       const s = rec3(st.map(a => resOf[String(a.round)]));
-      if (st.length >= 5) add('starter', nm, Math.round(s.ppg * 100) * 100 + st.length, `先発${st.length}試合 ${s.w}勝${s.d}分${s.l}敗`);
+      if (st.length >= 5) add('starter', nm, Math.round(s.ppg * 100) * 100 + st.length, `${s.w}勝${s.d}分${s.l}敗（先発${st.length}試合）`);
       let gf = 0, ga = 0, mins = 0, subGf = 0;
       list.forEach(a => {
         mins += n(a.minutes);
@@ -300,7 +300,7 @@ dash.calc('records', {
         add('plusminus', nm, d, `${d > 0 ? '+' : ''}${d}（ピッチにいる間 得点${gf}・失点${ga}）`);
         if (mins >= 450) add('wall', nm, ga / mins * 90, `90分あたり失点${(ga / mins * 90).toFixed(2)}`);
       }
-      if (subGf > 0) add('impact', nm, subGf, `途中出場中にチーム${subGf}得点`);
+      if (subGf > 0) add('impact', nm, subGf, `${subGf}得点（途中出場してピッチにいた間のチームの得点）`);
     });
     // 先発同時出場コンビ
     const startersBy = {};
@@ -313,7 +313,7 @@ dash.calc('records', {
     Object.entries(pairs).forEach(([k, list]) => {
       if (list.length < 6 || k.split('＆').some(isGK)) return;
       const r = rec3(list);
-      add('golden_pair', k, Math.round(r.ppg * 100) * 100 + list.length, `一緒に先発${list.length}試合 ${r.w}勝${r.d}分${r.l}敗`);
+      add('golden_pair', k, Math.round(r.ppg * 100) * 100 + list.length, `${r.w}勝${r.d}分${r.l}敗（一緒に先発${list.length}試合）`);
     });
     // 試合の流れを変えたゴール
     Object.values(allByRound).forEach(list => {
@@ -409,14 +409,14 @@ dash.calc('topics', {
     if (lk) {
       const s = (lk.display.match(/(\d+勝\d+分\d+敗)/) || [])[1] || '';
       const unbeatenLk = /0敗$/.test(s);
-      add('lucky', '🍀', '勝利の女神', unbeatenLk ? `${lk.name}が出れば負けない！` : `${lk.name}が出ると勝つ！`, s, `${lk.display}。チームにいちばん勝ち点を運ぶ勝利の女神`, '今日もピッチで勝利を呼んでくれ！');
+      add('lucky', '🍀', '勝利の女神', unbeatenLk ? `${lk.name}が出れば負けない！` : `${lk.name}が出ると勝つ！`, s, `出場${(lk.display.match(/出場(\d+)試合/) || [])[1] || ''}試合で${s}。チームにいちばん勝ち点を運ぶ勝利の女神`, '今日もピッチで勝利を呼んでくれ！');
       used.add(lk.name);
     }
     const sorted = id => records.filter(r => r.record === id).sort((a, b) => b.value - a.value);
     const pm = sorted('plusminus').find(r => !used.has(r.name));
     if (pm) { add('plusminus', '➕', '影のMVP', `${pm.name}がいると点差が開く！`, `${pm.value > 0 ? '+' : ''}${pm.value}`, pm.display.replace(/^[+-]?\d+/, '').replace(/[（）]/g, ''), '数字に表れる影の貢献に拍手を！'); used.add(pm.name); }
     const gp = sorted('golden_pair').find(r => r.name.split('＆').every(nm => !used.has(nm))) || sorted('golden_pair').find(r => !lk || !r.name.split('＆').includes(lk.name));
-    if (gp) add('pair', '💞', '黄金コンビ', /0敗$/.test(gp.display) ? `${gp.name.replace('＆', '×')}、2人そろえば負けない！` : `${gp.name.replace('＆', '×')}、2人そろえば勝ち点が積み上がる！`, gp.display.replace(/^.*試合 /, ''), `${gp.display}`, 'このコンビをまた見たい！');
+    if (gp) add('pair', '💞', '黄金コンビ', /0敗/.test(gp.display.split('（')[0]) ? `${gp.name.replace('＆', '×')}、2人そろえば負けない！` : `${gp.name.replace('＆', '×')}、2人そろえば勝ち点が積み上がる！`, gp.display.split('（')[0], `${gp.display.split('（')[1].replace('）', '')}で${gp.display.split('（')[0]}`, 'このコンビをまた見たい！');
     return T.map((t, i) => ({ ...t, order: i + 1, post: `【テゲバ非公式ランキング】${t.headline}\n${t.sub}\n${t.cheer}\n#テゲバジャーロ宮崎 #テゲバ` }));
   }
 });

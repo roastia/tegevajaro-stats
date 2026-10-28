@@ -31,7 +31,7 @@ export function getData() {
 
 // ---- ポストできるもの（トピック・ランキング・背景）を一つの形にそろえる ----
 import { ICON_OF_TOPIC, ICON_OF_RECORD, plainTitle } from './meta.js';
-import { postText } from './util.js';
+import { postText, splitDisp } from './util.js';
 
 export function getShareables() {
   const d = getData();
@@ -44,7 +44,7 @@ export function getShareables() {
     if (!rows.length || meta.warn) continue;
     const champs = rows.filter(r => r._rank === 1);
     const names = champs.map(r => r.name).join('・');
-    const val = champs.length > 1 || meta.hideValue ? '' : champs[0].display;
+    const val = champs.length > 1 || meta.hideValue ? '' : splitDisp(champs[0].display)[0];
     const title = plainTitle(meta.title);
     out.push({ kind: 'r', id: meta.id, label: title, icon: ICON_OF_RECORD[meta.id] || 'star', headline: `${title} 1位は${names}！`,
       big: names, sub: val, cheer: meta.cheer || '', note: meta.note,

@@ -20,3 +20,11 @@ export function formSummary(matches) {
   const head = `${title}${badges.length ? '（' + badges.join('・') + '）' : ''}`;
   return { last, title, badges, sub, cheer, text: postText(head, `${sub}\n${line}`, cheer) };
 }
+
+/** 今季の成績（勝・分・敗・勝ち点・得失点） */
+export function seasonRecord(matches) {
+  const c = r => matches.filter(m => m.result === r).length;
+  const w = c('勝'), d = c('分'), l = c('負');
+  const gf = matches.reduce((s, m) => s + Number(m.gf), 0), ga = matches.reduce((s, m) => s + Number(m.ga), 0);
+  return { played: matches.length, w, d, l, pts: w * 3 + d, gf, ga, gd: gf - ga };
+}

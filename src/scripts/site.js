@@ -45,13 +45,16 @@ const soon = people.map(p => ({ p, b: bdayInfo(p.birth) })).filter(x => x.b && x
 const today = soon.filter(x => x.b.days === 0);
 
 const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+// 名前の前に「背番号」バッジ（数字だけだと背番号とわかりにくいため）
+const jnoName = p => { const nm = h('span', 'nm'); const no = h('span', 'jno'); no.append(h('small', null, '背番号'), h('b', null, p.no)); nm.append(no, h('span', null, p.name)); return nm; };
+const bdayBtn = (birth, label) => { const b = h('button', 'bdbtn'); b.type = 'button'; b.dataset.bdayOpen = birth; b.innerHTML = icon('cake'); b.append(label); return b; };
 const postLink = (text, label, cls = 'bpost') => { const a = h('a', cls); a.href = xIntent(text, SITE.url + '/'); a.target = '_blank'; a.rel = 'noopener noreferrer'; a.innerHTML = X_MARK; a.append(label); return a; };
 
 const hbd = document.getElementById('hbd');
 if (hbd && today.length) {
   const names = today.map(({ p }) => `${p.name}選手`).join('・');
   const cake = h('div', 'cake'); cake.innerHTML = icon('cake');
-  hbd.append(cake, h('div', 'msg', 'お誕生日おめでとう！'), h('div', 'who', today.map(({ p, b }) => `${p.no} ${p.name}選手　${b.turning}歳`).join('　／　')),
+  hbd.append(cake, h('div', 'msg', 'お誕生日おめでとう！'), h('div', 'who', today.map(({ p, b }) => `${p.name}選手（背番号${p.no}）　${b.turning}歳`).join('　／　')),
     postLink(`今日は${names}の誕生日！${today.length === 1 ? `${today[0].b.turning}歳、` : ''}おめでとうございます🎂🎉 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`, 'お祝いをXでポスト'));
   hbd.hidden = false;
   if (!reduced && !sessionStorageGet('confetti')) {
@@ -72,12 +75,12 @@ for (const box of document.querySelectorAll('.bday[data-bday]')) {
   const row = h('div', 'row');
   for (const { p, b } of soon) {
     const c = h('div', 'bcard' + (b.days === 0 ? ' today' : ''));
-    if (b.days === 0) c.append(h('span', 'cd', 'TODAY'), h('span', 'nm', `${p.no} ${p.name}`), h('span', 'bg2', 'おめでとう！'), h('span', 'cd', `今日で${b.turning}歳`));
-    else c.append(h('span', 'cd', `あと${b.days}日`), h('span', 'nm', `${p.no} ${p.name}`), h('span', 'cd', `${b.m}月${b.d}日で`), h('span', 'bg2', `${b.turning}歳`));
+    if (b.days === 0) c.append(h('span', 'cd', 'TODAY'), jnoName(p), h('span', 'bg2', 'おめでとう！'), h('span', 'cd', `今日で${b.turning}歳`));
+    else c.append(h('span', 'cd', `あと${b.days}日`), jnoName(p), bdayBtn(p.birth, `${b.m}月${b.d}日で`), h('span', 'bg2', `${b.turning}歳`));
     const text = b.days === 0
       ? `今日${b.m}月${b.d}日は${p.name}選手の${b.turning}歳の誕生日！おめでとうございます🎂 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`
       : `${b.m}月${b.d}日は${p.name}選手の${b.turning}歳の誕生日🎂 あと${b.days}日！ みんなでお祝いしよう\n${SITE.hashtags}`;
-    c.append(postLink(text, b.days === 0 ? `${p.name}選手をXでお祝い` : `${p.name}選手の誕生日をXでポスト`));
+    c.append(postLink(text, b.days === 0 ? 'Xでお祝い' : 'Xでポスト'));
     row.append(c);
   }
   box.append(t, row);
@@ -117,3 +120,37 @@ if (!reduced && 'IntersectionObserver' in window) {
   }, { threshold: 0.6 });
   document.querySelectorAll('[data-count]').forEach(e => io.observe(e));
 }
+
+/* ---------- 同じ誕生日の人（誕生日を押すと開く。Popover API） ---------- */
+let bdPop;
+function openBday(birth) {
+  if (!birth) return;
+  const [, m, d] = birth.split('-').map(Number);
+  const md = birth.slice(5);
+  const same = people.filter(p => p.birth && p.birth.slice(5) === md);
+  const month = people.filter(p => p.birth && Number(p.birth.slice(5, 7)) === m && p.birth.slice(5) !== md).sort((a, b) => a.birth.slice(8).localeCompare(b.birth.slice(8)));
+  if (!bdPop) { bdPop = h('div', 'bdpop'); bdPop.popover = 'auto'; bdPop.id = 'bdpop'; bdPop.setAttribute('role', 'dialog'); document.body.append(bdPop); }
+  bdPop.textContent = '';
+  const close = h('button', 'x', '×'); close.type = 'button'; close.setAttribute('aria-label', '閉じる'); close.addEventListener('click', () => bdPop.hidePopover());
+  const t = h('div', 'ttl'); t.innerHTML = icon('cake'); t.append(`${m}月${d}日生まれ`);
+  bdPop.append(close, t, h('div', 'k', 'テゲバの同じ誕生日'));
+  const ul = h('ul');
+  same.forEach(p => { const b = bdayInfo(p.birth); ul.append(h('li', null, `${p.name}（背番号${p.no}・${p.pos}・${Number(p.birth.slice(0, 4))}年生まれ）${b && b.days === 0 ? '　今日が誕生日！' : ''}`)); });
+  bdPop.append(ul);
+  if (same.length === 1) bdPop.append(h('p', 'note', `チームで${m}月${d}日生まれは${same[0].name}選手だけ！`));
+  if (month.length) bdPop.append(h('div', 'k', `同じ${m}月生まれのチームメイト`), h('p', null, month.map(p => `${p.name}（${m}/${Number(p.birth.slice(8))}）`).join('、')));
+  const wiki = h('a', 'wiki', `${m}月${d}日生まれの有名人を見る（Wikipedia）`);
+  wiki.href = `https://ja.wikipedia.org/wiki/${m}%E6%9C%88${d}%E6%97%A5#%E8%AA%95%E7%94%9F%E6%97%A5`; wiki.target = '_blank'; wiki.rel = 'noopener noreferrer';
+  bdPop.append(wiki, h('div', 'k', `あなたも${m}月${d}日生まれ？`));
+  const who = same.map(p => `${p.name}選手`).join('・');
+  const a = h('a', 'postbtn'); a.target = '_blank'; a.rel = 'noopener noreferrer';
+  a.href = xIntent(`私も${who}と同じ${m}月${d}日生まれ！🎂\n同じ誕生日の選手を応援しよう！\n${SITE.hashtags}`, SITE.url + '/roots/');
+  a.innerHTML = X_MARK; const lb = h('span'); lb.append(h('b', 'nw', '「同じ誕生日」'), h('span', 'nw', 'をXでポスト')); a.append(lb);
+  bdPop.append(a);
+  bdPop.showPopover();
+  close.focus();
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest?.('[data-bday-open]');
+  if (b) { e.preventDefault(); e.stopPropagation(); openBday(b.dataset.bdayOpen); }
+});

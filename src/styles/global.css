@@ -292,3 +292,47 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .ages .ag { text-align: right; }
 .ages .soon { display: flex; align-items: center; gap: 2px; width: max-content; margin: 2px 0 0 auto; }
 .ages .soon .ic { width: 1em; height: 1em; }
+
+/* ランキング：説明は「?」、内訳は行をタップしたときだけ出す */
+.rec h2 .ttl { flex: 1; }
+.rec h2 .info { margin-left: 2px; }
+.rec h2 .src { margin-left: 0; }
+.rank li.has-det { cursor: pointer; }
+.rank li.has-det > .dv::after { content: ' ▾'; font-size: .65rem; color: var(--muted); }
+.rank li.has-det[aria-expanded='true'] > .dv::after { content: ' ▴'; }
+.rank li.has-det:focus-visible { outline: 2px solid var(--brand); }
+.rank li > .det { flex: 0 0 100%; padding: 2px 0 2px 2.4rem; font-size: .75rem; color: var(--muted); text-align: left; }
+
+/* 今季の成績（全ページのいちばん上） */
+.season { margin-top: 12px; border-radius: var(--radius); padding: 12px 16px; color: #fff; background: linear-gradient(120deg, var(--brand-dark), var(--brand-deep) 60%, var(--brand)); display: flex; flex-direction: column; gap: 2px; }
+.season-h { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: .78rem; }
+.season-k { font-weight: 700; background: rgba(255,255,255,.18); border-radius: 999px; padding: 0 10px; }
+.season-when { opacity: .9; }
+.season-rec { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 18px; }
+.season-rec .wdl { font-size: 1rem; font-weight: 700; }
+.season-rec .wdl b, .season-rec .pts b { font-size: clamp(1.8rem, 7vw, 2.4rem); line-height: 1.1; margin: 0 2px 0 6px; color: #FFF4C2; font-variant-numeric: tabular-nums; }
+.season-rec .wdl b:first-child { margin-left: 0; }
+.season-rec .pts { font-size: .9rem; font-weight: 700; }
+.season-rec .gl { font-size: .85rem; opacity: .95; }
+
+/* 誕生日ボタンと「同じ誕生日」パネル */
+.bdbtn { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; border-bottom: 1px dotted currentColor; }
+.bdbtn .ic { width: 1em; height: 1em; }
+.bdbtn:focus-visible { outline: 2px solid var(--brand); }
+.chip.bdbtn { border: 1px dashed var(--line); border-radius: 999px; padding: 1px 9px; color: var(--muted); }
+.bcard .bdbtn { align-self: flex-start; font-size: .78rem; }
+.bcard .nm { display: flex; align-items: center; gap: 8px; }
+.jno { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-width: 2.4rem; padding: 2px 6px; border-radius: 8px; background: #fff; color: #B8571A; line-height: 1; flex: none; }
+.jno small { font-size: .55rem; font-weight: 700; }
+.jno b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.bdpop { width: min(26rem, calc(100vw - 32px)); max-height: 85vh; overflow: auto; border: 0; border-top: 4px solid var(--brand); border-radius: 16px; padding: 18px; background: var(--panel); color: var(--fg); box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+.bdpop::backdrop { background: rgba(0,0,0,.35); }
+.bdpop[popover]:popover-open { display: flex; flex-direction: column; gap: 6px; }
+.bdpop .ttl { font-weight: 700; font-size: 1.3rem; color: var(--ink); display: flex; align-items: center; gap: 4px; }
+.bdpop .k { font-size: .78rem; color: var(--muted); margin-top: 6px; }
+.bdpop ul { margin: 0; padding-left: 1.2em; }
+.bdpop p { margin: 0; }
+.bdpop .note { font-size: .8rem; color: var(--muted); }
+.bdpop .x { all: unset; cursor: pointer; position: absolute; right: 12px; top: 8px; font-size: 22px; line-height: 1; color: var(--muted); padding: 4px; }
+.bdpop .wiki { margin-top: 4px; }
+.bpost { white-space: nowrap; }

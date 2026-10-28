@@ -50,6 +50,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
             <span data-bslot="bchip"></span>
           </div>
           <div class="pbody">
+            {p.birth && <div class="chips"><button class="chip prof bdbtn" type="button" data-bday-open={p.birth}><Fragment set:html={icon('cake')} />{Number(p.birth.slice(5, 7))}月{Number(p.birth.slice(8))}日生まれ</button></div>}
             {(p.hs_or_youth || p.university) && <div class="chips">{[p.hs_or_youth, p.university].filter(Boolean).map(s => <span class="chip prof"><Fragment set:html={icon('cap')} />{s}</span>)}</div>}
             {ts.length > 0 && <div class="chips">{ts.map(t => t.anchor
               ? <a class={`chip ${t.cls}`} href={href(t.anchor)}><Fragment set:html={icon(ICON_OF_RECORD[t.id] || 'star')} />{t.text}</a>

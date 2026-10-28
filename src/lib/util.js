@@ -33,3 +33,11 @@ export const POS_COLOR = { GK: '#8C6A12', DF: '#2F5E9E', MF: '#2E7D4F', FW: '#6A
 /** 公式サイト・YouTube 以外の URL は出さない */
 export const safeUrl = u => /^https:\/\/(www\.)?(youtube\.com|youtu\.be|jleague\.jp)\//.test(u || '') ? u : '';
 export const playerUrl = u => /^https:\/\/www\.jleague\.jp\/player\/\d+\/$/.test(u || '') ? u : '';
+
+/** 「メインの数字（内訳）」をメインと内訳に分ける。内訳はタップしたときだけ見せる */
+export function splitDisp(s) {
+  s = String(s || '');
+  const i = s.indexOf('（');
+  if (i < 0) return [s, ''];
+  return [s.slice(0, i), s.slice(i).replace(/）／/g, '／').replace(/）・/g, '・').replace(/[（）]/g, ' ').replace(/\s+/g, ' ').trim()];
+}

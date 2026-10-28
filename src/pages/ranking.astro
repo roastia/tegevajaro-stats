@@ -67,6 +67,18 @@ const tiles = [
     set(b.dataset.cat || '');
     history.replaceState(null, '', b.dataset.cat ? '#' + b.dataset.cat : location.pathname);
   });
+  // 行をタップすると内訳（「ピッチにいる間 得点18・失点13」など）を開く
+  const toggleRow = (li: HTMLElement) => {
+    const det = li.querySelector<HTMLElement>('.det'); if (!det) return;
+    det.hidden = !det.hidden; li.setAttribute('aria-expanded', String(!det.hidden));
+  };
+  document.getElementById('recGrid')?.addEventListener('click', e => {
+    const li = (e.target as HTMLElement).closest<HTMLElement>('li.has-det'); if (li) toggleRow(li);
+  });
+  document.getElementById('recGrid')?.addEventListener('keydown', e => {
+    const li = (e.target as HTMLElement).closest<HTMLElement>('li.has-det');
+    if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleRow(li); }
+  });
   const h = location.hash.slice(1);
   if (h && seg?.querySelector(`[data-cat="${CSS.escape(h)}"]`)) set(h);
 </script>
