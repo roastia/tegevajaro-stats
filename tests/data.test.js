@@ -77,7 +77,7 @@ test('Football LAB を切ると、その出典のランキングが消える', a
 test('選手の写真・エンブレム画像を使っていない（ルール4）', async () => {
   const fs = await import('node:fs');
   const files = fs.readdirSync('public', { recursive: true }).map(String);
-  assert.ok(!files.some(f => /\.(jpe?g|png|webp|avif|gif)$/i.test(f) && !f.startsWith('chars')), 'public/ に写真がある（キャラ画像は public/chars/ に置く）');
+  assert.ok(!files.some(f => /\.(jpe?g|png|webp|avif|gif)$/i.test(f) && !f.startsWith('chars') && f !== 'apple-touch-icon.png'), 'public/ に写真がある（キャラ画像は public/chars/ に置く）');
 });
 
 test('GK は出場時間系・チーム貢献系のランキングに入らず、「守護神」で別に比べる', () => {

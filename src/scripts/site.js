@@ -25,6 +25,28 @@ document.getElementById('themeBtn')?.addEventListener('click', () => {
   store.set('theme', next); applyTheme(next);
 });
 
+/* ---------- ページごとのスクロール位置 ----------
+   メニューで初めて開くページは一番上から。一度見たページは、前に見ていた位置から。 */
+const ss = {
+  get: k => { try { return sessionStorage.getItem(k); } catch { return null; } },
+  set: (k, v) => { try { v === null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch { /* 保存できなくても動く */ } },
+};
+const posKey = () => 'tg:scroll:' + location.pathname;
+const savePos = () => ss.set(posKey(), String(Math.round(scrollY)));
+document.querySelectorAll('.site-nav a').forEach(a => a.addEventListener('click', () => { savePos(); ss.set('tg:navjump', '1'); }));
+addEventListener('pagehide', savePos);
+{
+  const nav = performance.getEntriesByType('navigation')[0];
+  if (ss.get('tg:navjump') && (!nav || nav.type === 'navigate')) {
+    const y = Number(ss.get(posKey()) || 0);
+    scrollTo({ top: y, behavior: 'instant' });
+    requestAnimationFrame(() => scrollTo({ top: y, behavior: 'instant' }));
+    // 文字や誕生日の表示でページが伸びたあとに、もう一度合わせる（その前に自分で動かしたら何もしない）
+    addEventListener('load', () => { if (Math.abs(scrollY - y) > 2 && scrollY < y) scrollTo({ top: y, behavior: 'instant' }); }, { once: true });
+  }
+  ss.set('tg:navjump', null);
+}
+
 /* ---------- 誕生日（日本時間の今日から数える） ---------- */
 function todayJst() {
   const [y, m, d] = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-').map(Number);
