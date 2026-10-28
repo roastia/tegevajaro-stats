@@ -7,14 +7,14 @@ import { getData } from '../src/lib/data.js';
 
 // 丸首・袖にライン・まっすぐな胴のシンプルなサッカーシャツ（このサイト用に描いたオリジナル）
 const face = `
-  <path d="M37 14 L20 21 L7 47 L21 52 L27 40 L27 90 L73 90 L73 40 L79 52 L93 47 L80 21 L63 14" />
-  <path d="M37 14 Q50 30 63 14" />
-  <path d="M37 14 Q50 20 63 14" />
-  <path d="M24 26 L13 46 M76 26 L87 46" />`;
+  <path d="M37 13 L19 20 L6 48 L22 54 L28 41 L28 92 L72 92 L72 41 L78 54 L94 48 L81 20 L63 13" />
+  <path d="M37 13 Q50 31 63 13" />
+  <path d="M37 13 Q50 19 63 13" />
+  <path d="M26 22 L13 51 M74 22 L87 51" />`;
 const svg = no => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="背番号${no}">
-<g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="butt" stroke-linejoin="round">${face}
+<g fill="none" stroke="currentColor" stroke-width="4.6" stroke-linecap="butt" stroke-linejoin="round">${face}
 </g>
-<text x="50" y="${no.length > 1 ? 74 : 76}" text-anchor="middle" font-family="'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" font-weight="500" font-size="${no.length > 1 ? 30 : 34}" fill="currentColor">${no}</text>
+<text x="50" y="${no.length > 1 ? 78 : 82}" text-anchor="middle" font-family="'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" font-weight="500" letter-spacing="${no.length > 1 ? -1 : 0}" font-size="${no.length > 1 ? 31 : 44}" fill="currentColor">${no}</text>
 </svg>
 `;
 const nos = [...new Set(getData().profiles.map(p => String(p.no)).filter(Boolean))].sort((a, b) => a - b);
