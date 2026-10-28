@@ -363,5 +363,5 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 :root[data-theme='dark'] .jersey:not(.on-color) { filter: invert(1); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .jersey:not(.on-color) { filter: invert(1); } }
 .ages li { grid-template-columns: 1.6rem 2.75rem 1fr auto; }
-/* 誕生日カード（オレンジの上）は白い台の上に黒い線画で */
-.bcard .jersey.on-color { filter: none; background: #fff; border-radius: 10px; padding: 2px; width: 2.6rem; height: 2.6rem; }
+/* 誕生日カード（オレンジの上）は台なし・透過のまま黒い線画で */
+.bcard .jersey.on-color { filter: none; width: 2.75rem; height: 2.75rem; }
