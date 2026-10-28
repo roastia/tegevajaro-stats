@@ -139,6 +139,22 @@ addEventListener('pagehide', savePos);
   document.querySelectorAll('.rank li > span:nth-child(3), .vlist .gh').forEach(n => ro.observe(n));
 }
 
+/* ---------- 絞り込みのチップ ---------- */
+{
+  const SEL = '.seg button';
+// チップの幅を整数の px にそろえる（幅が半端だと、iPhone で枠の右の線だけ細く見えるため）
+const snapChips = root => {
+  const bs = [...root.querySelectorAll(SEL)].filter(b => b.offsetParent);
+  bs.forEach(b => { b.style.width = ''; });
+  const ws = bs.map(b => b.getBoundingClientRect().width);
+  bs.forEach((b, i) => { b.style.width = Math.ceil(ws[i]) + 'px'; });
+};
+  const run = () => snapChips(document);
+  run();
+  document.fonts?.ready.then(run);
+  let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(run, 100); });
+}
+
 /* ---------- 誕生日（日本時間の今日から数える） ---------- */
 function todayJst() {
   const [y, m, d] = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-').map(Number);
