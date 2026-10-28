@@ -24,7 +24,14 @@ const bigSize = s => { const n = [...String(s)].reduce((a, c) => a + (c.codePoin
 // 文節ごとの塊にして並べ、塊の途中では改行しない（BudouX）
 const budoux = loadDefaultJapaneseParser();
 const phrases = (t, style = {}) => budoux.parse(String(t)).map(p => ({ type: 'span', props: { style: { ...style }, children: p } }));
-const para = (style, text) => ({ type: 'div', props: { style: { display: 'flex', flexWrap: 'wrap', ...style }, children: phrases(text) } });
+// 文（。！？／ で終わる）ごとの箱に入れ、収まらない文は箱ごと次の行へ
+const sentences = t => String(t).split(/(?<=[。！？!?／])/).filter(Boolean);
+const clauses = t => String(t).split(/(?<=[、，：])/).filter(Boolean);
+const box = children => ({ type: 'div', props: { style: { display: 'flex', flexWrap: 'wrap', maxWidth: '100%' }, children } });
+// 文 → 節（、）→ 文節 の順に、収まらない塊を次の行へ送る
+const group = (parts, f) => parts.length < 2 ? f(parts[0] ?? '') : parts.map(p => box(f(p)));
+const para = (style, text) => ({ type: 'div', props: { style: { display: 'flex', flexWrap: 'wrap', ...style },
+  children: group(sentences(text), s => group(clauses(s), phrases)) } });
 const cut = (t, n) => { const a = [...String(t)]; return a.length > n ? a.slice(0, n - 1).join('') + '…' : a.join(''); };
 
 export function ogTree(item) {

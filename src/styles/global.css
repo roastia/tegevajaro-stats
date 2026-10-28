@@ -256,3 +256,6 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .share > .shot, .share > a { flex: 1; }
 .share > a { display: flex; flex-direction: column; }
 .share > a > .shot { flex: 1; }
+
+/* 文のまとまり：行に入りきらないときは文ごと次の行へ（「。」の後ろで改行） */
+.ss { display: inline-block; max-width: 100%; }

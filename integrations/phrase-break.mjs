@@ -11,6 +11,17 @@ const SKIP = /^(script|style|title|textarea|pre|code|svg)$/i;
 const dec = s => s.replace(/&(amp|lt|gt|quot|#39|#x27);/g, (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", '#x27': "'" }[e]));
 const enc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// 文（。！？／ で終わる）ごとに <span class="ss">（inline-block）で包み、文の中は文節の切れ目に <wbr>。
+// → 文が行に収まらないときは文ごと次の行へ送られ、「。」の後ろで改行される。
+export const splitSentences = t => t.split(/(?<=[。！？!?／])/).filter(Boolean);
+// 文の中は「、」「：」で区切った節も同じく箱にする（文 → 節 → 文節 の順に優先して改行）
+export const splitClauses = t => t.split(/(?<=[、，：])/).filter(Boolean);
+export function breakText(text) {
+  const phr = s => enc(parser.parse(s).join('\u0000')).replace(/\u0000/g, '<wbr>');
+  const group = (parts, f) => parts.length < 2 ? f(parts[0] ?? '') : parts.map(p => `<span class="ss">${f(p)}</span>`).join('<wbr>');
+  return group(splitSentences(text), s => group(splitClauses(s), phr));
+}
+
 export function addPhraseBreaks(html) {
   let out = '', i = 0;
   const skip = [];
@@ -18,7 +29,7 @@ export function addPhraseBreaks(html) {
   let m;
   while ((m = re.exec(html))) {
     const text = html.slice(i, m.index);
-    out += skip.length || !JP.test(text) ? text : enc(parser.parse(dec(text)).join('\u0000')).replace(/\u0000/g, '<wbr>');
+    out += skip.length || !JP.test(text) ? text : breakText(dec(text));
     out += m[0];
     i = re.lastIndex;
     if (m[2] && SKIP.test(m[2]) && !m[3].endsWith('/')) { if (m[1]) skip.pop(); else skip.push(m[2]); }

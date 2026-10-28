@@ -48,5 +48,5 @@
 - 外部から読み込むのは Google Fonts だけ。スクリプトの CDN は使わない（npm で入れてバンドルする）。
 - 部品の追加は最小限に。`npm install --save-exact` で版を固定し、出て2週間以内の版は避ける。
 - GitHub Actions の外部 Action は公式のみ、コミット SHA で固定する。
-- 日本語の改行は BudouX（ビルド後に `<wbr>` を挿入：`integrations/phrase-break.mjs`）＋ CSS の `word-break: keep-all`。画像内は文節ごとの塊で並べる（`src/lib/og.js`）。
+- 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。ポスト用画像も同じ順で塊にして並べる（`src/lib/og.js`）。
 - 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。
