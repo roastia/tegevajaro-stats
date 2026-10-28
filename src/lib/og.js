@@ -4,6 +4,7 @@ import path from 'node:path';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { ICONS } from './meta.js';
+import { loadDefaultJapaneseParser } from 'budoux';
 import { SITE } from '../config/site.js';
 
 const FONT_DIR = path.resolve(process.cwd(), 'src/assets/fonts');
@@ -20,6 +21,10 @@ const iconSrc = name => 'data:image/svg+xml;base64,' + Buffer.from(
 /** 文字数に合わせて大きな数字のサイズを決める */
 const bigSize = s => { const n = [...String(s)].reduce((a, c) => a + (c.codePointAt(0) > 0xff ? 2 : 1), 0); return n <= 6 ? 140 : n <= 10 ? 112 : n <= 16 ? 84 : 60; };
 
+// 文節ごとの塊にして並べ、塊の途中では改行しない（BudouX）
+const budoux = loadDefaultJapaneseParser();
+const phrases = (t, style = {}) => budoux.parse(String(t)).map(p => ({ type: 'span', props: { style: { ...style }, children: p } }));
+const para = (style, text) => ({ type: 'div', props: { style: { display: 'flex', flexWrap: 'wrap', ...style }, children: phrases(text) } });
 const cut = (t, n) => { const a = [...String(t)]; return a.length > n ? a.slice(0, n - 1).join('') + '…' : a.join(''); };
 
 export function ogTree(item) {
@@ -33,12 +38,12 @@ export function ogTree(item) {
       { type: 'img', props: { src: iconSrc(item.icon), width: 68, height: 68 } }),
     h('div', { position: 'absolute', left: 60, top: 48, width: 920, display: 'flex', flexDirection: 'column' },
       h('div', { display: 'flex', fontSize: 28, opacity: 0.92, letterSpacing: 2 }, kicker),
-      h('div', { display: 'flex', fontSize: 44, fontWeight: 700, lineHeight: 1.3, marginTop: 8 }, cut(headline, 44))),
+      para({ fontSize: 44, fontWeight: 700, lineHeight: 1.3, marginTop: 8 }, cut(headline, 44))),
     h('div', { position: 'absolute', left: 60, bottom: 76, width: 1080, display: 'flex', flexDirection: 'column' },
       h('div', { display: 'flex', fontSize: bigSize(item.big), fontWeight: 700, color: '#FFF4C2', lineHeight: 1.05 }, cut(item.big, 18)),
-      item.sub ? h('div', { display: 'flex', fontSize: 26, opacity: 0.95, marginTop: 10, lineHeight: 1.4 }, cut(item.sub, 52)) : null,
-      extra ? h('div', { display: 'flex', fontSize: 24, opacity: 0.9, marginTop: 4 }, cut(extra, 50)) : null,
-      item.cheer ? h('div', { display: 'flex', fontSize: 30, fontWeight: 700, marginTop: 8 }, cut(item.cheer, 34)) : null),
+      item.sub ? para({ fontSize: 26, opacity: 0.95, marginTop: 10, lineHeight: 1.4 }, cut(item.sub, 52)) : null,
+      extra ? para({ fontSize: 24, opacity: 0.9, marginTop: 4 }, cut(extra, 50)) : null,
+      item.cheer ? para({ fontSize: 30, fontWeight: 700, marginTop: 8 }, cut(item.cheer, 34)) : null),
     h('div', { position: 'absolute', left: 60, top: 572, width: 1080, display: 'flex', justifyContent: 'space-between', fontSize: 20, color: 'rgba(255,255,255,0.8)', borderTop: '2px solid rgba(255,255,255,0.25)', paddingTop: 10 },
       h('span', {}, `${SITE.short}（非公式ファンサイト）`), h('span', {}, `${SITE.roundLabel}時点`)),
   );

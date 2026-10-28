@@ -240,7 +240,10 @@ table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertic
 .xm { width: 1em; height: 1em; flex: none; }
 .bpost .xm { width: .95em; height: .95em; }
 /* 日本語の見出しを文節で折り返す（対応ブラウザのみ）・行の長さをそろえる */
-h1, h2, .hl, .cheer, .shot .hl, .page-lead { word-break: auto-phrase; text-wrap: balance; }
+/* 日本語は文節（<wbr> の位置）でだけ改行する。長すぎる語だけは折り返す */
+body { word-break: keep-all; overflow-wrap: anywhere; line-break: strict; }
+h1, h2, .hl, .cheer, .champ .nm { text-wrap: balance; }
+p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .rank li { grid-template-columns: 1.7rem max-content minmax(0, 1fr); }
 .rank li > span:nth-child(3) { white-space: nowrap; }
 .rank .dv { overflow-wrap: anywhere; }

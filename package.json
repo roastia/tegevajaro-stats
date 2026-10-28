@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "astro": "7.3.8",
+    "budoux": "0.9.3",
     "canvas-confetti": "1.9.4"
   },
   "devDependencies": {
