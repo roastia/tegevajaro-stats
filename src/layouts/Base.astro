@@ -52,7 +52,7 @@ const nav = [
         <span class="badge">非公式サポーターサイト</span>
         <button class="theme-btn" id="themeBtn" type="button" aria-label="表示モードを切り替え（自動・ライト・ダーク）"><Fragment set:html={icon('moon')} /></button>
       </div>
-      <h1><a href={href('')}>{SITE.name}</a><span class="tagline">{SITE.tagline}</span></h1>
+      <h1><a href={href('')} class="logo-link"><img class="logo" src={href('logo-tegesta.svg')} alt={SITE.name} width="1731" height="388" /></a><span class="tagline">{SITE.tagline}</span></h1>
       <p class="lead">数字で見ると、今季のテゲバはもっとアツい。テゲサポが語りたくなるランキングを集めました。</p>
       <section class="season" aria-label="今季の成績">
         <div class="season-h"><span class="season-k">今季の成績</span><span class="season-when">J2 {SITE.roundLabel}時点（{SITE.lastMatch}まで）</span></div>

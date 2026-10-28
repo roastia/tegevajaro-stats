@@ -15,6 +15,10 @@ const loadFonts = () => fonts ||= [
 ];
 
 const h = (type, style, ...children) => ({ type, props: { style, children: children.flat().filter(c => c !== null && c !== undefined && c !== false && c !== '') } });
+// サイトのロゴ（白）。ポスト用画像の背景はピンクなので白で載せる
+let logoSrc;
+const loadLogo = () => logoSrc ||= 'data:image/svg+xml;base64,' + Buffer.from(
+  fs.readFileSync(path.resolve(process.cwd(), 'public/logo-tegesta.svg'), 'utf8').replace(/fill="#[0-9A-Fa-f]{6}"/, 'fill="#ffffff"')).toString('base64');
 const iconSrc = name => 'data:image/svg+xml;base64,' + Buffer.from(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ICONS.sparkle}</svg>`).toString('base64');
 
@@ -52,7 +56,7 @@ export function ogTree(item) {
       extra ? para({ fontSize: 24, opacity: 0.9, marginTop: 4 }, cut(extra, 50)) : null,
       item.cheer ? para({ fontSize: 30, fontWeight: 700, marginTop: 8 }, cut(item.cheer, 34)) : null),
     h('div', { position: 'absolute', left: 60, top: 572, width: 1080, display: 'flex', justifyContent: 'space-between', fontSize: 20, color: 'rgba(255,255,255,0.8)', borderTop: '2px solid rgba(255,255,255,0.25)', paddingTop: 10 },
-      h('span', {}, `${SITE.short}（非公式サポーターサイト）`), h('span', {}, `${SITE.roundLabel}時点`)),
+      h('div', { display: 'flex', alignItems: 'center' }, { type: 'img', props: { src: loadLogo(), width: 116, height: 26 } }, h('span', { marginLeft: 8 }, '（非公式サポーターサイト）')), h('span', {}, `${SITE.roundLabel}時点`)),
   );
 }
 

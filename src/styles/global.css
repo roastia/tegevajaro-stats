@@ -387,6 +387,9 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .seg { overscroll-behavior: contain; touch-action: pan-x; }
 
 /* サイト名「テゲスタ！」とサブタイトル */
-.site-head h1 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; font-size: clamp(1.8rem, 7vw, 2.6rem); letter-spacing: .02em; }
+.site-head h1 { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 2px 12px; font-size: clamp(1.8rem, 7vw, 2.6rem); letter-spacing: .02em; }
 .site-head h1 a { color: var(--ink); }
+.site-head .logo-link { display: block; line-height: 0; }
+.site-head .logo { display: block; height: clamp(40px, 11vw, 58px); width: auto; }
+.site-head .tagline { padding-bottom: 2px; }
 .site-head .tagline { font-size: .95rem; font-weight: 700; color: var(--muted); letter-spacing: .04em; }
