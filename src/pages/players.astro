@@ -23,7 +23,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
     <h2>選手の称号</h2>
     <p class="note">ランキングで3位以内に入ると称号ゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>
     <div class="controls">
-      <input id="pq" type="search" placeholder="選手名で検索" aria-label="選手名で検索" />
+      <input id="pq" type="search" placeholder="名前・よみ・ローマ字で検索" aria-label="選手名で検索（漢字・ひらがな・ローマ字）" />
       <div class="seg" id="posSeg" role="group" aria-label="ポジション">
         {['', 'GK', 'DF', 'MF', 'FW'].map((p, i) => <button type="button" data-pos={p} aria-pressed={i === 0 ? 'true' : 'false'}>{p || '全員'}</button>)}
       </div>
@@ -40,7 +40,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
       const u = playerUrl(urlOf.get(p.name));
       const age = ageOf.get(p.name);
       return (
-        <section class={`card pcard reveal pos-${['GK','DF','MF','FW'].includes(p.pos) ? p.pos : 'x'}`} data-name={p.name} data-pos={p.pos} data-no={p.no} data-birth={p.birth || undefined} data-age-out={p.birth ? `age-${p.no}` : undefined}>
+        <section class={`card pcard reveal pos-${['GK','DF','MF','FW'].includes(p.pos) ? p.pos : 'x'}`} data-name={p.name} data-kana={p.kana || undefined} data-roma={p.romaji || undefined} data-pos={p.pos} data-no={p.no} data-birth={p.birth || undefined} data-age-out={p.birth ? `age-${p.no}` : undefined}>
           <div class="pband">
             <img class="jersey jersey-lg on-color" src={href(`chars/numbers-s/${p.no}.png`)} alt={`背番号${p.no}`} width="72" height="72" loading="lazy" decoding="async" />
             <div>
@@ -67,8 +67,10 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
   a.chip:hover { border-color: var(--brand); color: var(--ink); }
 </style>
 <script>
+  import { nameKeys, matchName } from '../lib/namesearch.js';
   const grid = document.getElementById('pGrid')!;
   const cards = [...grid.querySelectorAll<HTMLElement>('.pcard')];
+  const keys = new Map(cards.map(c => [c, nameKeys({ name: c.dataset.name, kana: c.dataset.kana, romaji: c.dataset.roma })]));
   const q = document.getElementById('pq') as HTMLInputElement;
   const ord = document.getElementById('pOrder') as HTMLSelectElement;
   const seg = document.getElementById('posSeg')!;
@@ -77,10 +79,10 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
     const s = q.value.trim();
     const sorted = [...cards].sort((a, b) => {
       if (ord.value === 'age') return (a.dataset.birth ? -1 : 1) - (b.dataset.birth ? -1 : 1) || String(b.dataset.birth).localeCompare(String(a.dataset.birth)) || Number(a.dataset.no) - Number(b.dataset.no);
-      if (ord.value === 'kana') return String(a.dataset.name).localeCompare(String(b.dataset.name), 'ja');
+      if (ord.value === 'kana') return String(a.dataset.kana || a.dataset.name).localeCompare(String(b.dataset.kana || b.dataset.name), 'ja');
       return Number(a.dataset.no) - Number(b.dataset.no);
     });
-    sorted.forEach((c, i) => { c.style.order = String(i); c.hidden = (!!s && !String(c.dataset.name).includes(s)) || (!!pos && c.dataset.pos !== pos); });
+    sorted.forEach((c, i) => { c.style.order = String(i); c.hidden = (!!s && !matchName(keys.get(c)!, s)) || (!!pos && c.dataset.pos !== pos); });
   };
   q.addEventListener('input', draw); ord.addEventListener('change', draw);
   seg.addEventListener('click', e => {

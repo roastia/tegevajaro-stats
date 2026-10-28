@@ -2,6 +2,7 @@
 // 使い方：npm run roster
 import fs from 'node:fs';
 import { readCsv } from '../src/lib/data.js';
+import { kanaToRomaji } from '../src/lib/namesearch.js';
 
 const profiles = readCsv('profiles'), players = readCsv('players');
 const problems = [], notes = [];
@@ -13,6 +14,8 @@ for (const p of profiles) {
   if (nos.has(p.no)) problems.push(`${who}：背番号が ${nos.get(p.no)} と重なっています`); else nos.set(p.no, p.name);
   if (!['GK', 'DF', 'MF', 'FW'].includes(p.pos)) problems.push(`${who}：ポジションは GK/DF/MF/FW のどれかにしてください`);
   if (p.birth && !/^\d{4}-\d{2}-\d{2}$/.test(p.birth)) problems.push(`${who}：生年月日は YYYY-MM-DD で`);
+  if (!/^[ぁ-ゖー]+( [ぁ-ゖー]+)+$/.test(p.kana || '')) problems.push(`${who}：kana（よみ）をひらがなで、姓と名の間を半角スペースにして入れてください（例：おくむら こうじ）`);
+  else if (p.romaji !== kanaToRomaji(p.kana)) problems.push(`${who}：romaji は「${kanaToRomaji(p.kana)}」にしてください（kana から作ります）`);
   if (!p.birth) notes.push(`${who}：生年月日が空です（年齢・誕生日に出ません）`);
   if (!p.height) notes.push(`${who}：身長が空です（「空の支配者」に出ません）`);
   if (!p.birthplace) notes.push(`${who}：出身地が空です`);

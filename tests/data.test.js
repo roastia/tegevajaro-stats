@@ -100,3 +100,27 @@ test('名簿：背番号が重ならず、全員に背番号イラストと play
     for (const dir of ['numbers', 'numbers-s']) assert.ok(fs.existsSync(`public/chars/${dir}/${p.no}.png`), `${p.name}（${p.no}）の背番号イラストがない → python3 tools/jersey_numbers.py`);
   }
 });
+
+test('選手名の検索：よみ（ひらがな）とローマ字がそろい、漢字・かな・ローマ字で見つかる', async () => {
+  const { kanaToRomaji, nameKeys, matchName } = await import('../src/lib/namesearch.js');
+  for (const p of profiles) {
+    assert.match(p.kana, /^[ぁ-ゖー]+( [ぁ-ゖー]+)+$/, `${p.name} の kana`);
+    assert.equal(p.romaji, kanaToRomaji(p.kana), `${p.name} の romaji`);
+  }
+  const find = q => profiles.filter(p => matchName(nameKeys(p), q)).map(p => p.name);
+  assert.deepEqual(find('奥村'), ['奥村 晃司']);
+  assert.deepEqual(find('おくむら'), ['奥村 晃司']);
+  assert.deepEqual(find('オクムラ'), ['奥村 晃司']);
+  assert.deepEqual(find('okumura'), ['奥村 晃司']);
+  assert.deepEqual(find('Koji Okumura'), ['奥村 晃司']);
+  assert.deepEqual(find('kouji'), ['奥村 晃司']);
+  assert.deepEqual(find('mogi syu'), ['茂木 秀']);
+  assert.deepEqual(find('ohkuma'), ['大熊 健太']);
+  assert.deepEqual(find('tutumi'), ['堤 奏一郎']);
+  assert.deepEqual(find('inoue'), ['井上 怜']);
+  assert.deepEqual(find('tizanga'), ['松本 ケン チザンガ']);
+  assert.ok(find('ch').includes('松本 ケン チザンガ'), '打ちかけの ch でも出る');
+  assert.ok(find('ch').length < 5, '打ちかけの ch で関係ない選手まで出ない');
+  assert.ok(find('けんた').length === 2);
+  assert.equal(find('xyz').length, 0);
+});

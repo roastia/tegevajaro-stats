@@ -64,10 +64,12 @@
    - Jリーグ公式の選手ページ（`https://www.jleague.jp/player/数字/`）：ポジション・背番号・生年月日・身長・出身地・経歴
    - 加入の種類（完全移籍・期限付き移籍・新加入）と前所属：クラブ公式の発表、Football LAB の移籍情報
    - 公式ページがまだないときは、クラブ公式の発表だけで入れ、わからない項目は空にしておく
-2. `src/data/profiles.csv` に1行追加する：`pos,no,name,birth,height,birthplace,hs_or_youth,university,career`
+2. `src/data/profiles.csv` に1行追加する：`pos,no,name,birth,height,birthplace,hs_or_youth,university,career,kana,romaji`
    - 名前は姓と名の間を半角スペース（例：`奥村 晃司`）。ほかのCSVと同じ表記にそろえる
    - `birthplace` は都道府県名の「県・府・都」なし（例：`宮崎`、`北海道`）。海外出身は国名
    - `career` は少年団から**宮崎に来る直前まで**を ` → ` でつなぐ。期限付き移籍で以前宮崎にいた場合は「元のクラブ → テゲバジャーロ宮崎 → 元のクラブ」の形（「宮崎を選んだ男」の判定に使う）
+   - `kana` は名前のよみをひらがなで、姓と名の間を半角スペース（例：`おくむら こうじ`）。よみは推測しない（スポーツナビの選手ページ `https://soccer.yahoo.co.jp/jleague/category/j2/teams/31508/players/数字` にカタカナで出ている。数字は Jリーグ公式の選手ページと同じ）
+   - `romaji` は `kana` から作る（`npm run roster` が正しい形を教えてくれる。例：`okumura koji`）。選手名の検索（漢字・ひらがな・ローマ字）に使う
    - 値にカンマを使わない
 3. `src/data/players.csv` に1行追加する（出場がまだなら数字は 0）。`jl_url` に公式の選手ページURL
 4. `python3 tools/jersey_numbers.py` で背番号イラストを作る
