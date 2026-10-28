@@ -18,7 +18,7 @@ const bdays = d.profiles.filter(p => p.birth).map(p => ({ no: p.no, name: p.name
 const nav = [
   ['', 'topics', '注目トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手の称号'],
   ['goals/', 'goals', 'ゴール動画'], ['roots/', 'roots', '選手の背景'],
-  ...(SITE.footballLab ? [['lineups/', 'lineups', 'スタメン']] : []),
+  ['lineups/', 'lineups', 'スタメン'],
 ];
 ---
 <!doctype html>
@@ -84,9 +84,9 @@ const nav = [
       <p>選手の写真・クラブのエンブレムは使用していません。選手名からJリーグ公式の選手ページへリンクしています。</p>
       <p>出典</p>
       <ul>
-        <li><a href="https://www.jleague.jp/" rel="noopener noreferrer" target="_blank">Jリーグ公式サイト</a>（試合結果・出場記録・選手情報・公式ハイライト）</li>
-        {SITE.footballLab && <li><a href="https://www.football-lab.jp/" rel="noopener noreferrer" target="_blank">Football LAB</a> ©DataStadium Inc.（シュート・ラストパス・ゴール期待値・プレー指標・パス交換・スタメンの配置）</li>}
-        <li>各メディア・クラブ公式サイト（得点時間・経歴の補足、スポーツナビの選手名のよみ・フォーメーション）</li>
+        <li><a href="https://www.jleague.jp/" rel="noopener noreferrer" target="_blank">Jリーグ公式サイト</a>（試合結果・出場記録・選手情報・公式ハイライト・スタメンとフォーメーション）</li>
+        {SITE.footballLab && <li><a href="https://www.football-lab.jp/" rel="noopener noreferrer" target="_blank">Football LAB</a> ©DataStadium Inc.（シュート・ラストパス・ゴール期待値・プレー指標・パス交換）</li>}
+        <li>各メディア・クラブ公式サイト（得点時間・経歴の補足、スポーツナビの選手名のよみ）</li>
       </ul>
       <p>データ時点：{SITE.roundLabel}（{SITE.asOf}）</p>
     </div>

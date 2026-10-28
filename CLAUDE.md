@@ -24,8 +24,8 @@
    - `goals.csv`（宮崎の得点）・`goals_all.csv`（両チームの得点）
    - `players.csv`：シーズン累計（出場・先発・分・得点・アシスト・警告など）
    - `suspension.csv`：累積警告
-   - `lineups.csv`：スタメンの配置（`round,formation,line,slot,name`）。line は 0=GK・1=最終ライン…、slot は宮崎が上に攻める向きで左から1。センターバック・ボランチの左右は Jリーグ公式の試合ページ「ラインナップ」のフォーメーション図で確かめて 2・3（CB）、1・2（ボランチ）と書く。図は宮崎が下に攻める向きのことがあるので、そのときは左右を入れかえる。確かめられないときは CB を `2-3`、ボランチを `1-2` と書く（同じ行に並べるだけになる）。フォーメーションはスポーツナビの試合ページ、配置は Football LAB の選手ページ（試合ごとのポジション）とチームのフォーメーションページでも確かめられる
-   - Football LAB 由来：`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列、`lineups.csv` の配置（line・slot）
+   - `lineups.csv`：スタメンの配置（`round,formation,line,slot,name`）。line は 0=GK・1=最終ライン…、slot は宮崎が上に攻める向きで左から1。出典は Jリーグ公式の試合ページ（`https://www.jleague.jp/match/j2/2026/月日番号/`）のフォーメーション図。ページの中のデータに宮崎の `formation` と各選手の `playerNumber`・`positionX`（小さいほど後ろ。GK がいちばん小さい）・`positionY`（マイナスが宮崎の左）が入っているので、positionX で列に分け、列の中を positionY の小さい順に 1, 2, … と番号をふる。背番号は `players.csv` で名前にする。図だけ見るときは、宮崎が下に攻める向きで描かれている試合があるので左右を入れかえて読む。確かめられないときだけ CB を `2-3`、ボランチを `1-2` と書く（同じ行に並べるだけになる）
+   - Football LAB 由来：`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列
    - 選手の加入・退団があれば `profiles.csv`（経歴は「宮崎に来る直前まで」を `→` でつなぐ）
 2. `src/config/site.js` の `asOf`・`roundLabel`・`lastMatch`・`rank`（Jリーグ公式の順位表の現在順位）を書き換える。
    - 背番号の変更・新加入があったら `python3 tools/jersey_numbers.py` で背番号入りシャツのイラスト（`public/chars/numbers/`・小さい表示用 `numbers-s/`）を作り直す。
@@ -43,7 +43,7 @@
 - `src/lib/meta.js` … ランキングの定義（タイトル・応援のひとこと・説明・出典）、アイコン、称号キャラ
 - `src/lib/data.js` … CSV 読み込み → 計算 → ページへ。`getShareables()` がポストできるもの（トピック・ランキング・背景）
 - `src/lib/og.js` … ポスト用画像（1200×630 PNG）を Satori + resvg でビルド時に生成
-- `src/pages/` … 注目トピック（/）・ランキング・選手の称号・ゴール動画・選手の背景・スタメン（`lineups.astro`、`src/lib/lineups.js`。Football LAB を切るとメニューから消える）、個別ページ `/t/` `/r/` `/b/`、画像 `/og/`
+- `src/pages/` … 注目トピック（/）・ランキング・選手の称号・ゴール動画・選手の背景・スタメン（`lineups.astro`、`src/lib/lineups.js`）、個別ページ `/t/` `/r/` `/b/`、画像 `/og/`
 - `public/logo-tegesta.svg` … サイトのロゴ（テゲスタ！の手描き文字をなぞった SVG）。ヘッダーとポスト用画像（白にして）で使う。`favicon.svg`・`apple-touch-icon.png` はロゴの「テ」
 - `src/scripts/site.js` … ポストの画像添付（スマホは共有メニューで `/og/` の画像を渡す。使えない端末は X の投稿画面）・スクロール位置・誕生日（日本時間の今日から計算）・紙吹雪・カウントアップ
 - `tests/` … 検算テスト（Node 標準のテストランナー）
