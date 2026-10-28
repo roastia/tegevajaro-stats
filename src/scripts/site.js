@@ -148,7 +148,7 @@ function openBday(birth) {
   a.innerHTML = X_MARK; const lb = h('span'); lb.append(h('b', 'nw', '「同じ誕生日」'), h('span', 'nw', 'をXでポスト')); a.append(lb);
   bdPop.append(a);
   bdPop.showPopover();
-  close.focus();
+  close.focus({ preventScroll: true });
 }
 document.addEventListener('click', e => {
   const b = e.target.closest?.('[data-bday-open]');
