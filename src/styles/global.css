@@ -336,3 +336,17 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .bdpop .x { all: unset; cursor: pointer; position: absolute; right: 12px; top: 8px; font-size: 22px; line-height: 1; color: var(--muted); padding: 4px; }
 .bdpop .wiki { margin-top: 4px; }
 .bpost { white-space: nowrap; }
+
+/* 誕生日カード：左（あと◯日・背番号と名前・日付）と右（年齢・ポスト）の2列でコンパクトに */
+.bday .row { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 8px; overflow: visible; scroll-snap-type: none; padding-bottom: 0; }
+.bcard { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "cd big" "nm big" "dt post"; align-items: center; column-gap: 10px; row-gap: 2px; padding: 8px 12px; flex: none; }
+.bcard > .cd:first-child { grid-area: cd; }
+.bcard > .nm { grid-area: nm; min-width: 0; }
+.bcard > .bdbtn, .bcard > .cd:not(:first-child) { grid-area: dt; justify-self: start; }
+.bcard > .bg2 { grid-area: big; justify-self: end; align-self: end; font-size: 2.1rem; }
+.bcard.today > .bg2 { font-size: 1.3rem; }
+.bcard > .bpost { grid-area: post; justify-self: end; margin-top: 0; }
+.bcard .jno { min-width: 2.1rem; padding: 1px 5px; }
+.bcard .jno b { font-size: .95rem; }
+.bcard .nm > span:last-child { white-space: nowrap; }
+.bcard > .bpost { font-size: .72rem; padding: 3px 10px; }
