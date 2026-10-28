@@ -12,4 +12,10 @@ export const SITE = {
   hashtags: '#テゲバジャーロ宮崎 #テゲバ',
   // Football LAB 由来のデータを表示するか（問い合わせ結果で切り替える）
   footballLab: true,
+  // おすすめスポットの投稿受付（Cloudflare Workers。worker/README.md の手順で用意してから入れる）
+  // 空のあいだは投稿フォームが「準備中」になる
+  spots: {
+    api: '',               // 例：'https://tegesta-spots.〇〇.workers.dev/api/spots'
+    turnstileSiteKey: '',  // Cloudflare Turnstile のサイトキー（公開してよい値）
+  },
 };

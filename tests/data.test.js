@@ -141,3 +141,15 @@ test('スタメン：各試合11人・出場記録の先発と一致・フォー
   assert.equal(L.games.length, matches.length);
   assert.ok(L.games.every(g => g.lines.flat().every(p => p.role)), 'すべての選手にポジション名');
 });
+
+test('おすすめスポット：載せる場所のデータの形（緯度経度は宮崎近辺の数字・X アカウントの形）', () => {
+  const rows = readCsv('spots');
+  const ids = new Set();
+  for (const r of rows) {
+    assert.ok(r.id && !ids.has(r.id), `id がない・重なっている：${r.name}`); ids.add(r.id);
+    assert.ok(r.name && r.info, `名前とひとことは必須：${r.id}`);
+    assert.ok(+r.lat > 24 && +r.lat < 46 && +r.lng > 122 && +r.lng < 154, `緯度経度が日本の範囲にない：${r.name}`);
+    assert.ok(!r.x_handle || /^[A-Za-z0-9_]{1,15}$/.test(r.x_handle), `X アカウントの形：${r.name}`);
+    assert.ok(![r.name, r.area, r.info].some(v => /https?:|<|>/.test(v || '')), `URL やタグは入れない：${r.name}`);
+  }
+});

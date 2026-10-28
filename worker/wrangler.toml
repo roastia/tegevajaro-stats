@@ -1,0 +1,22 @@
+# テゲスタ！ おすすめスポットの投稿受付
+name = "tegesta-spots"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# 受け付けるサイト（カンマ区切り）。手元で試すときは http://localhost:4321 を足す
+[vars]
+ALLOWED_ORIGIN = "https://roastia.github.io"
+
+# `npx wrangler d1 create tegesta-spots` で出た database_id をここに貼る
+[[d1_databases]]
+binding = "DB"
+database_name = "tegesta-spots"
+database_id = "ここに database_id"
+
+# 毎日 4:10（UTC）に古い制限記録を消す
+[triggers]
+crons = ["10 4 * * *"]
+
+# 秘密の値は wrangler.toml に書かず、次のコマンドで登録する：
+#   npx wrangler secret put TURNSTILE_SECRET   （Turnstile のシークレットキー）
+#   npx wrangler secret put IP_HASH_SECRET     （長いランダムな文字列。openssl rand -hex 32 などで作る）

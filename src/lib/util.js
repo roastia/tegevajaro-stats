@@ -41,3 +41,8 @@ export function splitDisp(s) {
   if (i < 0) return [s, ''];
   return [s.slice(0, i), s.slice(i).replace(/）／/g, '／').replace(/）・/g, '・').replace(/[（）]/g, ' ').replace(/\s+/g, ' ').trim()];
 }
+
+/** X のアカウント名（英数字と _ の15文字まで）なら https://x.com/〇〇、それ以外は空 */
+export const xUrl = h => /^[A-Za-z0-9_]{1,15}$/.test(String(h || '')) ? `https://x.com/${h}` : '';
+/** 緯度経度から Google マップのリンク */
+export const mapsUrl = (lat, lng) => Number.isFinite(+lat) && Number.isFinite(+lng) && lat !== '' && lng !== '' ? `https://www.google.com/maps/search/?api=1&query=${+lat},${+lng}` : '';

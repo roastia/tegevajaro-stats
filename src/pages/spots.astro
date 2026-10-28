@@ -1,0 +1,140 @@
+---
+import Base from '../layouts/Base.astro';
+import { readCsv } from '../lib/data.js';
+import { icon, xUrl, mapsUrl } from '../lib/util.js';
+import { SITE } from '../config/site.js';
+// 載せるのは、こちらで確認して src/data/spots.csv に入れたものだけ（投稿はそのままは出さない）
+const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '').map(s => ({ ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng) }));
+const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
+const mapData = spots.map(s => ({ id: s.id, name: s.name, lat: +s.lat, lng: +s.lng }));
+---
+<Base current="spots" title="おすすめスポット">
+  <p class="take">試合の前も後も、宮崎を楽しもう。テゲサポが教えてくれた、おすすめの場所です。</p>
+
+  <section class="card reveal">
+    <h2><Fragment set:html={icon('pin')} />テゲサポおすすめスポット</h2>
+    {spots.length > 0
+      ? <p class="note">{spots.length}か所。地図のピンか、下の名前を押すと場所がわかります。</p>
+      : <p class="note">まだありません。最初のおすすめを、下のフォームから教えてください！</p>}
+    {spots.length > 0 && <div class="spot-map" id="spotMap" role="region" aria-label="おすすめスポットの地図"></div>}
+    {spots.length > 0 && (
+      <ul class="spot-list">
+        {spots.map(s => (
+          <li id={`spot-${s.id}`} data-spot={s.id}>
+            <button class="spot-go" type="button" data-spot-go={s.id}><Fragment set:html={icon('pin')} /><b>{s.name}</b>{s.area && <small>{s.area}</small>}</button>
+            <p class="spot-info">{s.info}</p>
+            <div class="spot-meta">
+              {s.x && <a href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc">@{s.x_handle} さんのおすすめ</a>}
+              {s.maps && <a href={s.maps} target="_blank" rel="noopener noreferrer">Googleマップで開く</a>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+    {spots.length > 0 && <p class="note spot-osm">地図：© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors</p>}
+  </section>
+
+  <section class="card reveal spot-form-card" id="post">
+    <h2><Fragment set:html={icon('sparkle')} />おすすめを教えて！</h2>
+    <p class="note">送ってもらった内容は、すぐにはページに載りません。確認してから、このページに載せます。投稿は1日1件までです。</p>
+    {ready ? (
+      <form class="spot-form" id="spotForm" novalidate data-api={SITE.spots.api} data-sitekey={SITE.spots.turnstileSiteKey}>
+        <label>場所の名前<span class="req">必須</span><input name="name" required maxlength="60" autocomplete="off" placeholder="例：〇〇食堂" /></label>
+        <label>エリア<input name="area" maxlength="30" autocomplete="off" placeholder="例：新富町" /></label>
+        <label>ひとこと<span class="req">必須</span><textarea name="info" required maxlength="300" rows="3" placeholder="例：試合前に寄りたい、チキン南蛮がおいしいお店"></textarea></label>
+        <label>あなたの X アカウント<input name="x_handle" maxlength="16" autocomplete="off" inputmode="latin" placeholder="例：@tegesapo" /></label>
+        <p class="note">X アカウントを入れると、載せるときに「@〇〇 さんのおすすめ」として、入力どおりに表示します。</p>
+        <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <div class="ts" id="spotTs"></div>
+        <button class="spot-send" type="submit">送る</button>
+        <p class="spot-msg" id="spotMsg" role="status" aria-live="polite"></p>
+      </form>
+    ) : (
+      <p class="spot-wait">投稿フォームは準備中です。</p>
+    )}
+    <details class="spot-privacy">
+      <summary>送った内容の扱い</summary>
+      <ul>
+        <li>送ってもらうのは「場所の名前・エリア・ひとこと・X アカウント（任意）」だけです。</li>
+        <li>1日1件の確認のため、IP アドレスを、元に戻せない形（日ごとに変わる鍵でハッシュ化した値）にして2日間だけ使い、そのあと消します。IP アドレスそのものは保存しません。</li>
+        <li>ボット対策に Cloudflare Turnstile を使っています。</li>
+        <li>載せるかどうか・載せる文面は、こちらで判断します（個人のお宅、宣伝、悪口などは載せません）。載せた内容を消してほしいときは、X でご連絡ください。</li>
+      </ul>
+    </details>
+  </section>
+
+  <script type="application/json" id="spot-data" set:html={JSON.stringify(mapData).replace(/</g, '\\u003c')}></script>
+</Base>
+
+<script>
+  import 'leaflet/dist/leaflet.css';
+  import L from 'leaflet';
+
+  // ---- 地図（OpenStreetMap）。ピンは画像を使わない丸い印 ----
+  const el = document.getElementById('spotMap');
+  const data: { id: string; name: string; lat: number; lng: number }[] = JSON.parse(document.getElementById('spot-data')?.textContent || '[]');
+  if (el && data.length) {
+    const map = L.map(el, { scrollWheelZoom: false, tap: true } as any);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '' }).addTo(map);
+    const marks = new Map<string, L.CircleMarker>();
+    for (const s of data) {
+      const m = L.circleMarker([s.lat, s.lng], { radius: 9, color: '#fff', weight: 2, fillColor: '#C8375F', fillOpacity: 1 }).addTo(map);
+      const p = document.createElement('div'); p.textContent = s.name;  // 文字として入れる
+      m.bindPopup(p);
+      m.on('click', () => document.getElementById(`spot-${s.id}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+      marks.set(s.id, m);
+    }
+    map.fitBounds(L.latLngBounds(data.map(s => [s.lat, s.lng] as [number, number])), { padding: [30, 30], maxZoom: 14 });
+    document.querySelectorAll<HTMLElement>('[data-spot-go]').forEach(b => b.addEventListener('click', () => {
+      const m = marks.get(b.dataset.spotGo!); if (!m) return;
+      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      map.setView(m.getLatLng(), Math.max(map.getZoom(), 14)); m.openPopup();
+    }));
+  }
+
+  // ---- 投稿フォーム ----
+  const form = document.getElementById('spotForm') as HTMLFormElement | null;
+  if (form) {
+    const msg = document.getElementById('spotMsg')!;
+    const send = form.querySelector<HTMLButtonElement>('.spot-send')!;
+    let token = '';
+    let widget: string | undefined;
+    const say = (t: string, ok = false) => { msg.textContent = t; msg.classList.toggle('ok', ok); };
+    // Turnstile（ボット対策）は、フォームが画面に近づいたら読み込む
+    const render = () => {
+      if (widget !== undefined) return;
+      widget = (window as any).turnstile.render('#spotTs', {
+        sitekey: form.dataset.sitekey, action: 'spot', language: 'ja', appearance: 'interaction-only',
+        callback: (t: string) => { token = t; }, 'expired-callback': () => { token = ''; }, 'error-callback': () => { token = ''; },
+      });
+    };
+    const loadTs = () => {
+      if ((window as any).turnstile) { render(); return; }
+      if (document.getElementById('ts-js')) return;
+      (window as any).onTsLoad = render;
+      const s = document.createElement('script');
+      s.id = 'ts-js'; s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTsLoad'; s.async = true;
+      document.head.append(s);
+    };
+    new IntersectionObserver((es, io) => { if (es.some(e => e.isIntersecting)) { loadTs(); io.disconnect(); } }, { rootMargin: '400px' }).observe(form);
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const f = new FormData(form);
+      const body = Object.fromEntries(['name', 'area', 'info', 'x_handle', 'website'].map(k => [k, String(f.get(k) || '')]));
+      if (!body.name.trim() || !body.info.trim()) { say('「場所の名前」と「ひとこと」を入れてください'); return; }
+      if (!token) { say('確認中です。少し待ってから、もう一度「送る」を押してください'); return; }
+      send.disabled = true; say('送っています…');
+      try {
+        const r = await fetch(form.dataset.api!, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, turnstile: token }), credentials: 'omit', referrerPolicy: 'no-referrer' });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && d.ok) { form.reset(); say('ありがとうございます！確認してから載せます。', true); }
+        else say(d.error || '送れませんでした。時間をおいて、もう一度お試しください');
+      } catch { say('送れませんでした。電波のよいところで、もう一度お試しください'); }
+      finally {
+        send.disabled = false; token = '';
+        try { (window as any).turnstile?.reset(widget); } catch { /* 次の送信で確認し直す */ }
+      }
+    });
+  }
+</script>

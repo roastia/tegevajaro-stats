@@ -475,3 +475,33 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .pitch .pa { bottom: 0; width: 59%; height: 23%; }
 .pitch .ga { bottom: 0; width: 27%; height: 7.7%; }
 .pitch .parc { bottom: 23%; width: 21%; height: 5%; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+
+/* おすすめスポット */
+.spot-map { height: min(60vh, 340px); border-radius: 12px; border: 1px solid var(--line); margin: 8px 0 12px; z-index: 0; }
+.spot-list { list-style: none; margin: 0; padding: 0; }
+.spot-list li { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.spot-go { all: unset; cursor: pointer; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.spot-go .ic { width: 1em; height: 1em; color: var(--ink); align-self: center; }
+.spot-go b { font-size: 1.02rem; }
+.spot-go small { color: var(--muted); font-size: .8rem; }
+.spot-go:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.spot-info { margin: 4px 0; font-size: .92rem; }
+.spot-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .8rem; }
+.spot-meta a { color: var(--ink); }
+.spot-osm { font-size: .72rem; }
+.spot-form { display: grid; gap: 10px; margin-top: 8px; }
+.spot-form label { display: grid; gap: 4px; font-size: .88rem; font-weight: 700; }
+.spot-form .req { margin-left: 6px; font-size: .7rem; color: #fff; background: var(--brand-deep); border-radius: 999px; padding: 0 6px; font-weight: 500; justify-self: start; display: inline-block; }
+.spot-form label:has(.req) { grid-template-columns: auto 1fr; align-items: center; }
+.spot-form label:has(.req) > input, .spot-form label:has(.req) > textarea { grid-column: 1 / -1; }
+.spot-form input, .spot-form textarea { font: inherit; font-weight: 400; font-size: 16px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--fg); width: 100%; }
+.spot-form textarea { resize: vertical; }
+.spot-form .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.spot-send { all: unset; cursor: pointer; justify-self: start; padding: 10px 28px; border-radius: 999px; background: #0F1419; color: #fff; font-weight: 700; box-shadow: 0 3px 0 var(--brand); }
+.spot-send:disabled { opacity: .5; cursor: default; }
+.spot-msg { margin: 0; font-weight: 700; color: var(--bad); min-height: 1.4em; }
+.spot-msg.ok { color: var(--ok); }
+.spot-wait { font-weight: 700; color: var(--muted); }
+.spot-privacy { margin-top: 12px; font-size: .82rem; color: var(--muted); }
+.spot-privacy summary { cursor: pointer; color: var(--ink); }
+.spot-privacy ul { margin: 6px 0 0; padding-left: 1.2em; }

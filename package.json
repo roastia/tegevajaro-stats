@@ -6,13 +6,15 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "node --test tests/*.test.js",
-    "roster": "node tools/check_roster.mjs"
+    "test": "node --test tests/*.test.js worker/test/*.test.js",
+    "roster": "node tools/check_roster.mjs",
+    "spots:pull": "sh tools/pull_spots.sh"
   },
   "dependencies": {
     "astro": "7.3.8",
     "budoux": "0.9.3",
-    "canvas-confetti": "1.9.4"
+    "canvas-confetti": "1.9.4",
+    "leaflet": "1.9.4"
   },
   "devDependencies": {
     "@resvg/resvg-js": "2.6.2",
