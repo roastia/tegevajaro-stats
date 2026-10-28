@@ -6,10 +6,6 @@ const { what, text, url } = Astro.props;
 ---
 <div class="post">
   <a class="postbtn" href={xIntent(text, url)} target="_blank" rel="noopener noreferrer">
-    <Fragment set:html={X_MARK} /><span><b>「{what}」</b>をXでポスト</span>
+    <Fragment set:html={X_MARK} /><span><b class="nw">「{what}」</b><span class="nw">をXでポスト</span></span>
   </a>
-  <details class="postprev">
-    <summary>ポストする文章を見る</summary>
-    <p>{text}{url ? '\n' + url : ''}</p>
-  </details>
 </div>

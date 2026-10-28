@@ -22,17 +22,21 @@ export function breakText(text) {
   return group(splitSentences(text), s => group(splitClauses(s), phr));
 }
 
+const VOID = /^(area|base|br|col|embed|hr|img|input|link|meta|source|track|wbr)$/i;
 export function addPhraseBreaks(html) {
   let out = '', i = 0;
-  const skip = [];
+  const stack = []; // 開いている要素ごとに「中を処理しないか」を積む（script・style や class="nw" の中は触らない）
   const re = /<(\/?)([a-zA-Z][\w-]*)([^>]*)>|<!--[\s\S]*?-->|<!doctype[^>]*>/gi;
   let m;
   while ((m = re.exec(html))) {
     const text = html.slice(i, m.index);
-    out += skip.length || !JP.test(text) ? text : breakText(dec(text));
+    const skip = stack.some(Boolean);
+    out += skip || !JP.test(text) ? text : breakText(dec(text));
     out += m[0];
     i = re.lastIndex;
-    if (m[2] && SKIP.test(m[2]) && !m[3].endsWith('/')) { if (m[1]) skip.pop(); else skip.push(m[2]); }
+    if (!m[2] || VOID.test(m[2]) || m[3].endsWith('/')) continue;
+    if (m[1]) stack.pop();
+    else stack.push(SKIP.test(m[2]) || /\bclass="[^"]*\bnw\b/.test(m[3]));
   }
   return out + html.slice(i);
 }

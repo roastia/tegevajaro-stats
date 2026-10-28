@@ -248,7 +248,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .rank li > span:nth-child(3) { white-space: nowrap; }
 .rank .dv { overflow-wrap: anywhere; }
 /* カードが狭いときは記録を名前の下に回す（Container Queries） */
-@container (max-width: 20rem) { .rank li { grid-template-columns: 1.7rem 1fr; } .rank .dv { grid-column: 2; text-align: left; } }
+
 /* 誕生日カードは横スクロール（Scroll Snap）で、トピックを押し下げない */
 .bday .row { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; scrollbar-width: thin; }
 .bcard { flex: 0 0 min(78%, 15rem); scroll-snap-align: start; }
@@ -259,3 +259,14 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 
 /* 文のまとまり：行に入りきらないときは文ごと次の行へ（「。」の後ろで改行） */
 .ss { display: inline-block; max-width: 100%; }
+
+/* ランキングの行：名前は折り返さない。記録が入りきらないときは名前の下へ回す（縦書きのような崩れを防ぐ） */
+.rank li { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; row-gap: 0; }
+.rank li > .rk { flex: 0 0 1.7rem; }
+.rank li > span:nth-child(3) { flex: 1 0 auto; white-space: nowrap; }
+.rank li > .dv { flex: 1 1 10rem; min-width: 0; text-align: right; }
+.ages .nm { white-space: nowrap; }
+.champ .nm { white-space: nowrap; }
+
+/* ポストボタンの文字は「「名前」／をXでポスト」の間だけで改行する */
+.postbtn .nw { white-space: nowrap; }
