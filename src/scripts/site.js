@@ -5,25 +5,8 @@ import { SITE } from '../config/site.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ---------- 表示モード（自動 → ライト → ダーク） ---------- */
-const store = {
-  get: k => { try { return localStorage.getItem(k); } catch { return null; } },
-  set: (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch { /* 保存できなくても動く */ } },
-};
-const modes = ['', 'light', 'dark'];
-function applyTheme(m) {
-  if (m) document.documentElement.dataset.theme = m; else delete document.documentElement.dataset.theme;
-  const btn = document.getElementById('themeBtn');
-  if (btn) {
-    btn.innerHTML = icon(m === 'light' ? 'sun' : m === 'dark' ? 'moon' : 'sparkle');
-    btn.title = m === 'light' ? 'ライト表示' : m === 'dark' ? 'ダーク表示' : '端末の設定に合わせる';
-  }
-}
-applyTheme(store.get('theme') || '');
-document.getElementById('themeBtn')?.addEventListener('click', () => {
-  const next = modes[(modes.indexOf(store.get('theme') || '') + 1) % modes.length];
-  store.set('theme', next); applyTheme(next);
-});
+// 表示は白背景だけ（ダーク表示はなし）
+try { localStorage.removeItem('theme'); } catch { /* 保存できなくても動く */ }
 
 /* ---------- ページごとのスクロール位置 ----------
    メニューで初めて開くページは一番上から。一度見たページは、前に見ていた位置から。 */
