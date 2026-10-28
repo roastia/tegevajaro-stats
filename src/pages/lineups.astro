@@ -42,6 +42,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
           <span class={`lu-res ${resCls[g.result] || ''}`}>{g.gf}-{g.ga} {resWord[g.result] || ''}</span>
         </div>
         <div class="pitch" role="img" aria-label={`${g.formation}：${g.lines.flat().map(p => `${p.role} ${p.name}`).join('、')}`}>
+          <span class="pa" aria-hidden="true"></span><span class="ga" aria-hidden="true"></span><span class="parc" aria-hidden="true"></span>
           <span class="lu-form">{g.formation}</span>
           {g.lines.map(line => (
             <div class={`pl-row n${line.length}`}>
