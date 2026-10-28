@@ -26,7 +26,7 @@ const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
       <ul class="vlist" id="goalList">
         {goals.map(g => { const m = byRound.get(String(g.round)) || {}; const v = safeUrl(m.video_url), p = safeUrl(m.match_url); return (
           <li data-scorer={g.scorer} data-round={g.round} data-minute={g.minute}>
-            <div><b>{g.scorer}</b>　{g.time}</div>
+            <div class="gh"><b>{g.scorer}</b>　{g.time}</div>
             <div class="lk">
               {v && <a class="yt" href={v} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />ハイライト</a>}
               {p && <a href={p} target="_blank" rel="noopener noreferrer">公式試合ページ</a>}

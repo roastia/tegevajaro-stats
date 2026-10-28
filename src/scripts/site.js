@@ -126,6 +126,19 @@ addEventListener('pagehide', savePos);
   }
 }
 
+/* ---------- ランキング・ゴール集の名前：長い名前は文字を少し小さくして1行に収める（省略しない） ---------- */
+{
+  const fit = n => {
+    n.style.fontSize = ''; n.style.lineHeight = '';
+    if (!n.clientWidth) return;
+    let k = 1;
+    const lh = n.getBoundingClientRect().height + 'px';  // 文字を小さくしても行の高さは変えない
+    while (n.scrollWidth > n.clientWidth + 1 && k > 0.7) { n.style.lineHeight = lh; k -= 0.04; n.style.fontSize = k.toFixed(2) + 'em'; }
+  };
+  const ro = new ResizeObserver(es => es.forEach(e => fit(e.target)));
+  document.querySelectorAll('.rank li > span:nth-child(3), .vlist .gh').forEach(n => ro.observe(n));
+}
+
 /* ---------- 誕生日（日本時間の今日から数える） ---------- */
 function todayJst() {
   const [y, m, d] = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-').map(Number);

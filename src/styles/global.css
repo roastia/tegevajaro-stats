@@ -436,3 +436,9 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .ages .nm small { overflow: hidden; text-overflow: ellipsis; }
 /* 「あと〇日」は名前の右に置き、どの行も同じ高さにする */
 .ages .nm .soon { display: inline-flex; vertical-align: .15em; margin: 0 0 0 6px; }
+
+/* ランキングの行：名前が長くても数字を次の行に落とさない（どの行も同じ高さ） */
+.rank li > span:nth-child(3) { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.rank li > .dv { flex: 0 0 auto; margin-left: auto; white-space: nowrap; }
+.rank li { min-height: 2.3rem; }
+.vlist .gh { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
