@@ -23,7 +23,7 @@ export const RECORDS = [
   { id: 'early', cat: 'goal', title: '💨 電光石火', cheer: 'キックオフ直後から目が離せない', note: '前半15分までのゴール', src: 'J STATS' },
   { id: 'late', cat: 'goal', title: '🎆 劇的弾', cheer: '最後まで信じた人だけが見られるゴール', note: '後半30分以降（アディショナルタイム含む）のゴール', src: 'J STATS' },
   { id: 'home_hero', cat: 'goal', title: '🏟️ いちごの英雄', cheer: 'いちごを沸かせたのはこの男', note: 'ホームゲームでのゴール', src: 'J STATS' },
-  { id: 'away_hero', cat: 'goal', title: '✈️ アウェーの仕事人', cheer: '遠いアウェーでも結果を出す', note: 'アウェーゲームでのゴール', src: 'J STATS' },
+  { id: 'away_hero', cat: 'goal', title: '✈️ アウェイの仕事人', cheer: '遠いアウェイでも結果を出す', note: 'アウェイゲームでのゴール', src: 'J STATS' },
   { id: 'per_goal', cat: 'goal', title: '🎯 何分に1点？', cheer: 'ゴールを量産するハイペース', note: '出場時間÷得点（2得点以上）。短いほど決めるペースが速い', src: 'J STATS', asc: true },
   { id: 'iron', cat: 'time', title: '🦾 鉄人', cheer: 'ピッチに立ち続ける鉄人に感謝', note: 'リーグ戦の出場時間。出場率は全試合90分出場を100%とした割合（GKは「守護神」で別に比べます）', src: 'J STATS' },
   { id: 'allgames', cat: 'time', title: '📅 皆勤賞', cheer: '1試合も欠かさず戦い続ける', note: '全試合に出場した選手（先発回数の多い順）（GKは「守護神」で別に比べます）', src: 'J STATS' },

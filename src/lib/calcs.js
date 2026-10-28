@@ -356,7 +356,7 @@ dash.calc('team_records', {
 dash.calc('topics', {
   inputs: ['matches', 'goals_all', 'records', 'team_records'],
   title: 'SNS用トピック',
-  description: '試合結果・全ゴール・個人記録から、拡散しやすい見出しと数字を作る。デーゲーム＝18時より前のキックオフ。遠征距離＝ホームスタジアムからアウェー会場までの直線距離の往復。',
+  description: '試合結果・全ゴール・個人記録から、拡散しやすい見出しと数字を作る。デーゲーム＝18時より前のキックオフ。遠征距離＝ホームスタジアムからアウェイ会場までの直線距離の往復。',
   fn: (matches, goals_all, records, team_records) => {
     const n = v => Number(v) || 0;
     const ms = [...matches].sort((a, b) => n(a.round) - n(b.round));
@@ -395,12 +395,12 @@ dash.calc('topics', {
       const aw = ms.filter(m => m.ha === 'A');
       const total = Math.round(aw.reduce((s, m) => s + 2 * km([n(home.venue_lat), n(home.venue_lng)], [n(m.venue_lat), n(m.venue_lng)]), 0));
       const far = aw.map(m => ({ m, d: km([n(home.venue_lat), n(home.venue_lng)], [n(m.venue_lat), n(m.venue_lng)]) })).sort((a, b) => b.d - a.d)[0];
-      add('travel', '✈️', 'アウェー遠征', `今季のアウェー遠征は往復約${total.toLocaleString()}km！`, `${total.toLocaleString()}km`, `地球${(total / 40075 * 100).toFixed(0)}%周分（直線距離）。最遠は${far.m.opponent}戦の約${Math.round(far.d).toLocaleString()}km`, 'どこまでも、テゲサポの声は届く！');
+      add('travel', '✈️', 'アウェイ遠征', `今季のアウェイ遠征は往復約${total.toLocaleString()}km！`, `${total.toLocaleString()}km`, `地球${(total / 40075 * 100).toFixed(0)}%周分（直線距離）。最遠は${far.m.opponent}戦の約${Math.round(far.d).toLocaleString()}km`, 'どこまでも、テゲサポの声は届く！');
     }
     const avg = list => list.length ? Math.round(list.reduce((s, m) => s + n(m.attendance), 0) / list.length) : 0;
     const ha = avg(ms.filter(m => m.ha === 'H')), aa = avg(ms.filter(m => m.ha === 'A'));
     const big = [...ms].sort((a, b) => n(b.attendance) - n(a.attendance))[0];
-    if (big) add('crowd', '🏟️', '大観衆', `最多観客は${big.opponent}戦の${n(big.attendance).toLocaleString()}人！`, `${n(big.attendance).toLocaleString()}人`, `ホームの平均観客は${ha.toLocaleString()}人、アウェーは${aa.toLocaleString()}人`, '次のホームも、いちごをテゲサポで埋めよう！');
+    if (big) add('crowd', '🏟️', '大観衆', `最多観客は${big.opponent}戦の${n(big.attendance).toLocaleString()}人！`, `${n(big.attendance).toLocaleString()}人`, `ホームの平均観客は${ha.toLocaleString()}人、アウェイは${aa.toLocaleString()}人`, '次のホームも、いちごをテゲサポで埋めよう！');
     const conc = goals_all.filter(g => g.team === '相手');
     const late = conc.filter(g => n(g.minute) >= 75).length;
     if (conc.length) add('late', '⏰', '最後まで集中', 'ラスト15分はテゲサポの出番！', `${Math.round(late / conc.length * 100)}%`, `${conc.length}失点のうち${late}失点（${Math.round(late / conc.length * 100)}%）が後半30分以降`, '最後の笛まで、声でチームを押し上げよう！');

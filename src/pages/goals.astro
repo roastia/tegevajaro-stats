@@ -9,7 +9,7 @@ d.goals.forEach(g => { counts[g.scorer] = (counts[g.scorer] || 0) + 1; });
 const scorers = Object.entries(counts).sort((a, b) => b[1] - a[1]);
 const goals = [...d.goals].sort((a, b) => Number(b.round) - Number(a.round) || Number(b.minute) - Number(a.minute));
 const matches = [...d.matches].sort((a, b) => Number(b.round) - Number(a.round));
-const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェー');
+const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
 ---
 <Base current="goals" title="ゴール動画">
   <div class="grid two">
