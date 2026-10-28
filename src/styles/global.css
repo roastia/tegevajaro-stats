@@ -444,3 +444,12 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .vlist .gh { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .vlist li { grid-template-columns: minmax(0, 1fr) auto; }
 .rank li > span:nth-child(3), .vlist .gh { display: block; }
+
+/* もうすぐ誕生日：2行のコンパクトなカード（名前・年齢 / あと〇日・日付・ポスト） */
+.bcard { grid-template-columns: auto 1fr auto; grid-template-areas: "nm nm big" "cd dt post"; row-gap: 0; column-gap: 8px; padding: 6px 10px; }
+.bcard > .cd:first-child { grid-area: cd; align-self: center; }
+.bcard > .bdbtn, .bcard > .cd:not(:first-child) { grid-area: dt; }
+.bcard > .bg2 { align-self: center; font-size: 1.7rem; }
+.bcard .jersey.on-color { width: 2.2rem; height: 2.2rem; }
+.bday { padding: 12px; }
+.bday h2 { margin-bottom: 6px; }
