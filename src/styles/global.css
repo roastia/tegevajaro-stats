@@ -459,3 +459,5 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .seg button { padding: 4px clamp(6px, 1.9vw, 10px); }
 @media (max-width: 380px) { .seg button { font-size: .76rem; padding-inline: 6px; } }
 @media (max-width: 345px) { .seg { gap: 2px; } .seg button { font-size: .7rem; padding-inline: 5px; } }
+/* チップの列はスクロールする箱にしない（iPhone で文字の読み込み後に右端が切れることがあるため）。全部収まる幅にしてあり、収まらない狭い画面だけ折り返す */
+.seg { overflow: visible; flex-wrap: wrap; touch-action: auto; overscroll-behavior: auto; }
