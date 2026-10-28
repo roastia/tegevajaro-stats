@@ -429,3 +429,11 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .pl { display: flex; flex-direction: column; align-items: center; width: 24%; min-width: 0; }
 .pl-j { width: 2.4rem; height: 2.4rem; display: block; }
 .pl-n { font-size: .74rem; font-weight: 700; line-height: 1.2; text-align: center; background: rgba(255,255,255,.85); border-radius: 6px; padding: 1px 5px; margin-top: 1px; max-width: 100%; overflow-wrap: anywhere; }
+
+/* 年齢一覧：枠の左右に余白をとり、右の年齢・「あと〇日」が枠にくっつかないように */
+.ages li { padding: 6px 12px; column-gap: 10px; }
+.ages .nm { min-width: 0; }
+.ages .nm small { overflow: hidden; text-overflow: ellipsis; }
+/* 「あと〇日」は右下の別の行に置き、年齢の列を細くして生年月日を省略しない */
+.ages li.bd { padding-bottom: 32px; }
+.ages li.bd .soon { position: absolute; right: 12px; bottom: 7px; margin: 0; }
