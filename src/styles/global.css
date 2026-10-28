@@ -434,6 +434,5 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .ages li { padding: 6px 12px; column-gap: 10px; }
 .ages .nm { min-width: 0; }
 .ages .nm small { overflow: hidden; text-overflow: ellipsis; }
-/* 「あと〇日」は右下の別の行に置き、年齢の列を細くして生年月日を省略しない */
-.ages li.bd { padding-bottom: 32px; }
-.ages li.bd .soon { position: absolute; right: 12px; bottom: 7px; margin: 0; }
+/* 「あと〇日」は名前の右に置き、どの行も同じ高さにする */
+.ages .nm .soon { display: inline-flex; vertical-align: .15em; margin: 0 0 0 6px; }

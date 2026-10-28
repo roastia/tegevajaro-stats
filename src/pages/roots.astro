@@ -46,8 +46,8 @@ const posCls = p => `pos-${['GK', 'DF', 'MF', 'FW'].includes(p) ? p : 'x'}`;
         <li class={posCls(p.pos)} data-no={p.no} data-pos={p.pos} data-birth={p.birth || undefined} data-age-out={p.birth ? `ag-${p.no}` : undefined}>
           <span class={`bar w${has && hi > lo ? Math.round(20 + 80 * (Number(a) - lo) / (hi - lo)) : 0}`}></span>
           <img class="jersey jersey-sm" src={href(`chars/numbers-s/${p.no}.png`)} alt={`背番号${p.no}`} width="44" height="44" loading="lazy" decoding="async" />
-          <span class="nm">{p.name}<small>{p.pos}{p.birth && <>・<button class="bdbtn" type="button" data-bday-open={p.birth}><Fragment set:html={icon('cake')} />{Number(y)}年{Number(m)}月{Number(dd)}日生まれ</button></>}</small></span>
-          <span class="ag">{has ? <><span id={`ag-${p.no}`}>{a}</span><small>歳</small></> : '—'}<span data-bslot="soon"></span></span>
+          <span class="nm">{p.name}<span data-bslot="soon"></span><small>{p.pos}{p.birth && <>・<button class="bdbtn" type="button" data-bday-open={p.birth}><Fragment set:html={icon('cake')} />{Number(y)}年{Number(m)}月{Number(dd)}日生まれ</button></>}</small></span>
+          <span class="ag">{has ? <><span id={`ag-${p.no}`}>{a}</span><small>歳</small></> : '—'}</span>
         </li>); })}
     </ol>
   </section>
