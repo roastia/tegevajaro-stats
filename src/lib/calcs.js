@@ -146,6 +146,10 @@ dash.calc('records', {
     const ms = [...matches].sort((a, b) => n(a.round) - n(b.round));
     const R = ms.length;
     const gs = [...goals].sort((a, b) => n(a.round) - n(b.round) || n(a.minute) - n(b.minute));
+    // GK は1人がフル出場し続けることが多く、出場時間やチーム成績の比較では有利になりすぎるため、
+    // 出場時間系・チーム貢献系のランキングから外し、GK同士の「守護神」で別に比べる
+    const posOf = {}; players.forEach(p => { posOf[p.name] = p.pos; }); profiles.forEach(p => { posOf[p.name] = posOf[p.name] || p.pos; });
+    const isGK = nm => posOf[nm] === 'GK';
     const byRound = {};
     gs.forEach(g => { (byRound[String(g.round)] = byRound[String(g.round)] || []).push(g); });
     const haOf = {}; ms.forEach(m => { haOf[String(m.round)] = m.ha; });
@@ -182,11 +186,11 @@ dash.calc('records', {
     players.forEach(p => {
       const m = n(p.minutes), g = n(p.goals), a = n(p.assists);
       if (g + a > 0) add('ga', p.name, g + a, `${g + a}（${g}得点・${a}アシスト）`);
-      if (m > 0) add('iron', p.name, m, `${m.toLocaleString()}分・出場率${Math.round(m / (R * 90) * 100)}%`);
-      if (n(p.apps) === R && R > 0) add('allgames', p.name, n(p.starts), `全${R}試合（先発${n(p.starts)}）`);
+      if (m > 0 && !isGK(p.name)) add('iron', p.name, m, `${m.toLocaleString()}分・出場率${Math.round(m / (R * 90) * 100)}%`);
+      if (n(p.apps) === R && R > 0 && !isGK(p.name)) add('allgames', p.name, n(p.starts), `全${R}試合（先発${n(p.starts)}）`);
       if (g >= 2) add('per_goal', p.name, Math.round(m / g), `${Math.round(m / g)}分に1点`);
       if (n(p.subs) > 0) add('super_sub', p.name, n(p.subs) * 100 + g, `途中出場${n(p.subs)}回・${g}得点`);
-      if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) <= 23 && m > 0) add('young', p.name, m, `${ageOf[p.name]}歳・${m.toLocaleString()}分`);
+      if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) <= 23 && m > 0 && !isGK(p.name)) add('young', p.name, m, `${ageOf[p.name]}歳・${m.toLocaleString()}分`);
       if (n(p.shots) > 0) add('shooter', p.name, n(p.shots), `${n(p.shots)}本`);
       if (n(p.shots) >= 10) add('finisher', p.name, g / n(p.shots), `${(g / n(p.shots) * 100).toFixed(1)}%`);
       if (n(p.last_passes) > 0) add('creator', p.name, n(p.last_passes), `${n(p.last_passes)}本`);
@@ -229,8 +233,8 @@ dash.calc('records', {
       const ga = n(p.goals) + n(p.assists);
       if (ga > 0) add('ga90', p.name, ga / m * 90, `90分あたり${(ga / m * 90).toFixed(2)}`);
       if (n(p.shots) > 0) add('shot90', p.name, n(p.shots) / m * 90, `90分あたり${(n(p.shots) / m * 90).toFixed(1)}本`);
-      if (n(p.yellow) === 0 && n(p.red) === 0) add('clean', p.name, m, `${m.toLocaleString()}分で警告ゼロ`);
-      if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) >= 28) add('veteran', p.name, m, `${ageOf[p.name]}歳・${m.toLocaleString()}分`);
+      if (n(p.yellow) === 0 && n(p.red) === 0 && !isGK(p.name)) add('clean', p.name, m, `${m.toLocaleString()}分で警告ゼロ`);
+      if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) >= 28 && !isGK(p.name)) add('veteran', p.name, m, `${ageOf[p.name]}歳・${m.toLocaleString()}分`);
     });
 
     // シュート1本の質（xG÷シュート）
@@ -264,6 +268,18 @@ dash.calc('records', {
     const byPlayer = {};
     appearances.forEach(a => { (byPlayer[a.name] = byPlayer[a.name] || []).push(a); });
     Object.entries(byPlayer).forEach(([nm, list]) => {
+      if (isGK(nm)) {
+        // 守護神：GKだけで、ピッチにいた時間の90分あたり失点を比べる
+        let ga = 0, mins = 0, cs = 0;
+        list.forEach(a => {
+          mins += n(a.minutes);
+          const c = (allByRound[String(a.round)] || []).filter(g => g.team !== '宮崎' && n(g.minute) >= n(a.on) && n(g.minute) <= n(a.off)).length;
+          ga += c;
+          if (c === 0 && n(a.minutes) >= 90) cs++;
+        });
+        if (mins >= 180) add('keeper', nm, ga / mins * 90, `出場${list.length}試合・90分あたり失点${(ga / mins * 90).toFixed(2)}・無失点${cs}試合`);
+        return;
+      }
       const all = rec3(list.map(a => resOf[String(a.round)]));
       if (list.length >= 5) add('lucky', nm, Math.round(all.ppg * 100) * 100 + list.length, `出場${list.length}試合 ${all.w}勝${all.d}分${all.l}敗`);
       const st = list.filter(a => n(a.started) === 1);
@@ -295,9 +311,9 @@ dash.calc('records', {
       for (let i = 0; i < s.length; i++) for (let j = i + 1; j < s.length; j++) { const k = s[i] + '＆' + s[j]; (pairs[k] = pairs[k] || []).push(resOf[r]); }
     });
     Object.entries(pairs).forEach(([k, list]) => {
-      if (list.length < 6) return;
+      if (list.length < 6 || k.split('＆').some(isGK)) return;
       const r = rec3(list);
-      if (r.l === 0) add('golden_pair', k, Math.round(r.ppg * 100) * 100 + list.length, `一緒に先発${list.length}試合 ${r.w}勝${r.d}分${r.l}敗`);
+      add('golden_pair', k, Math.round(r.ppg * 100) * 100 + list.length, `一緒に先発${list.length}試合 ${r.w}勝${r.d}分${r.l}敗`);
     });
     // 試合の流れを変えたゴール
     Object.values(allByRound).forEach(list => {
@@ -400,7 +416,7 @@ dash.calc('topics', {
     const pm = sorted('plusminus').find(r => !used.has(r.name));
     if (pm) { add('plusminus', '➕', '影のMVP', `${pm.name}がいると点差が開く！`, `${pm.value > 0 ? '+' : ''}${pm.value}`, pm.display.replace(/^[+-]?\d+/, '').replace(/[（）]/g, ''), '数字に表れる影の貢献に拍手を！'); used.add(pm.name); }
     const gp = sorted('golden_pair').find(r => r.name.split('＆').every(nm => !used.has(nm))) || sorted('golden_pair').find(r => !lk || !r.name.split('＆').includes(lk.name));
-    if (gp) add('pair', '💞', '黄金コンビ', `${gp.name.replace('＆', '×')}、2人そろえば負けない！`, gp.display.replace(/^.*試合 /, ''), `一緒に先発した${gp.display}`, 'このコンビをまた見たい！');
+    if (gp) add('pair', '💞', '黄金コンビ', /0敗$/.test(gp.display) ? `${gp.name.replace('＆', '×')}、2人そろえば負けない！` : `${gp.name.replace('＆', '×')}、2人そろえば勝ち点が積み上がる！`, gp.display.replace(/^.*試合 /, ''), `${gp.display}`, 'このコンビをまた見たい！');
     return T.map((t, i) => ({ ...t, order: i + 1, post: `【テゲバ非公式ランキング】${t.headline}\n${t.sub}\n${t.cheer}\n#テゲバジャーロ宮崎 #テゲバ` }));
   }
 });

@@ -79,3 +79,13 @@ test('選手の写真・エンブレム画像を使っていない（ルール4�
   const files = fs.readdirSync('public', { recursive: true }).map(String);
   assert.ok(!files.some(f => /\.(jpe?g|png|webp|avif|gif)$/i.test(f) && !f.startsWith('chars')), 'public/ に写真がある（キャラ画像は public/chars/ に置く）');
 });
+
+test('GK は出場時間系・チーム貢献系のランキングに入らず、「守護神」で別に比べる', () => {
+  const d = getData();
+  const gk = new Set(profiles.filter(p => p.pos === 'GK').map(p => p.name));
+  for (const id of ['plusminus', 'lucky', 'starter', 'golden_pair', 'wall', 'iron', 'allgames', 'young', 'veteran', 'clean']) {
+    for (const r of d.records.filter(x => x.record === id)) assert.ok(!r.name.split('＆').some(n => gk.has(n)), `${id}: ${r.name}`);
+  }
+  const keepers = d.records.filter(x => x.record === 'keeper');
+  assert.ok(keepers.length > 0 && keepers.every(r => gk.has(r.name)));
+});
