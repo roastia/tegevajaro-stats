@@ -1,6 +1,6 @@
 // すべてのページで動く小さなスクリプト：表示モード・誕生日・紙吹雪・数字のカウントアップ
 import confetti from 'canvas-confetti';
-import { icon, xIntent, X_MARK } from '../lib/util.js';
+import { icon, xIntent, X_MARK, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -46,7 +46,13 @@ const today = soon.filter(x => x.b.days === 0);
 
 const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 // 名前の前に「背番号」バッジ（数字だけだと背番号とわかりにくいため）
-const jnoName = p => { const nm = h('span', 'nm'); const no = h('span', 'jno'); no.append(h('small', null, '背番号'), h('b', null, p.no)); nm.append(no, h('span', null, p.name)); return nm; };
+// 名前の前に背番号入りシャツのイラスト
+const jnoName = p => {
+  const nm = h('span', 'nm');
+  const img = h('img', 'jersey jersey-sm on-color'); img.src = href(`chars/numbers-s/${p.no}.png`); img.alt = `背番号${p.no}`; img.width = 44; img.height = 44; img.decoding = 'async';
+  nm.append(img, h('span', null, p.name));
+  return nm;
+};
 const bdayBtn = (birth, label) => { const b = h('button', 'bdbtn'); b.type = 'button'; b.dataset.bdayOpen = birth; b.innerHTML = icon('cake'); b.append(label); return b; };
 const postLink = (text, label, cls = 'bpost') => { const a = h('a', cls); a.href = xIntent(text, SITE.url + '/'); a.target = '_blank'; a.rel = 'noopener noreferrer'; a.innerHTML = X_MARK; a.append(label); return a; };
 

@@ -42,7 +42,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
       return (
         <section class={`card pcard reveal pos-${['GK','DF','MF','FW'].includes(p.pos) ? p.pos : 'x'}`} data-name={p.name} data-pos={p.pos} data-no={p.no} data-birth={p.birth || undefined} data-age-out={p.birth ? `age-${p.no}` : undefined}>
           <div class="pband">
-            <span class="pnum" aria-label={`背番号${p.no}`}>{p.no}</span>
+            <img class="jersey jersey-lg on-color" src={href(`chars/numbers-s/${p.no}.png`)} alt={`背番号${p.no}`} width="72" height="72" loading="lazy" decoding="async" />
             <div>
               <div class="pname">{u ? <a href={u} target="_blank" rel="noopener noreferrer">{p.name}</a> : p.name}</div>
               <div class="pmeta">{p.pos}{age !== '' && age != null && <>・<span id={`age-${p.no}`}>{age}</span>歳</>}{p.birthplace && `・${p.birthplace}出身`}</div>
