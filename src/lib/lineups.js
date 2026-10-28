@@ -1,11 +1,11 @@
 // スタメンとフォーメーション（lineups.csv）
 // line：0=GK、1=最終ライン、2=その前… / slot：宮崎が上に攻める向きで左から1。
-// センターバック（2-3）とボランチ（1-2）は出典で左右を区別していないので、同じ行に並べるだけにする
+// センターバック・ボランチの左右がわからない試合は 2-3・1-2 と書き、同じ行に並べるだけにする（わかった試合は 2・3、1・2）
 
 const ROLE = {
   '0:1': 'GK',
-  '1:1': '左SB', '1:2-3': 'CB', '1:4': '右SB',
-  '2:1-2': 'ボランチ',
+  '1:1': '左SB', '1:2-3': 'CB', '1:2': 'CB', '1:3': 'CB', '1:4': '右SB',
+  '2:1-2': 'ボランチ', '2:1': 'ボランチ', '2:2': 'ボランチ',
   '3:1': '左SH', '3:2': 'トップ下', '3:3': '右SH',
   '4:1': 'CF',
 };
@@ -56,5 +56,7 @@ export function buildLineups(D) {
   D.lineups.forEach(r => { starts[r.name] = (starts[r.name] || 0) + 1; });
   const total = games.length;
   const ironmen = Object.entries(starts).filter(([, n]) => n === total).map(([n]) => n);
-  return { games, formations, roles, ironmen, total };
+  // 左右がわからないまま並べている試合
+  const unsure = [...new Set(D.lineups.filter(r => String(r.slot).includes('-')).map(r => Number(r.round)))].sort((a, b) => a - b);
+  return { games, formations, roles, ironmen, total, unsure };
 }

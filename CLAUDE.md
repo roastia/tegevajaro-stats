@@ -24,7 +24,7 @@
    - `goals.csv`（宮崎の得点）・`goals_all.csv`（両チームの得点）
    - `players.csv`：シーズン累計（出場・先発・分・得点・アシスト・警告など）
    - `suspension.csv`：累積警告
-   - `lineups.csv`：スタメンの配置（`round,formation,line,slot,name`）。line は 0=GK・1=最終ライン…、slot は宮崎が上に攻める向きで左から1。センターバック2人は `2-3`、ボランチ2人は `1-2`（左右は出典で区別できないため）。フォーメーションはスポーツナビの試合ページ、配置は Football LAB の選手ページ（試合ごとのポジション）とチームのフォーメーションページで確かめる
+   - `lineups.csv`：スタメンの配置（`round,formation,line,slot,name`）。line は 0=GK・1=最終ライン…、slot は宮崎が上に攻める向きで左から1。センターバック・ボランチの左右は Jリーグ公式の試合ページ「ラインナップ」のフォーメーション図で確かめて 2・3（CB）、1・2（ボランチ）と書く。図は宮崎が下に攻める向きのことがあるので、そのときは左右を入れかえる。確かめられないときは CB を `2-3`、ボランチを `1-2` と書く（同じ行に並べるだけになる）。フォーメーションはスポーツナビの試合ページ、配置は Football LAB の選手ページ（試合ごとのポジション）とチームのフォーメーションページでも確かめられる
    - Football LAB 由来：`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列、`lineups.csv` の配置（line・slot）
    - 選手の加入・退団があれば `profiles.csv`（経歴は「宮崎に来る直前まで」を `→` でつなぐ）
 2. `src/config/site.js` の `asOf`・`roundLabel`・`lastMatch`・`rank`（Jリーグ公式の順位表の現在順位）を書き換える。

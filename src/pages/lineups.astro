@@ -6,6 +6,7 @@ import { href, icon } from '../lib/util.js';
 const L = buildLineups({ lineups: readCsv('lineups'), matches: readCsv('matches'), players: readCsv('players') });
 const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
 const md = s => { const [, m, d] = s.split('-').map(Number); return `${m}/${d}`; };
+const ranges = ns => ns.reduce((o, n) => { const l = o[o.length - 1]; if (l && n === l[1] + 1) l[1] = n; else o.push([n, n]); return o; }, []).map(([a, b]) => a === b ? `${a}` : `${a}〜${b}`).join('・');
 const main = L.formations[0];
 const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
 const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
@@ -19,7 +20,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
       <p class="lu-cap">{main.games === L.total ? `${L.total}試合すべてこの形でスタート！` : `${L.total}試合中${main.games}試合でこの形`}</p>
       {L.formations.length > 1 && <p class="note">ほか：{L.formations.slice(1).map(f => `${f.formation}（${f.games}試合）`).join('・')}</p>}
       {L.ironmen.length > 0 && <p class="lu-iron"><b>全{L.total}試合スタメン</b>：{L.ironmen.join('・')}</p>}
-      <p class="note">センターバックとボランチの2人は、左右を区別せずに並べています。</p>
+      {L.unsure.length > 0 && <p class="note">{L.unsure.length === L.total ? '' : `第${ranges(L.unsure)}節の`}センターバックとボランチの2人は、左右を区別せずに並べています。</p>}
     </section>
     <section class="card reveal">
       <h2><Fragment set:html={icon('network')} />ポジション別の顔ぶれ</h2>
