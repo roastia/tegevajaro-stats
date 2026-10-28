@@ -371,3 +371,11 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .rec h2 .src { margin-left: auto; }
 .rec h2 .ttl .nw { white-space: nowrap; }
 .rec h2 .ttl .info { margin-left: 4px; vertical-align: 0.1em; }
+
+/* 切り替えボタン：1行のチップ。入りきらないときは横にスクロール（2行にしない） */
+.seg { display: flex; flex-wrap: nowrap; gap: 4px; border: 0; border-radius: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; max-width: 100%; padding: 2px 0; }
+.seg::-webkit-scrollbar { display: none; }
+.seg button { flex: none; white-space: nowrap; border: 1px solid color-mix(in srgb, var(--brand) 40%, var(--line)); border-radius: 999px; padding: 4px 10px; }
+.seg button:last-child { border-right: 1px solid color-mix(in srgb, var(--brand) 40%, var(--line)); }
+.seg button[aria-pressed='true'] { border-color: var(--brand-deep); }
+.seg button { font-size: .8rem; padding: 4px 9px; }
