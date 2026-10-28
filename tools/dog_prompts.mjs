@@ -26,7 +26,8 @@ const POSES = {
 // 一度決めた犬種・ポーズは src/data/dogs.csv に保存し、二度と変えない（作った画像を直さなくて済むように）。
 // まだ決まっていない選手（新加入）だけ、チーム内でほかと重ならない犬種と、ポジション内で重ならないポーズを割り当てる。
 const DOGS = 'src/data/dogs.csv';
-const saved = fs.existsSync(DOGS) ? fs.readFileSync(DOGS, 'utf8').trim().split('\n').slice(1).map(l => { const [name, breed, pose] = l.split(','); return { name, breed, pose }; }) : [];
+// look：本人の雰囲気を写真から読み取った見た目の特徴（空なら使わない）
+const saved = fs.existsSync(DOGS) ? fs.readFileSync(DOGS, 'utf8').trim().split('\n').slice(1).map(l => { const [name, breed, pose, look = ''] = l.split(','); return { name, breed, pose, look }; }) : [];
 const byName = Object.fromEntries(saved.map(r => [r.name, r]));
 const idOf = Object.fromEntries(d.players.map(p => [p.name, (String(p.jl_url).match(/player\/(\d+)/) || [])[1] || '']));
 const order = ['GK', 'DF', 'MF', 'FW'];
@@ -40,14 +41,14 @@ for (const p of players) {
   const poses = POSES[p.pos] || POSES.MF;
   const takenP = new Set(Object.values(byName).filter(r => (d.profiles.find(x => x.name === r.name) || {}).pos === p.pos).map(r => r.pose));
   const pose = poses.find(x => !takenP.has(x)) || poses[Object.keys(byName).length % poses.length];
-  byName[p.name] = { name: p.name, breed, pose };
+  byName[p.name] = { name: p.name, breed, pose, look: '' };
 }
-fs.writeFileSync(DOGS, 'name,breed,pose\n' + Object.values(byName).map(r => [r.name, r.breed, r.pose].join(',')).join('\n') + '\n');
+fs.writeFileSync(DOGS, 'name,breed,pose,look\n' + Object.values(byName).map(r => [r.name, r.breed, r.pose, r.look || ''].join(',')).join('\n') + '\n');
 const blocks = players.map(p => {
-  const { breed, pose } = byName[p.name];
+  const { breed, pose, look } = byName[p.name];
   const h = Number(p.height) || 0;
   const body = /大型犬/.test(breed) ? '背が高く大柄' : /小型犬/.test(breed) ? '小柄ですばしっこい' : 'バランスのよい体つき';
-  const file = idOf[p.name] ? `public/chars/players/${idOf[p.name]}.webp` : `public/chars/players/（Jリーグ選手IDが決まったら）.webp`;
+  const file = idOf[p.name] ? `public/chars/players/${idOf[p.name]}.png` : `public/chars/players/（Jリーグ選手IDが決まったら）.png`;
   const c = POSC[p.pos] || ['グレー', '#8A8A8A'];
   const extra = p.birthplace === '宮崎' ? '・特徴：胸に「太陽とヤシの木」の小さなワッペン（地元・宮崎出身）\n' : '';
   return `### ${p.name}（${p.pos}）
@@ -57,15 +58,14 @@ const blocks = players.map(p => {
 \`\`\`
 共通ルールで1匹描いてください。
 ・犬種：${breed}（${body}）
-・バンダナの色：${c[0]}（${c[1]}）
 ・ポーズ：${pose}
-${extra}\`\`\`
+${look ? `・見た目：${look}\n` : ''}${extra}\`\`\`
 `;
 });
 const head = fs.readFileSync('docs/dog-illustration-prompts.md', 'utf8').split('## 選手ごとのプロンプト')[0];
 fs.writeFileSync('docs/dog-illustration-prompts.md', head + `## 選手ごとのプロンプト
 
-称号・年齢・背番号のように変わる情報は使っていないので、一度作った画像は作り直す必要がありません。使っているのは、ポジション（バンダナの色とポーズ）・身長（犬の大きさ）・出身地（宮崎出身だけワッペン）です。顔や見た目は使っていません。新しい選手が加入したら \`node tools/dog_prompts.mjs\` を実行すると、その選手のプロンプトが追加されます（既存の選手のプロンプトは変わりません）。
+称号・年齢・背番号のように変わる情報は使っていないので、一度作った画像は作り直す必要がありません。使っているのは、ポジション（ポーズ）・身長（犬の大きさ）・出身地（宮崎出身だけワッペン）と、写真から読み取った見た目の特徴（入れた選手のみ）です。白黒の線画なので色の指定はありません。新しい選手が加入したら \`node tools/dog_prompts.mjs\` を実行すると、その選手のプロンプトが追加されます（既存の選手のプロンプトは変わりません）。
 
 ` + blocks.join('\n'));
 console.log(blocks.length);
