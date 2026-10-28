@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="背番号19">
 <g fill="none" stroke="currentColor" stroke-width="4.6" stroke-linecap="butt" stroke-linejoin="round">
-  <path d="M37 13 L19 20 L6 48 L22 54 L28 41 L28 92 L72 92 L72 41 L78 54 L94 48 L81 20 L63 13" />
-  <path d="M37 13 Q50 31 63 13" />
-  <path d="M37 13 Q50 19 63 13" />
-  <path d="M26 22 L13 51 M74 22 L87 51" />
+  <path d="M36 12 Q50 27 64 12" />
+  <path d="M36 12 L16 20 L5 46 L19 52 L26 37" />
+  <path d="M64 12 L84 20 L95 46 L81 52 L74 37" />
+  <path d="M23 24 L13 44 L19.5 47 L30 27 Z" />
+  <path d="M77 24 L87 44 L80.5 47 L70 27 Z" />
+  <path d="M27 44 L27 93 L73 93 L73 44" />
 </g>
-<text x="50" y="78" text-anchor="middle" font-family="'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" font-weight="500" letter-spacing="-1" font-size="31" fill="currentColor">19</text>
+<text x="50" y="78" text-anchor="middle" font-family="'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" font-weight="700" letter-spacing="-1" font-size="31" fill="currentColor">19</text>
 </svg>
