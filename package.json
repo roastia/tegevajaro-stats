@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "roster": "node tools/check_roster.mjs"
   },
   "dependencies": {
     "astro": "7.3.8",

@@ -89,3 +89,14 @@ test('GK は出場時間系・チーム貢献系のランキングに入らず�
   const keepers = d.records.filter(x => x.record === 'keeper');
   assert.ok(keepers.length > 0 && keepers.every(r => gk.has(r.name)));
 });
+
+test('名簿：背番号が重ならず、全員に背番号イラストと players.csv の行がある', async () => {
+  const fs = await import('node:fs');
+  const nos = profiles.map(p => p.no);
+  assert.equal(new Set(nos).size, nos.length, '背番号の重複');
+  for (const p of profiles) {
+    assert.ok(['GK', 'DF', 'MF', 'FW'].includes(p.pos), `${p.name} のポジション`);
+    assert.ok(players.some(x => x.name === p.name), `${p.name} が players.csv にない`);
+    for (const dir of ['numbers', 'numbers-s']) assert.ok(fs.existsSync(`public/chars/${dir}/${p.no}.png`), `${p.name}（${p.no}）の背番号イラストがない → python3 tools/jersey_numbers.py`);
+  }
+});
