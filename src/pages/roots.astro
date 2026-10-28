@@ -32,7 +32,7 @@ const posCls = p => `pos-${['GK', 'DF', 'MF', 'FW'].includes(p) ? p : 'x'}`;
   <section class="bday" data-bday hidden></section>
   <section class="card">
     <h2><Fragment set:html={icon('cake')} /> 年齢一覧</h2>
-    <p class="note">今日時点の満年齢。色付きの行は1か月以内に誕生日を迎える選手です。</p>
+    <p class="note">今日時点の満年齢。左の数字が並び順で、上から順に読みます（2段のときは左の段の下から右の段へ続きます）。オレンジの枠は1か月以内に誕生日を迎える選手です。</p>
     <div class="controls gap">
       <div class="seg" id="ageSeg" role="group" aria-label="並び順">
         {[['young', '若い順'], ['old', '年上順'], ['no', '背番号順'], ['bday', '誕生日が近い順']].map(([v, l], i) => <button type="button" data-ord={v} aria-pressed={i === 0 ? 'true' : 'false'}>{l}</button>)}
@@ -69,7 +69,6 @@ const posCls = p => `pos-${['GK', 'DF', 'MF', 'FW'].includes(p) ? p : 'x'}`;
   .two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
   .gap { margin-bottom: 10px; }
   .factlink { text-decoration: none; }
-  .ages { display: grid; }
 </style>
 <script>
   const list = document.getElementById('ageList')!;
@@ -89,7 +88,7 @@ const posCls = p => `pos-${['GK', 'DF', 'MF', 'FW'].includes(p) ? p : 'x'}`;
       const x = a.dataset.birth || '', y = b.dataset.birth || '';
       if (!x || !y) return x ? -1 : y ? 1 : 0;
       return ord === 'young' ? y.localeCompare(x) : x.localeCompare(y);
-    }).forEach((e, i) => { e.style.order = String(i); e.hidden = !!pos && e.dataset.pos !== pos; });
+    }).forEach(e => { e.hidden = !!pos && e.dataset.pos !== pos; list.append(e); });
   };
   const bind = (id: string, key: string, fn: (v: string) => void) => {
     const s = document.getElementById(id)!;

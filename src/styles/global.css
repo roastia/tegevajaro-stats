@@ -149,10 +149,6 @@ input[type=search] { flex: 1 1 10rem; }
 
 /* team tiles & form */
 .tile .big { font-size: 2rem; }
-.form { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-.form div { border: 1px solid var(--line); border-radius: 10px; padding: 6px; text-align: center; font-size: .75rem; color: var(--muted); }
-.form b { display: block; font-size: 1.2rem; color: var(--fg); }
-.form .w b { color: var(--ok); } .form .l b { color: var(--bad); }
 
 /* players */
 .pcard { padding: 0; overflow: hidden; border-top: 0; display: flex; flex-direction: column; }
@@ -266,7 +262,33 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .rank li > span:nth-child(3) { flex: 1 0 auto; white-space: nowrap; }
 .rank li > .dv { flex: 1 1 10rem; min-width: 0; text-align: right; }
 .ages .nm { white-space: nowrap; }
-.champ .nm { white-space: nowrap; }
+
 
 /* ポストボタンの文字は「「名前」／をXでポスト」の間だけで改行する */
 .postbtn .nw { white-space: nowrap; }
+
+/* 直近5試合：結果は「勝ち／引き分け／負け」と言葉で、勝ちはブランド色で目立たせる */
+.formcard { display: flex; flex-direction: column; gap: 8px; }
+.ftitle { font-weight: 700; font-size: clamp(1.4rem, 5vw, 1.9rem); line-height: 1.25; color: var(--ink); }
+.fbadges { display: flex; flex-wrap: wrap; gap: 6px; }
+.fbadge { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: .8rem; color: #fff; background: linear-gradient(120deg, var(--brand-deep), var(--brand)); border-radius: 999px; padding: 3px 12px; }
+.form { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
+.form > div { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 10px 4px 8px; border-radius: 12px; border: 1px solid var(--line); color: var(--muted); text-align: center; }
+.form .res { font-weight: 700; font-size: .78rem; white-space: nowrap; }
+.form .sc { font-weight: 700; font-size: clamp(1.1rem, 4vw, 1.5rem); line-height: 1.1; color: var(--fg); font-variant-numeric: tabular-nums; }
+.form .op { font-size: .78rem; color: var(--fg); white-space: nowrap; }
+.form .rd { font-size: .65rem; white-space: nowrap; }
+.form > .w { background: linear-gradient(160deg, var(--brand-deep), var(--brand)); border-color: var(--brand-deep); color: rgba(255,255,255,.9); }
+.form > .w .sc, .form > .w .op, .form > .w .res { color: #fff; }
+.form > .d { background: color-mix(in srgb, var(--gold) 14%, transparent); border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); }
+.form > .d .res { color: color-mix(in srgb, var(--gold) 70%, var(--fg)); }
+.form > .l { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+.newtag { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); font-size: .62rem; font-weight: 700; color: var(--brand-deep); background: #fff; border: 1px solid var(--brand); border-radius: 999px; padding: 0 6px; white-space: nowrap; }
+
+/* 年齢一覧：上から順に読む縦の並び（広い画面では2段組、左の段→右の段）。行頭に順位を付ける */
+.ages { display: block; columns: 2 22rem; column-gap: 24px; counter-reset: ord; }
+.ages li { break-inside: avoid; margin-bottom: 4px; grid-template-columns: 1.6rem 2rem 1fr auto; counter-increment: ord; }
+.ages li::before { content: counter(ord); font-size: .75rem; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.ages .ag { text-align: right; }
+.ages .soon { display: flex; align-items: center; gap: 2px; width: max-content; margin: 2px 0 0 auto; }
+.ages .soon .ic { width: 1em; height: 1em; }
