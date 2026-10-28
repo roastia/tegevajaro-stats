@@ -51,7 +51,10 @@ def make(no, area=None, height=None, stroke=None, thicken=0, size_out=None):
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
-    nos = sorted({r['no'] for r in csv.DictReader(open(os.path.join(ROOT, 'src/data/profiles.csv'), encoding='utf-8')) if r['no']}, key=int)
+    # 在籍選手（profiles.csv）に加えて、スタメンに出た選手（退団した選手も）の背番号も作る
+    rd = lambda f: list(csv.DictReader(open(os.path.join(ROOT, 'src/data', f), encoding='utf-8')))
+    starters = {r['name'] for r in rd('lineups.csv')} if os.path.exists(os.path.join(ROOT, 'src/data/lineups.csv')) else set()
+    nos = sorted({r['no'] for r in rd('profiles.csv') if r['no']} | {r['no'] for r in rd('players.csv') if r['no'] and r['name'] in starters}, key=int)
     os.makedirs(OUT + '-s', exist_ok=True)
     for no in nos:
         make(no).save(os.path.join(OUT, f'{no}.png'), optimize=True)

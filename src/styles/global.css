@@ -399,3 +399,33 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .sharepop .sp-go .xm { width: 1.1em; height: 1.1em; }
 .sharepop .sp-plain { font-size: .85rem; color: var(--ink); text-align: center; }
 .sharepop .sp-close { all: unset; cursor: pointer; align-self: center; font-size: .85rem; color: var(--muted); padding: 4px 10px; }
+
+/* スタメン（フォーメーション） */
+.lu-big { font-size: clamp(2.6rem, 12vw, 3.6rem); font-weight: 700; line-height: 1.1; color: var(--ink); letter-spacing: .02em; }
+.lu-cap { margin: 4px 0 8px; font-weight: 700; }
+.lu-iron { margin: 0 0 6px; }
+.lu-roles { margin: 8px 0 0; display: grid; gap: 6px; }
+.lu-roles > div { display: grid; grid-template-columns: 5.2em 1fr; gap: 8px; align-items: baseline; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+.lu-roles dt { font-weight: 700; color: var(--ink); font-size: .9rem; }
+.lu-roles dd { margin: 0; font-size: .92rem; }
+.lu-roles small { margin-left: 2px; color: var(--muted); font-size: .75rem; }
+.lu-h { margin: 28px 0 12px; font-size: 1.15rem; }
+.lu-games { grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); }
+.lu-game { padding: 12px; }
+.lu-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 8px; }
+.lu-rd { font-weight: 700; color: var(--ink); }
+.lu-vs { font-weight: 700; }
+.lu-vs small { font-weight: 400; color: var(--muted); }
+.lu-res { margin-left: auto; font-size: .85rem; font-weight: 700; padding: 1px 10px; border-radius: 999px; border: 1px solid var(--line); }
+.lu-res.win { background: var(--brand-deep); color: #fff; border-color: var(--brand-deep); }
+.lu-res.draw { background: var(--tint); }
+/* ピッチ：宮崎が上に攻める向き */
+.pitch { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; padding: 26px 6px 10px; border-radius: 12px;
+  background: repeating-linear-gradient(180deg, #EAF5EC 0 28px, #E1F0E4 28px 56px); border: 2px solid #CFE6D4; aspect-ratio: 1 / 1.05; overflow: hidden; }
+.pitch::before { content: ''; position: absolute; left: 50%; top: 50%; width: 30%; aspect-ratio: 1; transform: translate(-50%, -50%); border: 2px solid rgba(255,255,255,.9); border-radius: 50%; }
+.pitch::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px solid rgba(255,255,255,.9); }
+.lu-form { position: absolute; top: 6px; left: 10px; font-size: .75rem; font-weight: 700; color: #2E6B3F; z-index: 1; }
+.pl-row { position: relative; z-index: 1; display: flex; justify-content: space-evenly; }
+.pl { display: flex; flex-direction: column; align-items: center; width: 24%; min-width: 0; }
+.pl-j { width: 2.4rem; height: 2.4rem; display: block; }
+.pl-n { font-size: .74rem; font-weight: 700; line-height: 1.2; text-align: center; background: rgba(255,255,255,.85); border-radius: 6px; padding: 1px 5px; margin-top: 1px; max-width: 100%; overflow-wrap: anywhere; }

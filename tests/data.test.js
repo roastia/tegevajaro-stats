@@ -124,3 +124,20 @@ test('選手名の検索：よみ（ひらがな）とローマ字がそろい�
   assert.ok(find('けんた').length === 2);
   assert.equal(find('xyz').length, 0);
 });
+
+test('スタメン：各試合11人・出場記録の先発と一致・フォーメーションの人数どおりに並ぶ', async () => {
+  const { buildLineups } = await import('../src/lib/lineups.js');
+  const lu = readCsv('lineups'), apps = readCsv('appearances'), matches = readCsv('matches');
+  for (const m of matches) {
+    const rows = lu.filter(r => r.round === m.round);
+    assert.equal(rows.length, 11, `第${m.round}節は11人`);
+    const starters = apps.filter(a => a.round === m.round && a.started === '1').map(a => a.name).sort();
+    assert.deepEqual(rows.map(r => r.name).sort(), starters, `第${m.round}節の先発`);
+    const per = rows[0].formation.split('-').map(Number);
+    assert.equal(rows.filter(r => r.line === '0').length, 1, `第${m.round}節のGKは1人`);
+    per.forEach((n, i) => assert.equal(rows.filter(r => Number(r.line) === i + 1).length, n, `第${m.round}節 ${rows[0].formation} の${i + 1}列目`));
+  }
+  const L = buildLineups({ lineups: lu, matches, players: readCsv('players') });
+  assert.equal(L.games.length, matches.length);
+  assert.ok(L.games.every(g => g.lines.flat().every(p => p.role)), 'すべての選手にポジション名');
+});

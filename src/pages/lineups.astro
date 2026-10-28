@@ -1,0 +1,59 @@
+---
+import Base from '../layouts/Base.astro';
+import { readCsv } from '../lib/data.js';
+import { buildLineups } from '../lib/lineups.js';
+import { href, icon } from '../lib/util.js';
+const L = buildLineups({ lineups: readCsv('lineups'), matches: readCsv('matches'), players: readCsv('players') });
+const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
+const md = s => { const [, m, d] = s.split('-').map(Number); return `${m}/${d}`; };
+const main = L.formations[0];
+const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
+const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
+---
+<Base current="lineups" title="スタメン">
+  <p class="take">キックオフのピッチに立った11人。どの試合も、この並びから始まった。</p>
+  <div class="grid two">
+    <section class="card reveal lu-sum">
+      <h2><Fragment set:html={icon('target')} />今季のフォーメーション</h2>
+      <div class="lu-big">{main.formation}</div>
+      <p class="lu-cap">{main.games === L.total ? `${L.total}試合すべてこの形でスタート！` : `${L.total}試合中${main.games}試合でこの形`}</p>
+      {L.formations.length > 1 && <p class="note">ほか：{L.formations.slice(1).map(f => `${f.formation}（${f.games}試合）`).join('・')}</p>}
+      {L.ironmen.length > 0 && <p class="lu-iron"><b>全{L.total}試合スタメン</b>：{L.ironmen.join('・')}</p>}
+      <p class="note">センターバックとボランチの2人は、左右を区別せずに並べています。</p>
+    </section>
+    <section class="card reveal">
+      <h2><Fragment set:html={icon('network')} />ポジション別の顔ぶれ</h2>
+      <p class="note">そのポジションで先発した選手と試合数。</p>
+      <dl class="lu-roles">
+        {L.roles.filter(r => r.players.length).map(r => (
+          <div><dt>{r.role}</dt><dd>{r.players.map((p, i) => <span class="nw">{p.name}<small>{p.games}</small>{i < r.players.length - 1 ? '・' : ''}</span>)}</dd></div>
+        ))}
+      </dl>
+    </section>
+  </div>
+  <h2 class="lu-h">試合ごとのスタメン</h2>
+  <div class="grid lu-games">
+    {L.games.map(g => (
+      <section class="card lu-game reveal" aria-label={`第${g.round}節 ${g.opponent}戦のスタメン`}>
+        <div class="lu-head">
+          <span class="lu-rd">第{g.round}節</span>
+          <span class="lu-vs">{md(g.date)} {g.opponent}<small>（{ha(g)}）</small></span>
+          <span class={`lu-res ${resCls[g.result] || ''}`}>{g.gf}-{g.ga} {resWord[g.result] || ''}</span>
+        </div>
+        <div class="pitch" role="img" aria-label={`${g.formation}：${g.lines.flat().map(p => `${p.role} ${p.name}`).join('、')}`}>
+          <span class="lu-form">{g.formation}</span>
+          {g.lines.map(line => (
+            <div class={`pl-row n${line.length}`}>
+              {line.map(p => (
+                <div class="pl">
+                  {p.no ? <img class="jersey pl-j" src={href(`chars/numbers-s/${p.no}.png`)} alt={`背番号${p.no}`} width="128" height="128" loading="lazy" /> : <span class="pl-j" />}
+                  <span class="pl-n">{p.short}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</Base>
