@@ -153,3 +153,14 @@ test('おすすめスポット：載せる場所のデータの形（緯度経�
     assert.ok(![r.name, r.area, r.info].some(v => /https?:|<|>/.test(v || '')), `URL やタグは入れない：${r.name}`);
   }
 });
+
+test('スタジアムからの距離の計算と表示', async () => {
+  const { STADIUM, distanceKm, distanceLabel } = await import('../src/lib/util.js');
+  assert.equal(distanceKm(STADIUM.lat, STADIUM.lng, STADIUM.lat, STADIUM.lng), 0);
+  const km = distanceKm(STADIUM.lat, STADIUM.lng, STADIUM.lat + 0.1, STADIUM.lng);  // 緯度0.1度 ≒ 11.1km
+  assert.ok(km > 11 && km < 11.2, String(km));
+  assert.equal(distanceLabel(0.34), '約300m');
+  assert.equal(distanceLabel(0.02), '約100m');
+  assert.equal(distanceLabel(3.456), '約3.5km');
+  assert.equal(distanceLabel(24.6), '約25km');
+});

@@ -46,14 +46,14 @@
 - `src/pages/` … 注目トピック（/）・ランキング・選手の称号・ゴール動画・選手の背景・スタメン（`lineups.astro`、`src/lib/lineups.js`）、個別ページ `/t/` `/r/` `/b/`、画像 `/og/`
 - `public/logo-tegesta.svg` … サイトのロゴ（テゲスタ！の手描き文字をなぞった SVG）。ヘッダーとポスト用画像（白にして）で使う。`favicon.svg`・`apple-touch-icon.png` はロゴの「テ」
 - `src/scripts/site.js` … ポストの画像添付（スマホは共有メニューで `/og/` の画像を渡す。使えない端末は X の投稿画面）・スクロール位置・誕生日（日本時間の今日から計算）・紙吹雪・カウントアップ
-- `src/pages/spots.astro` … おすすめスポット（地図・一覧・投稿フォーム）。載せるのは `src/data/spots.csv` だけ
+- `src/pages/spots.astro` … おすすめスポット（スタジアムから近い順の一覧・投稿フォーム）。押すと Google マップが開き、いちご宮崎新富サッカー場からの直線距離を出す（位置は `src/lib/util.js` の `STADIUM`）。載せるのは `src/data/spots.csv` だけ
 - `worker/` … おすすめスポットの投稿受付（Cloudflare Workers + D1 + Turnstile）。準備の手順は `worker/README.md`
 - `tests/` … 検算テスト（Node 標準のテストランナー）。`worker/test/` も `npm test` で動く
 
 ## セキュリティ
 - サーバー側のプログラム・データベース・フォームは置かない（静的ファイルのみ）。**例外はおすすめスポットの投稿受付だけ**で、GitHub Pages とは別の Cloudflare Workers（`worker/`）に置く。投稿の中身を返す API は作らない（取り出しは `npm run spots:pull`）。
 - CSP は `astro.config.mjs` の `security.csp`。HTML に `style="..."` 属性やインラインのイベント属性を書かない（CSP で止まる）。幅や色はクラス（`w0`〜`w100`、`pos-GK` など）で指定する。
-- 外部から読み込むのは Google Fonts だけ。スクリプトの CDN は使わない（npm で入れてバンドルする）。例外：おすすめスポットの地図画像（OpenStreetMap のタイル）と、ボット対策の Cloudflare Turnstile（スクリプトと iframe）。地図の部品 Leaflet は npm で入れてある。
+- 外部から読み込むのは Google Fonts だけ。スクリプトの CDN は使わない（npm で入れてバンドルする）。例外：おすすめスポットのボット対策の Cloudflare Turnstile（スクリプトと iframe）だけ。地図は埋め込まず、各スポットから Google マップを開く。
 - 部品の追加は最小限に。`npm install --save-exact` で版を固定し、出て2週間以内の版は避ける。
 - GitHub Actions の外部 Action は公式のみ、コミット SHA で固定する。
 - 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。ポスト用画像も同じ順で塊にして並べる（`src/lib/og.js`）。
@@ -104,5 +104,5 @@
    - `info` は投稿者のことばを生かして、長いときは短く整える。カンマ・URL は入れない
    - `x_handle` は入力どおり（@なし）。人が「載せない」と言ったものは空にする
    - `added` は載せた日（YYYY-MM-DD）
-5. `npm test` → `npm run build` → `npm run preview` で地図と一覧を確認 → コミット（push は人）。載せた／見送った id を人に伝え、必要なら `worker/README.md` の status 更新コマンドを案内する
+5. `npm test` → `npm run build` → `npm run preview` で一覧と距離を確認 → コミット（push は人）。載せた／見送った id を人に伝え、必要なら `worker/README.md` の status 更新コマンドを案内する
 6. 消してほしいと連絡があった場所は、`spots.csv` から行を消してコミットする

@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import phraseBreak from './integrations/phrase-break.mjs';
 import { SITE } from './src/config/site.js';
 
-// おすすめスポット：投稿の送り先（Cloudflare Workers）と、地図の画像（OpenStreetMap）・ボット対策（Turnstile）だけ外部を許可する
+// おすすめスポット：投稿の送り先（Cloudflare Workers）とボット対策（Turnstile）だけ外部を許可する
 const spotsApiOrigin = SITE.spots.api ? new URL(SITE.spots.api).origin : '';
 const TURNSTILE = 'https://challenges.cloudflare.com';
 
@@ -20,7 +20,7 @@ export default defineConfig({
     csp: {
       directives: [
         "default-src 'self'",
-        "img-src 'self' data: https://tile.openstreetmap.org",
+        "img-src 'self' data:",
         "font-src https://fonts.gstatic.com",
         `connect-src 'self'${spotsApiOrigin ? ' ' + spotsApiOrigin : ''}`,
         `frame-src ${TURNSTILE}`,

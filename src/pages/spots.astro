@@ -1,12 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import { readCsv } from '../lib/data.js';
-import { icon, xUrl, mapsUrl } from '../lib/util.js';
+import { icon, xUrl, mapsUrl, STADIUM, distanceKm, distanceLabel } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 // 載せるのは、こちらで確認して src/data/spots.csv に入れたものだけ（投稿はそのままは出さない）
-const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '').map(s => ({ ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng) }));
+// スタジアムから近い順に並べ、直線距離を出す。タップすると Google マップが開く
+const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '')
+  .map(s => { const km = distanceKm(STADIUM.lat, STADIUM.lng, +s.lat, +s.lng); return { ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng), km, dist: distanceLabel(km) }; })
+  .sort((a, b) => a.km - b.km);
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
-const mapData = spots.map(s => ({ id: s.id, name: s.name, lat: +s.lat, lng: +s.lng }));
 ---
 <Base current="spots" title="おすすめスポット">
   <p class="take">試合の前も後も、宮崎を楽しもう。テゲサポが教えてくれた、おすすめの場所です。</p>
@@ -14,24 +16,22 @@ const mapData = spots.map(s => ({ id: s.id, name: s.name, lat: +s.lat, lng: +s.l
   <section class="card reveal">
     <h2><Fragment set:html={icon('pin')} />テゲサポおすすめスポット</h2>
     {spots.length > 0
-      ? <p class="note">{spots.length}か所。地図のピンか、下の名前を押すと場所がわかります。</p>
+      ? <p class="note">{STADIUM.name}から近い順。距離は直線距離です。場所を押すと Google マップが開きます。</p>
       : <p class="note">まだありません。最初のおすすめを、下のフォームから教えてください！</p>}
-    {spots.length > 0 && <div class="spot-map" id="spotMap" role="region" aria-label="おすすめスポットの地図"></div>}
     {spots.length > 0 && (
       <ul class="spot-list">
         {spots.map(s => (
-          <li id={`spot-${s.id}`} data-spot={s.id}>
-            <button class="spot-go" type="button" data-spot-go={s.id}><Fragment set:html={icon('pin')} /><b>{s.name}</b>{s.area && <small>{s.area}</small>}</button>
-            <p class="spot-info">{s.info}</p>
-            <div class="spot-meta">
-              {s.x && <a href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc">@{s.x_handle} さんのおすすめ</a>}
-              {s.maps && <a href={s.maps} target="_blank" rel="noopener noreferrer">Googleマップで開く</a>}
-            </div>
+          <li id={`spot-${s.id}`}>
+            <a class="spot-go" href={s.maps} target="_blank" rel="noopener noreferrer">
+              <span class="spot-head"><Fragment set:html={icon('pin')} /><b>{s.name}</b>{s.area && <small>{s.area}</small>}</span>
+              <span class="spot-dist">スタジアムから{s.dist}</span>
+              <span class="spot-info">{s.info}</span>
+            </a>
+            {s.x && <a class="spot-x" href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc">@{s.x_handle} さんのおすすめ</a>}
           </li>
         ))}
       </ul>
     )}
-    {spots.length > 0 && <p class="note spot-osm">地図：© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors</p>}
   </section>
 
   <section class="card reveal spot-form-card" id="post">
@@ -63,35 +63,9 @@ const mapData = spots.map(s => ({ id: s.id, name: s.name, lat: +s.lat, lng: +s.l
     </details>
   </section>
 
-  <script type="application/json" id="spot-data" set:html={JSON.stringify(mapData).replace(/</g, '\\u003c')}></script>
 </Base>
 
 <script>
-  import 'leaflet/dist/leaflet.css';
-  import L from 'leaflet';
-
-  // ---- 地図（OpenStreetMap）。ピンは画像を使わない丸い印 ----
-  const el = document.getElementById('spotMap');
-  const data: { id: string; name: string; lat: number; lng: number }[] = JSON.parse(document.getElementById('spot-data')?.textContent || '[]');
-  if (el && data.length) {
-    const map = L.map(el, { scrollWheelZoom: false, tap: true } as any);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '' }).addTo(map);
-    const marks = new Map<string, L.CircleMarker>();
-    for (const s of data) {
-      const m = L.circleMarker([s.lat, s.lng], { radius: 9, color: '#fff', weight: 2, fillColor: '#C8375F', fillOpacity: 1 }).addTo(map);
-      const p = document.createElement('div'); p.textContent = s.name;  // 文字として入れる
-      m.bindPopup(p);
-      m.on('click', () => document.getElementById(`spot-${s.id}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
-      marks.set(s.id, m);
-    }
-    map.fitBounds(L.latLngBounds(data.map(s => [s.lat, s.lng] as [number, number])), { padding: [30, 30], maxZoom: 14 });
-    document.querySelectorAll<HTMLElement>('[data-spot-go]').forEach(b => b.addEventListener('click', () => {
-      const m = marks.get(b.dataset.spotGo!); if (!m) return;
-      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      map.setView(m.getLatLng(), Math.max(map.getZoom(), 14)); m.openPopup();
-    }));
-  }
-
   // ---- 投稿フォーム ----
   const form = document.getElementById('spotForm') as HTMLFormElement | null;
   if (form) {

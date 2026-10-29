@@ -46,3 +46,19 @@ export function splitDisp(s) {
 export const xUrl = h => /^[A-Za-z0-9_]{1,15}$/.test(String(h || '')) ? `https://x.com/${h}` : '';
 /** 緯度経度から Google マップのリンク */
 export const mapsUrl = (lat, lng) => Number.isFinite(+lat) && Number.isFinite(+lng) && lat !== '' && lng !== '' ? `https://www.google.com/maps/search/?api=1&query=${+lat},${+lng}` : '';
+
+/** ホームスタジアム（Google マップの施設の位置。いちご宮崎新富サッカー場の公式サイトの地図リンクから） */
+export const STADIUM = { name: 'いちご宮崎新富サッカー場', lat: 32.0737818, lng: 131.4909384 };
+/** 2点の直線距離（km）。地球を半径6371kmの球として計算 */
+export function distanceKm(lat1, lng1, lat2, lng2) {
+  const r = d => d * Math.PI / 180, R = 6371;
+  const a = Math.sin(r(lat2 - lat1) / 2) ** 2 + Math.cos(r(lat1)) * Math.cos(r(lat2)) * Math.sin(r(lng2 - lng1) / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+/** 「約1.2km」「約300m」「約25km」の形 */
+export function distanceLabel(km) {
+  if (!Number.isFinite(km)) return '';
+  if (km < 1) return `約${Math.max(100, Math.round(km * 10) * 100)}m`;
+  if (km < 10) return `約${km.toFixed(1)}km`;
+  return `約${Math.round(km)}km`;
+}
