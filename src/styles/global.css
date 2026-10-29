@@ -698,3 +698,13 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .hl-xi summary .xi-form { white-space: nowrap; }
 /* 箱はすべて、細い線だけのシンプルな形（上のピンクの太線はつけない） */
 .card { border-top: 1px solid var(--line); }
+/* アウェイからお越しのみなさんへ */
+.away-guide .ag-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.away-guide .ag-list li { display: grid; grid-template-columns: 6em 1fr auto; gap: 4px 10px; align-items: center; padding-bottom: 8px; border-bottom: 1px dashed var(--line); font-size: .9rem; }
+.away-guide .ag-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.away-guide .ag-list b { color: var(--apri-ink); }
+.away-guide a.ag-go { justify-self: start; white-space: nowrap; font-size: .8rem; font-weight: 700; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--apri); background: #fff; color: var(--apri-ink); text-decoration: none; }
+.away-guide a.ag-go:hover { background: var(--apri-soft); }
+.away-guide a.ag-go.ext::after { content: ' ↗'; }
+.away-guide a.ag-go.in::after { content: ' ↓'; }
+@media (max-width: 640px) { .away-guide .ag-list li { grid-template-columns: 1fr; } }
