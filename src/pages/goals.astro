@@ -1,4 +1,5 @@
 ---
+import { SITE } from '../config/site.js';
 import Base from '../layouts/Base.astro';
 import { getData, readCsv } from '../lib/data.js';
 import { buildLineups } from '../lib/lineups.js';
@@ -16,7 +17,7 @@ const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}
 const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
 const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
 ---
-<Base current="goals" title="ハイライト">
+<Base current="goals" title="試合ハイライト・スタメン" description={`テゲバジャーロ宮崎の今季の試合ハイライト動画・ゴールした選手・スタメンとフォーメーションを試合ごとにまとめました（非公式）。${SITE.roundLabel}時点。`}>
   <section class="hl-controls" aria-label="絞り込み">
     <div class="controls">
       <div class="seg" id="resSeg" role="group" aria-label="結果">

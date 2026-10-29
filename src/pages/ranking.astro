@@ -1,4 +1,5 @@
 ---
+import { SITE } from '../config/site.js';
 import Base from '../layouts/Base.astro';
 import RankCard from '../components/RankCard.astro';
 import { getData, getShareables } from '../lib/data.js';
@@ -7,7 +8,7 @@ const share = new Map(getShareables().filter(s => s.kind === 'r').map(s => [s.id
 const cats = [['', 'すべて'], ['goal', 'ゴール'], ['time', '出場'], ['team', '貢献'], ['play', 'プレー'], ['trivia', 'トリビア']]
   .filter(([c]) => !c || d.rankings.some(r => r.meta.cat === c && r.rows.length));
 ---
-<Base current="ranking" title="ランキング">
+<Base current="ranking" title="選手ランキング" description={`テゲバジャーロ宮崎の選手ランキング。得点・アシスト・出場時間・決勝ゴールなど、今季の記録から独自に集計したランキングを、選手の称号つきで（非公式）。${SITE.roundLabel}時点。`}>
   <div class="controls">
     <div class="seg" id="recSeg" role="group" aria-label="ランキングの種類">
       {cats.map(([c, l], i) => <button type="button" data-cat={c} aria-pressed={i === 0 ? 'true' : 'false'}>{l}</button>)}

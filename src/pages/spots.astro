@@ -10,7 +10,7 @@ const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '
   .sort((a, b) => a.km - b.km);
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 ---
-<Base current="spots" title="宮崎情報">
+<Base current="spots" title="宮崎情報・アウェイ観戦ガイド" description="テゲバジャーロ宮崎のホーム、いちご宮崎新富サッカー場へのアクセス・スタグル・観戦ルールの案内（公式ページへのリンク）と、テゲサポおすすめの宮崎のスポット（非公式）。">
   <section class="miya-hero">
     <h2 class="welcome-h welcome-img"><img src={href('welcome-miyazaki.svg')} alt="ようこそみやざきへ！" width="2020" height="301" /></h2>
     <p>遠くから、ようこそお越しくださいました！試合の前も後も、宮崎をゆっくり楽しんでいってください。スタジアムへの行きかたや観戦ルールなどの案内と、地元のテゲサポがおすすめする場所をまとめました。「また来たいな」と思ってもらえたら、うれしいです。</p>

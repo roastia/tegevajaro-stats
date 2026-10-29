@@ -29,7 +29,7 @@ d.rankings.forEach(({ meta, rows }, idx) => {
 });
 const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
 ---
-<Base current="players" title="選手">
+<Base current="players" title="選手の背景・称号" description="テゲバジャーロ宮崎の選手の年齢・出身地・出身校・経歴と、今季の記録から決まる選手の称号の一覧（非公式）。">
   <div class="sec-h"><h2>選手の背景</h2><a href="#titles">選手の称号へ ↓</a></div>
   <div class="grid">
     {facts.map(f => (
