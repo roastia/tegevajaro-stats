@@ -22,7 +22,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
   <section class="card">
     <div class="controls">
       <div class="seg" id="resSeg" role="group" aria-label="結果">
-        {['', '勝', '分', '負'].map((r, i) => <button type="button" data-res={r} aria-pressed={i === 0 ? 'true' : 'false'}>{r || '全て'}</button>)}
+        {['', '勝', '分', '負'].map((r, i) => <button type="button" data-res={r} aria-pressed={i === 0 ? 'true' : 'false'}>{r || 'すべて'}</button>)}
       </div>
       <select id="scorerSel" aria-label="ゴールを決めた選手">
         <option value="">全員のゴール（{d.goals.length}）</option>
