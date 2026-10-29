@@ -537,3 +537,101 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .site-head .head-sub { display: flex; flex-direction: column; gap: 1px; padding-bottom: 2px; }
 .site-head .head-sub .tagline { padding-bottom: 0; }
 .site-head .unofficial { font-size: 11px; font-weight: 500; line-height: 1.3; color: var(--muted); letter-spacing: .02em; white-space: nowrap; }
+
+/* ===== 配色：ロゴの #F16682 に合う、やさしい単色（グラデーションは使わない） =====
+   ピンク（#F16682）を主役に、淡いピンクの面・あたたかいグレーの文字。黄色は GK と1位の印だけ、アプリコットは「宮崎情報」だけ */
+:root {
+  --brand: #F16682;          /* 塗り・線・選んだ状態 */
+  --brand-deep: #F16682;
+  --brand-dark: #F16682;
+  --ink: #C23F63;            /* 白地の上のピンク文字（読みやすい濃さ） */
+  --soft: #FFF1F4;           /* 淡いピンクの面 */
+  --soft2: #FDE3EA;
+  --fg: #3A3236;
+  --muted: #7A6E73;
+  --line: #F0DDE3;
+  --gold: #F5C451;           /* やさしい黄色（GK・1位） */
+  --gold-soft: #FFF6DC;
+  --gold-ink: #8A6510;
+  --apri: #F6A57A;           /* 宮崎情報 */
+  --apri-soft: #FFF1E8;
+  --apri-ink: #A9521F;
+  --tint: var(--soft);
+}
+/* 今季の成績 */
+.season { background: var(--soft); color: var(--fg); }
+.season-k { background: #fff; color: var(--ink); }
+.season-when, .season-rec .gl { color: var(--muted); }
+.season-rec .wdl b, .season-rec .pts b, .season-rec .rank b { color: var(--ink); }
+.season-rec .rank { background: #fff; }
+/* 注目トピックのカード */
+.shot { background: var(--soft); color: var(--fg); }
+.shot::before { background: conic-gradient(from var(--spin), transparent 0 70%, rgba(241,102,130,.18) 80%, transparent 90%); }
+.shot::after { background: rgba(241,102,130,.07); }
+.shot .lb { color: var(--ink); opacity: 1; }
+.shot .bg { color: var(--ink); }
+.shot .sb { color: #5E5257; opacity: 1; }
+.shot .ch { color: var(--ink); }
+.shot .ft { color: var(--muted); opacity: 1; border-top-color: var(--line); }
+.char { background: #fff; color: var(--ink); }
+/* ポストのボタン */
+.postbtn, .sharepop .sp-go, .spot-send { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 3px 0 #D9506F; }
+.postbtn:hover { box-shadow: 0 5px 0 #D9506F; }
+.postbtn:active { box-shadow: 0 1px 0 #D9506F; }
+.postbtn b { color: #fff; }
+.postbtn:focus-visible { outline-color: var(--ink); }
+/* 直近5試合 */
+.fbadge { background: var(--brand); }
+.form > .w { background: var(--soft2); border-color: var(--brand); color: var(--ink); }
+.form > .w .sc, .form > .w .op { color: var(--fg); }
+.form > .w .res { color: var(--ink); }
+.form > .d { background: var(--gold-soft); border-color: #EBD9A6; }
+.form > .d .res { color: var(--gold-ink); }
+.newtag { color: var(--ink); }
+/* ランキング */
+.rank li .bar { background: var(--soft2); }
+.rank li.r1 .bar { background: var(--gold-soft); }
+.rank li.r1 .rk { background: var(--gold); color: var(--fg); }
+.seg button[aria-pressed='true'] { background: var(--brand); border-color: var(--brand); color: #fff; }
+/* 選手の称号：GK は黄色、ほかはピンク（どちらも淡い面に濃い文字） */
+.pos-GK { --pc: var(--gold); --pc-soft: var(--gold-soft); --pc-ink: var(--gold-ink); --pc-on: var(--fg); }
+.pos-DF, .pos-MF, .pos-FW { --pc: var(--brand); --pc-soft: var(--soft); --pc-ink: var(--ink); --pc-on: #fff; }
+.pos-x { --pc: #B9AEB3; --pc-soft: #F5F2F3; --pc-ink: var(--muted); --pc-on: #fff; }
+.pband { background: var(--pc-soft); color: var(--fg); border-bottom: 3px solid var(--pc); }
+.pband .jersey.on-color { filter: none; opacity: .85; }
+.pnum { -webkit-text-stroke-color: var(--pc-ink); }
+.pname a { color: var(--fg); border-bottom-color: color-mix(in srgb, var(--pc-ink) 60%, transparent); }
+.pmeta { color: var(--muted); opacity: 1; }
+.bchip { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+.ages li .bar { background: var(--pc-soft); }
+.ages .no { background: var(--pc); color: var(--pc-on); }
+.ages li.bd { box-shadow: 0 0 0 1px var(--brand) inset; background: var(--soft); }
+.soon { background: var(--brand); }
+/* 誕生日 */
+.hbd { background: var(--gold-soft); color: var(--fg); animation: none; }
+.hbd .cake { color: var(--ink); }
+.bday { background: var(--gold-soft); color: var(--fg); }
+.bday h2 { color: var(--gold-ink); }
+.bcard { background: #fff; border-color: #EBD9A6; }
+.bcard.today { background: #fff; box-shadow: 0 0 0 2px var(--gold) inset; }
+.bcard .bg2 { color: var(--ink); }
+.bcard .cd { color: var(--muted); opacity: 1; }
+.bpost { background: var(--brand); color: #fff; }
+.bday .jersey.on-color, .bcard .jersey.on-color { filter: none; }
+.jno { color: var(--ink); }
+/* スタメン */
+.lu-res.win { background: var(--brand); border-color: var(--brand); }
+.pitch { background: #E8F3EA; }
+/* ゴール動画 */
+.vlist .lk a.yt { border-color: var(--ink); color: var(--ink); }
+/* 宮崎情報 */
+.welcome-h { color: var(--apri-ink); }
+.site-nav a.nav-miya, .site-nav a.nav-miya:hover { color: var(--apri-ink); }
+.site-nav a.nav-miya[aria-current='page'] { color: var(--apri-ink); border-bottom-color: var(--apri); }
+.spot-form .req { background: var(--brand); }
+@media (max-width: 640px) {
+  .site-nav a[aria-current='page'] { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .site-nav a.nav-miya { border-color: var(--apri); color: var(--apri-ink); background: var(--apri-soft); }
+  .site-nav a.nav-miya[aria-current='page'] { background: var(--apri); border-color: var(--apri); color: var(--fg); }
+}
+.spot-ask { margin: 0; font-weight: 500; }

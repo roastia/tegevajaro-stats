@@ -30,7 +30,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
       <select id="pOrder" aria-label="並び順"><option value="no">背番号順</option><option value="age">若い順</option><option value="kana">名前順</option></select>
     </div>
     <div class="legend legend-gap">
-      {['GK', 'DF', 'MF', 'FW'].map(p => <span class={`pos-${p}`}><i></i>{p}</span>)}
+      <span class="pos-GK"><i></i>GK</span><span class="pos-FW"><i></i>DF・MF・FW</span>
       <span>大きな数字は背番号</span>
     </div>
   </section>
