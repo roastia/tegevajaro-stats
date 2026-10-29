@@ -48,7 +48,7 @@
 - `src/pages/` … 注目トピック（/）・ランキング・選手（`players.astro`：上段に選手の背景、下段に選手の称号。前の `/roots/` は `/players/` へ移す）・ハイライト（`goals.astro`：試合ごとのハイライト・ゴール・スタメン図と今季のスタメン。スタメンの計算は `src/lib/lineups.js`。前の `/lineups/` は `/goals/` へ移す）、個別ページ `/t/` `/r/` `/b/`、画像 `/og/`
 - `public/logo-tegesta.svg` … サイトのロゴ（テゲスタ！の手描き文字をなぞった SVG）。ヘッダーとポスト用画像（白にして）で使う。`favicon.svg`・`apple-touch-icon.png` はロゴの「テ」
 - `src/scripts/site.js` … ポストの画像添付（スマホは共有メニューで `/og/` の画像を渡す。使えない端末は X の投稿画面）・スクロール位置・誕生日（日本時間の今日から計算）・紙吹雪・カウントアップ
-- `src/pages/spots.astro` … メニューの「宮崎情報」（オレンジ色の項目）のページ。見出しは「宮崎へようこそ！」。アウェイから来た人向けのあいさつと「アウェイからお越しのみなさんへ」（スタジアムの地図・電車・空港から・車と駐車場・クラブ公式の観戦ガイド・来場案内・おすすめへの案内）。電車・駐車場の情報はクラブ公式の「アクセス」ページ（https://www.tegevajaro.com/club/stadium/access）どおりに書き、運賃や台数・料金が変わったら直す。確かめられない情報は書かず、公式へリンクする。その下に載せたおすすめスポット、下に投稿フォーム（スタジアムから近い順の一覧・投稿フォーム）。押すと Google マップが開き、いちご宮崎新富サッカー場からの直線距離を出す（位置は `src/lib/util.js` の `STADIUM`）。載せるのは `src/data/spots.csv` だけ
+- `src/pages/spots.astro` … メニューの「宮崎情報」（オレンジ色の項目）のページ。見出しは「宮崎へようこそ！」。アウェイから来た人向けのあいさつと「アウェイからお越しのみなさんへ」（スタジアム・観戦ルール・来場案内・おすすめの見かた）。アクセス・駐車場・観戦ルール・来場案内の中身はこのサイトに書かず、すべてクラブ公式のページ（アクセス https://www.tegevajaro.com/club/stadium/access ・観戦ガイド・お知らせ）へ案内する。その下に載せたおすすめスポット、下に投稿フォーム（スタジアムから近い順の一覧・投稿フォーム）。押すと Google マップが開き、いちご宮崎新富サッカー場からの直線距離を出す（位置は `src/lib/util.js` の `STADIUM`）。載せるのは `src/data/spots.csv` だけ
 - `worker/` … おすすめスポットの投稿受付（Cloudflare Workers + D1 + Turnstile）。準備の手順は `worker/README.md`
 - `tests/` … 検算テスト（Node 標準のテストランナー）。`worker/test/` も `npm test` で動く
 
@@ -59,7 +59,7 @@
 - 部品の追加は最小限に。`npm install --save-exact` で版を固定し、出て2週間以内の版は避ける。
 - GitHub Actions の外部 Action は公式のみ、コミット SHA で固定する。
 - 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。ポスト用画像も同じ順で塊にして並べる（`src/lib/og.js`）。
-- 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：宮崎情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップへ固定のリンクを置く。
+- 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：宮崎情報の案内だけ、クラブ公式サイト（tegevajaro.com）へ固定のリンクを置く（おすすめスポットは Google マップ）。
 
 ## 選手の加入・退団・背番号変更
 依頼の例：「新加入：〇〇選手（MF・背番号△）。サイトに追加して」「〇〇選手が退団。サイトから外して」「〇〇選手の背番号が△に変わった」
