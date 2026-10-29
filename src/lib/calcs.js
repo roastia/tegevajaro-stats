@@ -368,9 +368,13 @@ dash.calc('topics', {
 
     const pt = top('points');
     if (pt) { const pct = (pt.display.match(/チームの(\d+)%/) || [])[1]; add('points', '💰', 'エースの証明', `${pt.name}、チームの勝ち点の${pct}%をひとりで稼ぎ出す！`, `${pct}%`, `そのゴールがなければ失っていた勝ち点は${pt.value}。チームの勝ち点の${pct}%を背負っている`, '頼れるエースに、もっと大きな声援を！'); }
-    if (tr.unbeaten) add('unbeaten', '🛡️', '無敗街道', `リーグ戦${tr.unbeaten}試合負けなし！`, `${tr.unbeaten}試合`, `第${tr.unbeaten_from}節から一度も負けていない。しかも${tr.scoring}試合連続でゴール中`, 'この勢い、誰にも止めさせない！');
+    if (tr.unbeaten) add('unbeaten', '🛡️', '無敗街道', `リーグ戦${tr.unbeaten}試合負けなし！`, `${tr.unbeaten}試合`, `第${tr.unbeaten_from}節から一度も負けていない`, 'この勢い、誰にも止めさせない！');
     const lead = rec(ms.filter(m => m.first_goal === '宮崎'));
     if (lead.c) add('lead', '🥇', '先制の法則', lead.l === 0 ? '先制すれば負けない！' : '先制した試合の成績', lead.s, `先に点を取った${lead.c}試合は${lead.s}`, 'キックオフから全力で声を届けよう！');
+    if (n(tr.scoring) >= 2) add('scoring', '⚽', '連続得点', `${tr.scoring}試合連続でゴール！`, `${tr.scoring}試合`, `第${ms[ms.length - n(tr.scoring)].round}節から、毎試合ゴールを奪い続けている`, 'ゴールの瞬間を、いっしょに叫ぼう！');
+    const homeRec = rec(ms.filter(m => m.ha === 'H'));
+    if (n(tr.home_unbeaten) >= 2) add('home', '🏟️', 'ホーム無敗', `ホームで${tr.home_unbeaten}試合負けなし！`, `${tr.home_unbeaten}試合`, `いちごはテゲバの砦。今季のホームは${homeRec.s}`, 'いちごをテゲサポでいっぱいにしよう！');
+    if (n(tr.scorers) > 0) add('scorers', '🎉', 'みんなで取る', `ゴールを決めた選手は${tr.scorers}人！`, `${tr.scorers}人`, `今季の${ms.reduce((s, m) => s + n(m.gf), 0)}得点を${tr.scorers}人で分け合う。誰もがゴールを狙えるチーム`, '次は誰が決める？ゴールを待とう！');
     const sr = {};
     goals_all.filter(g => g.team === '宮崎').forEach(g => { (sr[g.scorer] = sr[g.scorer] || new Set()).add(String(g.round)); });
     const myth = Object.entries(sr).map(([nm, set]) => ({ nm, r: rec(ms.filter(m => set.has(String(m.round)))) })).filter(x => x.r.l === 0 && x.r.c >= 3).sort((a, b) => b.r.c - a.r.c)[0];
