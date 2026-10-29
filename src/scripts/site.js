@@ -8,9 +8,9 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 // 表示は白背景だけ（ダーク表示はなし）
 try { localStorage.removeItem('theme'); } catch { /* 保存できなくても動く */ }
 
-/* ---------- ページごとのスクロール位置（スマホ・パソコン） ----------
-   メニューで初めて開くページは、メニューが画面の一番上に来る位置（ページの頭）から。
-   一度見たページは、前に見ていた位置から（ページの頭より上にいたときは、ページの頭から）。 */
+/* ---------- メニューで移ったときのスクロール位置（スマホ・パソコン共通） ----------
+   メニューがまだ上に張り付いていない（上にロゴなどが見えている）とき：スクロールはそのまま。メニューは画面の同じ位置に残る。
+   メニューが上に張り付いているとき：メニューは上のまま。下は、初めてのページはページの頭から、一度見たページは前に見ていた位置から。 */
 const ss = {
   get: k => { try { return sessionStorage.getItem(k); } catch { return null; } },
   set: (k, v) => { try { v === null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch { /* 保存できなくても動く */ } },
@@ -18,16 +18,22 @@ const ss = {
 const posKey = () => 'tg:scroll:' + location.pathname;
 const savePos = () => ss.set(posKey(), String(Math.round(scrollY)));
 const navTopY = () => { const a = document.querySelector('.navtop'); return a ? Math.round(a.getBoundingClientRect().top + scrollY) : 0; };
-document.querySelectorAll('.site-nav a').forEach(a => a.addEventListener('click', () => { savePos(); ss.set('tg:navjump', '1'); }));
-addEventListener('pagehide', savePos);
+// メニューを押した瞬間の位置を覚える（ページを離れるまでの間に高さが変わって位置がずれても、押したときの位置を使う）
+let navClicked = false;
+document.querySelectorAll('.site-nav a').forEach(a => a.addEventListener('click', () => { navClicked = true; savePos(); ss.set('tg:navfrom', String(Math.round(scrollY))); ss.set('tg:navjump', '1'); }));
+addEventListener('pagehide', () => { if (!navClicked) savePos(); });
+addEventListener('pageshow', () => { navClicked = false; });
 {
   const nav = performance.getEntriesByType('navigation')[0];
-  const phone = matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 640px)').matches;
-  // パソコンは、前に見たことのあるページだけ前の位置に戻す（初めてのページはブラウザのふつうの動き＝上から）
-  const seen = ss.get(posKey()) !== null;
-  if ((phone || seen) && ss.get('tg:navjump') && (!nav || nav.type === 'navigate')) {
-    const saved = Number(ss.get(posKey()) || 0);
-    const target = () => phone ? Math.max(saved, navTopY()) : saved;
+  const fromY = ss.get('tg:navfrom');
+  if (ss.get('tg:navjump') && fromY !== null && (!nav || nav.type === 'navigate')) {
+    const from = Number(fromY);
+    const savedRaw = ss.get(posKey());
+    const target = () => {
+      const top = navTopY();
+      if (from < top) return from;                                   // メニューは画面の同じ位置のまま
+      return savedRaw !== null ? Math.max(Number(savedRaw), top) : top; // メニューは上のまま
+    };
     const go = () => scrollTo({ top: target(), behavior: 'instant' });
     go(); requestAnimationFrame(go);
     // 文字や誕生日の表示でページの高さが変わったあとに、もう一度合わせる（その間に自分でスクロールしていたら何もしない）
@@ -35,9 +41,10 @@ addEventListener('pagehide', savePos);
     const mark = () => { moved = true; };
     addEventListener('touchstart', mark, { once: true, passive: true });
     addEventListener('wheel', mark, { once: true, passive: true });
+    addEventListener('keydown', mark, { once: true });
     addEventListener('load', () => { if (!moved) go(); }, { once: true });
   }
-  ss.set('tg:navjump', null);
+  ss.set('tg:navjump', null); ss.set('tg:navfrom', null);
 }
 
 // メニューの今いるページの項目が、横にはみ出して隠れないようにする
