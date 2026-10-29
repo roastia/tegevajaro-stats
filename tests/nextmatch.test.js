@@ -1,7 +1,7 @@
 // 次の試合：日本時間でのカウントダウンと切り替わりの検算
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { nextMatch } from '../src/lib/nextmatch.js';
+import { nextMatch, splitLeft } from '../src/lib/nextmatch.js';
 import { readCsv, getData } from '../src/lib/data.js';
 
 const fixtures = readCsv('fixtures');
@@ -23,7 +23,10 @@ test('カウントダウンと切り替わり（日本時間）', () => {
   assert.equal(nextMatch(fx, ms, at('2026-10-29T23:59+09:00')).big, 'あと2日');
   assert.equal(nextMatch(fx, ms, at('2026-10-30T00:00+09:00')).mode, 'tomorrow');
   const today = nextMatch(fx, ms, at('2026-10-31T11:30+09:00'));
-  assert.equal(today.mode, 'today'); assert.equal(today.sub, 'キックオフまで、あと2時間30分');
+  assert.equal(today.mode, 'today'); assert.ok(today.count);
+  assert.deepEqual(splitLeft(today.target - at('2026-10-31T11:30+09:00').getTime()), { d: 0, h: 2, m: 30, s: 0 });
+  assert.deepEqual(splitLeft(nextMatch(fx, ms, at('2026-10-29T10:00:05+09:00')).target - at('2026-10-29T10:00:05+09:00').getTime()), { d: 2, h: 3, m: 59, s: 55 });
+  assert.equal(nextMatch(fx, ms, at('2026-10-31T15:00+09:00')).count, false);
   assert.equal(nextMatch(fx, ms, at('2026-10-31T15:00+09:00')).mode, 'live');
   assert.equal(nextMatch(fx, ms, at('2026-10-31T23:00+09:00')).mode, 'after');
   // 日付が変わったら次の節へ（結果の反映がまだでも）

@@ -2,7 +2,8 @@
 import confetti from 'canvas-confetti';
 import { icon, xIntent, X_MARK, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
-import { nextMatch } from '../lib/nextmatch.js';
+import { nextMatch, splitLeft } from '../lib/nextmatch.js';
+import { makeFlipBoard } from '../lib/flipboard.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -231,18 +232,32 @@ document.addEventListener('click', e => {
   try { data = JSON.parse(document.getElementById('next-data')?.textContent || 'null'); } catch { data = null; }
   if (card && data) {
     const set = (k, v) => { const e = card.querySelector(`[data-nx="${k}"]`); if (e) e.textContent = v; };
+    const boardBox = card.querySelector('[data-nx="board"]');
+    const board = makeFlipBoard();
+    boardBox?.appendChild(board.el);
+    let nx = null;
+    const tick = () => { if (nx?.count) board.set(splitLeft(nx.target - Date.now())); };
     const draw = () => {
-      const nx = nextMatch(data.fixtures, data.matches, new Date());
+      nx = nextMatch(data.fixtures, data.matches, new Date());
       if (!nx) { card.hidden = true; return; }
       card.dataset.mode = nx.mode;
-      set('tag', nx.tag); set('big', nx.big); set('vs', 'vs ' + nx.vs.replace(/戦$/, '')); set('when', nx.when);
+      card.classList.toggle('is-count', nx.count);
+      if (boardBox) boardBox.hidden = !nx.count;
+      set('tag', nx.tag); set('big', nx.count ? nx.cap : nx.big); set('vs', 'vs ' + nx.vs.replace(/戦$/, '')); set('when', nx.when);
       set('venue', nx.fx.venue); set('hook', nx.hook); set('sub', nx.sub);
       const ha = card.querySelector('[data-nx="ha"]');
       if (ha) { ha.textContent = nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ'; ha.className = 'nx-ha ' + (nx.fx.ha === 'H' ? 'h' : 'a'); }
       const sub = card.querySelector('[data-nx="sub"]'); if (sub) sub.hidden = !nx.sub;
       const a = card.querySelector('[data-nx="post"]'); if (a) a.href = xIntent(`${nx.post}\n${SITE.hashtags}`, SITE.url + '/', '');
     };
-    draw();
-    setInterval(draw, 60e3);   // 当日はキックオフまでの時間を1分ごとに更新
+    draw(); tick();
+    // 秒読み：毎秒めくる。表示の切り替わり（前日・当日・試合中など）は1分ごとに見直す
+    let last = -1;
+    setInterval(() => {
+      const sec = Math.floor(Date.now() / 1000);
+      if (sec === last) return;
+      if (sec % 60 === 0 || (nx && nx.count && nx.target <= Date.now())) draw();
+      last = sec; tick();
+    }, 200);
   }
 }

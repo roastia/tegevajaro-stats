@@ -29,7 +29,7 @@
    - `lineups.csv`：スタメンの配置（`round,formation,line,slot,name`）。line は 0=GK・1=最終ライン…、slot は宮崎が上に攻める向きで左から1。出典は Jリーグ公式の試合ページ（`https://www.jleague.jp/match/j2/2026/月日番号/`）のフォーメーション図。ページの中のデータに宮崎の `formation` と各選手の `playerNumber`・`positionX`（小さいほど後ろ。GK がいちばん小さい）・`positionY`（マイナスが宮崎の左）が入っているので、positionX で列に分け、列の中を positionY の小さい順に 1, 2, … と番号をふる。背番号は `players.csv` で名前にする。図だけ見るときは、宮崎が下に攻める向きで描かれている試合があるので左右を入れかえて読む。確かめられないときだけ CB を `2-3`、ボランチを `1-2` と書く（同じ行に並べるだけになる）
    - Football LAB 由来：`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列
    - 選手の加入・退団があれば `profiles.csv`（経歴は「宮崎に来る直前まで」を `→` でつなぐ）
-   - `fixtures.csv`：これからの試合の日程（`round,date,kickoff,opponent,opponent_full,ha,venue`）。出典はクラブ公式の試合日程（https://www.tegevajaro.com/matches?type=all&year=2026）。`opponent` は `matches.csv` と同じ略称（前回の対戦を探すのに使う）。キックオフ時間が未定なら空。日程が発表されたら足し、変更があれば直す。結果が入った節は表示されないので消さなくてよい。トップの「次の試合」（`src/lib/nextmatch.js`）がブラウザで日本時間の今日から「あと〇日」「今日は試合の日！」「試合中！」を切り替える。ダッシュボード版は `index.html` の `FIXTURES` に同じ日程を入れる
+   - `fixtures.csv`：これからの試合の日程（`round,date,kickoff,opponent,opponent_full,ha,venue`）。出典はクラブ公式の試合日程（https://www.tegevajaro.com/matches?type=all&year=2026）。`opponent` は `matches.csv` と同じ略称（前回の対戦を探すのに使う）。キックオフ時間が未定なら空。日程が発表されたら足し、変更があれば直す。結果が入った節は表示されないので消さなくてよい。トップの「次の試合」（`src/lib/nextmatch.js`）がブラウザで日本時間の今日からキックオフまでの秒読み（パタパタめくれる得点板ふうの表示。`src/lib/flipboard.js`）と「今日は試合の日！」「試合中！」を切り替える。ダッシュボード版は `index.html` の `FIXTURES` に同じ日程を入れる
 2. `src/config/site.js` の `asOf`・`roundLabel`・`lastMatch`・`rank`（Jリーグ公式の順位表の現在順位）を書き換える。
    - 背番号の変更・新加入があったら `python3 tools/jersey_numbers.py` で背番号入りシャツのイラスト（`public/chars/numbers/`・小さい表示用 `numbers-s/`）を作り直す。
 3. `npm test` で検算する（出場時間の合計・スコアとゴール数・勝敗・ポスト文の長さなど）。失敗したらデータを直す。

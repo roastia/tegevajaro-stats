@@ -772,9 +772,30 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 @media (min-width: 641px) {
   .nextcard { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "label label label" "big info post" "big sub post" "hook hook post"; column-gap: 24px; row-gap: 4px; align-items: center; }
   .nextcard > .label { grid-area: label; }
-  .nextcard > .nx-big { grid-area: big; font-size: 2.6rem; padding-right: 8px; border-right: 1px solid var(--line); align-self: stretch; display: flex; align-items: center; }
+  .nextcard > .nx-main { grid-area: big; padding-right: 20px; border-right: 1px solid var(--line); align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+  .nextcard:not(.is-count) .nx-big { font-size: 2.6rem; }
   .nextcard > .nx-info { grid-area: info; }
   .nextcard > .nx-sub { grid-area: sub; }
   .nextcard > .nx-hook { grid-area: hook; }
   .nextcard > .post { grid-area: post; padding-top: 0; align-self: center; }
 }
+
+/* 次の試合：パタパタ（めくり式）の得点板 */
+.nx-main { display: flex; flex-direction: column; gap: 6px; }
+.nextcard.is-count .nx-big { font-size: 1rem; }
+.fb { display: flex; gap: clamp(6px, 2vw, 10px); }
+.fb-g { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.fb-ds { display: flex; gap: 3px; }
+.fb-u { font-size: .72rem; font-weight: 700; color: var(--muted); }
+.fl { position: relative; display: block; width: 1.12em; height: 1.55em; font-size: clamp(22px, 6.4vw, 42px); font-weight: 700; line-height: 1.55em; text-align: center; color: #fff; font-variant-numeric: tabular-nums; perspective: 260px; }
+.fl > span { position: absolute; inset: 0; border-radius: 6px; background: #3A3236; backface-visibility: hidden; }
+.fl-t, .fl-ft { clip-path: inset(0 0 50% 0); }
+.fl-b, .fl-fb { clip-path: inset(50% 0 0 0); background: #332C30 !important; }
+.fl::after { content: ''; position: absolute; left: 0; right: 0; top: calc(50% - .5px); height: 1px; background: #1E191B; z-index: 5; }
+.fl::before { content: ''; position: absolute; left: -1px; top: calc(50% - 3px); width: 3px; height: 6px; border-radius: 1px; background: #1E191B; z-index: 5; box-shadow: calc(1.12em - 1px) 0 0 #1E191B; }
+.fl:not(.go) .fl-ft, .fl:not(.go) .fl-fb { visibility: hidden; }
+.fl.go .fl-ft { z-index: 3; transform-origin: 50% 50%; animation: fl-top .22s ease-in forwards; }
+.fl.go .fl-fb { z-index: 3; transform-origin: 50% 50%; animation: fl-bot .22s .22s ease-out both; }
+@keyframes fl-top { from { transform: rotateX(0); } to { transform: rotateX(-90deg); } }
+@keyframes fl-bot { from { transform: rotateX(90deg); } to { transform: rotateX(0); } }
+@media (prefers-reduced-motion: reduce) { .fl.go .fl-ft, .fl.go .fl-fb { animation: none; visibility: hidden; } }

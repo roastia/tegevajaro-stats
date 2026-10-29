@@ -58,11 +58,7 @@ export function nextMatch(fixtures, matches, now = new Date()) {
   let big, sub;
   if (mode === 'days') { big = `あと${days}日`; sub = ''; }
   else if (mode === 'tomorrow') { big = 'いよいよあした！'; sub = ''; }
-  else if (mode === 'today') {
-    big = '今日は試合の日！';
-    const left = ko ? ko - t : 0;
-    sub = ko ? `キックオフまで、あと${Math.floor(left / H)}時間${Math.floor(left % H / 60e3)}分` : '';
-  }
+  else if (mode === 'today') { big = '今日は試合の日！'; sub = ko ? '' : 'キックオフ時間はまだ発表されていません'; }
   else if (mode === 'live') { big = '試合中！'; sub = 'みんなで念を送ろう！'; }
   else { big = 'おつかれさまでした！'; sub = '結果はこのあと反映します'; }
 
@@ -73,5 +69,16 @@ export function nextMatch(fixtures, matches, now = new Date()) {
     : mode === 'live' ? `${vs}、キックオフ！\nみんなで念を送ろう！`
     : `${vs}、おつかれさまでした！\n次も一緒に応援しよう！`;
 
-  return { fx, mode, days, tag, vs, when, where, big, sub, hook, prev, post };
+  // 秒読みの表示（パタパタの得点板）：キックオフ（時間が未定ならその日の0時）まで
+  const target = ko || jstInstant(fx.date);
+  const count = mode === 'days' || mode === 'tomorrow' || (mode === 'today' && !!ko);
+  const cap = mode === 'tomorrow' ? 'いよいよあした！ キックオフまで' : mode === 'today' ? '今日は試合の日！ キックオフまで' : 'キックオフまで';
+
+  return { fx, mode, days, tag, vs, when, where, big, sub, hook, prev, post, target, count, cap };
+}
+
+/** 残り時間（ミリ秒）→ 日・時間・分・秒 */
+export function splitLeft(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return { d: Math.floor(s / 86400), h: Math.floor(s % 86400 / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 };
 }
