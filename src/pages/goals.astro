@@ -21,7 +21,6 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
 <Base current="goals" title="ハイライト">
   <section class="card">
     <h2>試合ハイライト</h2>
-    <p class="note">勝った試合も、悔しい試合も、もう一度。ゴールの場面は試合のハイライト（YouTube）で見られます。「スタメン＆フォーメーション」を押すと、その試合の先発11人と並びが開きます。</p>
     <div class="controls">
       <div class="seg" id="resSeg" role="group" aria-label="結果">
         {['', '勝', '分', '負'].map((r, i) => <button type="button" data-res={r} aria-pressed={i === 0 ? 'true' : 'false'}>{r || '全て'}</button>)}
