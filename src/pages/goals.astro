@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import { getData, readCsv } from '../lib/data.js';
 import { buildLineups } from '../lib/lineups.js';
 import { icon, safeUrl, href } from '../lib/util.js';
-// ハイライト：試合ごとに「ハイライト動画・その試合のゴール・スタメン」をまとめ、下に今季のスタメンの傾向
+// ハイライト：試合ごとに「ハイライト動画・その試合のゴール・スタメン」をまとめる
 const d = getData();
 const L = buildLineups({ lineups: readCsv('lineups'), matches: readCsv('matches'), players: readCsv('players') });
 const xiOf = new Map(L.games.map(g => [String(g.round), g]));
@@ -13,8 +13,6 @@ const scorers = Object.entries(counts).sort((a, b) => b[1] - a[1]);
 const matches = [...d.matches].sort((a, b) => Number(b.round) - Number(a.round));
 const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
 const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}`; };
-const ranges = ns => ns.reduce((o, n) => { const l = o[o.length - 1]; if (l && n === l[1] + 1) l[1] = n; else o.push([n, n]); return o; }, []).map(([a, b]) => a === b ? `${a}` : `${a}〜${b}`).join('・');
-const main = L.formations[0];
 const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
 const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
 ---
@@ -70,26 +68,6 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
   </ul>
   <p class="hl-empty" id="hlEmpty" hidden>該当する試合はありません</p>
 
-  <h2 class="lu-h">今季のスタメン＆フォーメーション</h2>
-  <div class="grid two">
-    <section class="card reveal lu-sum">
-      <h2><Fragment set:html={icon('target')} />今季のフォーメーション</h2>
-      <div class="lu-big">{main.formation}</div>
-      <p class="lu-cap">{main.games === L.total ? `${L.total}試合すべてこの形でスタート！` : `${L.total}試合中${main.games}試合でこの形`}</p>
-      {L.formations.length > 1 && <p class="note">ほか：{L.formations.slice(1).map(f => `${f.formation}（${f.games}試合）`).join('・')}</p>}
-      {L.ironmen.length > 0 && <p class="lu-iron"><b>全{L.total}試合スタメン</b>：{L.ironmen.join('・')}</p>}
-      {L.unsure.length > 0 && <p class="note">{L.unsure.length === L.total ? '' : `第${ranges(L.unsure)}節の`}センターバックとボランチの2人は、左右を区別せずに並べています。</p>}
-    </section>
-    <section class="card reveal">
-      <h2><Fragment set:html={icon('network')} />ポジション別の顔ぶれ</h2>
-      <p class="note">そのポジションで先発した選手と試合数。</p>
-      <dl class="lu-roles">
-        {L.roles.filter(r => r.players.length).map(r => (
-          <div><dt>{r.role}</dt><dd>{r.players.map((x, i) => <span class="nw">{x.name}<small>{x.games}</small>{i < r.players.length - 1 ? '・' : ''}</span>)}</dd></div>
-        ))}
-      </dl>
-    </section>
-  </div>
 </Base>
 <style>
   .two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
