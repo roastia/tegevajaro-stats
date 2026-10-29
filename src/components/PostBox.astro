@@ -1,15 +1,11 @@
 ---
-// どのデータのポストかがわかるボタン。
-// スマホでは共有メニューで画像を添付してポスト（site.js）、それ以外は X の投稿画面を開く
-import { xIntent, X_MARK, href } from '../lib/util.js';
+// どのデータのポストかがわかるボタン。押すと X の投稿画面が開く（画像の添付や共有メニューは使わない）
+import { xIntent, X_MARK } from '../lib/util.js';
 interface Props { what: string; text: string; url?: string }
 const { what, text, url } = Astro.props;
-// 個別ページ（/t/ /r/ /b/）のポスト用画像
-const m = /\/([trb])\/([^/]+)\/$/.exec(url || '');
-const img = m ? href(`og/${m[1]}/${m[2]}.png`) : undefined;
 ---
 <div class="post">
-  <a class="postbtn" href={xIntent(text, url)} target="_blank" rel="noopener noreferrer" data-img={img} data-text={text} data-url={url} data-name={m ? `tegesta-${m[1]}-${m[2]}.png` : undefined}>
+  <a class="postbtn" href={xIntent(text, url)} target="_blank" rel="noopener noreferrer">
     <Fragment set:html={X_MARK} /><span><b class="nw">「{what}」</b><span class="nw">をXでポスト</span></span>
   </a>
 </div>

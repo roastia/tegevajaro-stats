@@ -36,11 +36,11 @@
 5. 変更をコミットする（**push は人が行う**）。コミットメッセージは「第14節（11/1 大分戦）を反映」のように。
 
 ## 公開URLが決まったら
-ポストのボタンを押すと、文のあとにテゲスタ！のURL（トピック・ランキング・背景はそれぞれの画像つきページ、ほかはトップ）が付く。URLはまだ仮（`https://roastia.github.io/tegevajaro-stats`）。決まったら次の3か所をそろえて変える。
+ポストのボタンを押すと X の投稿画面が開き（画像の添付や共有メニューは使わない）、文のあとにテゲスタ！のURL（トピック・ランキング・背景はそれぞれの個別ページ、ほかはトップ）が付く。X ではそのURLにテゲスタ！のロゴのサムネイルが出る。ポスト文は改行を使わず1行（句点・空白でつなぐ）、最後に `#テゲバジャーロ宮崎 #テゲバ #テゲスタ`。URLはまだ仮（`https://roastia.github.io/tegevajaro-stats`）。決まったら次の3か所をそろえて変える。
 1. `src/config/site.js` の `url`
 2. `astro.config.mjs` の `site`（ドメイン）と `base`（ドメイン直下なら `/`）
 3. ダッシュボード版の `SITE_URL`（`index.html` の中）
-変えたら `npm run build` → ポスト用画像のページ（`/t/〇〇/`）とポストのリンクを確認する。
+変えたら `npm run build` → 個別ページ（`/t/〇〇/`）のサムネイル（`og:image`）とポストのリンクを確認する。
 
 ## Football LAB の切り替え
 - `src/config/site.js` の `footballLab` を `false` にすると、Football LAB 出典のランキングとフッターの表記が消える。
@@ -51,10 +51,10 @@
 - `src/lib/calcs.js` … ランキング計算（純粋関数）。ダッシュボード版で検算済みのロジック
 - `src/lib/meta.js` … ランキングの定義（タイトル・応援のひとこと・説明・出典）、アイコン、称号キャラ
 - `src/lib/data.js` … CSV 読み込み → 計算 → ページへ。`getShareables()` がポストできるもの（トピック・ランキング・背景）
-- `src/lib/og.js` … ポスト用画像（1200×630 PNG）を Satori + resvg でビルド時に生成
-- `src/pages/` … 注目トピック（/）・ランキング・選手（`players.astro`：上段に選手の背景、下段に選手の称号。前の `/roots/` は `/players/` へ移す）・ハイライト（`goals.astro`：試合ごとのハイライト・ゴール・スタメン図。スタメンの計算は `src/lib/lineups.js`。前の `/lineups/` は `/goals/` へ移す）、個別ページ `/t/` `/r/` `/b/`、画像 `/og/`
+- `src/lib/og.js` … リンクのサムネイル画像（1200×630 PNG、テゲスタ！のロゴ。全ページ共通の `/og/site.png`）を Satori + resvg でビルド時に生成
+- `src/pages/` … 注目トピック（/）・ランキング・選手（`players.astro`：上段に選手の背景、下段に選手の称号。前の `/roots/` は `/players/` へ移す）・ハイライト（`goals.astro`：試合ごとのハイライト・ゴール・スタメン図。スタメンの計算は `src/lib/lineups.js`。前の `/lineups/` は `/goals/` へ移す）、個別ページ `/t/` `/r/` `/b/`（ポストに付くリンク先）、サムネイル画像 `/og/site.png`
 - `public/logo-tegesta.svg` … サイトのロゴ（テゲスタ！の手描き文字をなぞった SVG）。ヘッダーとポスト用画像（白にして）で使う。`favicon.svg`・`apple-touch-icon.png` はロゴの「テ」
-- `src/scripts/site.js` … ポストの画像添付（スマホは共有メニューで `/og/` の画像を渡す。使えない端末は X の投稿画面）・スクロール位置・誕生日（日本時間の今日から計算）・紙吹雪・カウントアップ
+- `src/scripts/site.js` … スクロール位置・誕生日（日本時間の今日から計算）・紙吹雪・カウントアップ
 - `src/pages/spots.astro` … メニューの「宮崎情報」（オレンジ色の項目）のページ。上にアプリコットの面の「ようこそみやざきへ！」の手描き文字（`public/welcome-miyazaki.svg`。画像をなぞった SVG）と（あいさつと「おすすめスポットを見る」「おすすめを教える」のボタン）。案内はアイコンつきのタイル（ボタンはピンクの枠つき）。アウェイから来た人向けのあいさつと「アウェイからお越しのみなさんへ」（スタジアム＝Google マップ・アクセス・スタグル・観戦ルール・来場案内）。飛行機・電車・車・駐車場・スタグル・観戦ルール・来場案内の中身はこのサイトに書かず、すべてクラブ公式のページ（アクセス https://www.tegevajaro.com/club/stadium/access ・観戦ガイド・お知らせ）へ案内する。その下に載せたおすすめスポット、下に投稿フォーム（スタジアムから近い順の一覧・投稿フォーム）。押すと Google マップが開き、いちご宮崎新富サッカー場からの直線距離を出す（位置は `src/lib/util.js` の `STADIUM`）。載せるのは `src/data/spots.csv` だけ
 - `worker/` … おすすめスポットの投稿受付（Cloudflare Workers + D1 + Turnstile）。準備の手順は `worker/README.md`
 - `tests/` … 検算テスト（Node 標準のテストランナー）。`worker/test/` も `npm test` で動く
@@ -65,7 +65,7 @@
 - 外部から読み込むのは Google Fonts だけ。スクリプトの CDN は使わない（npm で入れてバンドルする）。例外：おすすめスポットのボット対策の Cloudflare Turnstile（スクリプトと iframe）だけ。地図は埋め込まず、各スポットから Google マップを開く。
 - 部品の追加は最小限に。`npm install --save-exact` で版を固定し、出て2週間以内の版は避ける。
 - GitHub Actions の外部 Action は公式のみ、コミット SHA で固定する。
-- 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。ポスト用画像も同じ順で塊にして並べる（`src/lib/og.js`）。
+- 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。
 - 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：宮崎情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。
 
 ## 選手の加入・退団・背番号変更

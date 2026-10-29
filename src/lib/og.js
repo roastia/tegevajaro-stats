@@ -1,10 +1,9 @@
-// ポスト用画像（1200×630）をビルド時に作る。Satori で SVG を作り、resvg で PNG にする
+// リンクのサムネイル画像（1200×630）をビルド時に作る。中身はテゲスタ！のロゴだけ（全ページ共通）。
+// Satori で SVG を作り、resvg で PNG にする
 import fs from 'node:fs';
 import path from 'node:path';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
-import { ICONS } from './meta.js';
-import { loadDefaultJapaneseParser } from 'budoux';
 import { SITE } from '../config/site.js';
 
 const FONT_DIR = path.resolve(process.cwd(), 'src/assets/fonts');
@@ -15,52 +14,17 @@ const loadFonts = () => fonts ||= [
 ];
 
 const h = (type, style, ...children) => ({ type, props: { style, children: children.flat().filter(c => c !== null && c !== undefined && c !== false && c !== '') } });
-// サイトのロゴ（そのままの色）。ポスト用画像の背景は淡いピンクの単色
-let logoSrc;
-const loadLogo = () => logoSrc ||= 'data:image/svg+xml;base64,' + Buffer.from(
+// サイトのロゴ（そのままの色）
+const logoSrc = () => 'data:image/svg+xml;base64,' + Buffer.from(
   fs.readFileSync(path.resolve(process.cwd(), 'public/logo-tegesta.svg'), 'utf8')).toString('base64');
-const iconSrc = name => 'data:image/svg+xml;base64,' + Buffer.from(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#C23F63" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ICONS.sparkle}</svg>`).toString('base64');
 
-/** 文字数に合わせて大きな数字のサイズを決める */
-const bigSize = s => { const n = [...String(s)].reduce((a, c) => a + (c.codePointAt(0) > 0xff ? 2 : 1), 0); return n <= 6 ? 140 : n <= 10 ? 112 : n <= 16 ? 84 : 60; };
-
-// 文節ごとの塊にして並べ、塊の途中では改行しない（BudouX）
-const budoux = loadDefaultJapaneseParser();
-const phrases = (t, style = {}) => budoux.parse(String(t)).map(p => ({ type: 'span', props: { style: { ...style }, children: p } }));
-// 文（。！？／ で終わる）ごとの箱に入れ、収まらない文は箱ごと次の行へ
-const sentences = t => String(t).split(/(?<=[。！？!?／])/).filter(Boolean);
-const clauses = t => String(t).split(/(?<=[、，：])/).filter(Boolean);
-const box = children => ({ type: 'div', props: { style: { display: 'flex', flexWrap: 'wrap', maxWidth: '100%' }, children } });
-// 文 → 節（、）→ 文節 の順に、収まらない塊を次の行へ送る
-const group = (parts, f) => parts.length < 2 ? f(parts[0] ?? '') : parts.map(p => box(f(p)));
-const para = (style, text) => ({ type: 'div', props: { style: { display: 'flex', flexWrap: 'wrap', ...style },
-  children: group(sentences(text), s => group(clauses(s), phrases)) } });
-const cut = (t, n) => { const a = [...String(t)]; return a.length > n ? a.slice(0, n - 1).join('') + '…' : a.join(''); };
-
-export function ogTree(item) {
-  const kicker = item.kind === 'r' ? `ランキング｜${item.label}` : item.label;
-  const headline = item.kind === 'r' ? `${item.label} 1位` : item.headline;
-  const extra = item.top && item.top.length > 1 ? item.top.slice(1).map(t => `${t.rank}位 ${t.name}`).join('　') : '';
-  return h('div', { width: 1200, height: 630, display: 'flex', flexDirection: 'column', color: '#3A3236', fontFamily: 'NotoSansJP',
-      backgroundColor: '#FFF1F4', position: 'relative' },
-    h('div', { position: 'absolute', left: 900, top: -140, width: 440, height: 440, borderRadius: 9999, background: 'rgba(241,102,130,0.08)', display: 'flex' }),
-    h('div', { position: 'absolute', left: 1024, top: 44, width: 116, height: 116, borderRadius: 9999, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-      { type: 'img', props: { src: iconSrc(item.icon), width: 68, height: 68 } }),
-    h('div', { position: 'absolute', left: 60, top: 48, width: 920, display: 'flex', flexDirection: 'column' },
-      h('div', { display: 'flex', fontSize: 28, color: '#C23F63', fontWeight: 700, letterSpacing: 2 }, kicker),
-      para({ fontSize: 44, fontWeight: 700, lineHeight: 1.3, marginTop: 8 }, cut(headline, 44))),
-    h('div', { position: 'absolute', left: 60, bottom: 76, width: 1080, display: 'flex', flexDirection: 'column' },
-      h('div', { display: 'flex', fontSize: bigSize(item.big), fontWeight: 700, color: '#C23F63', lineHeight: 1.05 }, cut(item.big, 18)),
-      item.sub ? para({ fontSize: 26, color: '#5E5257', marginTop: 10, lineHeight: 1.4 }, cut(item.sub, 52)) : null,
-      extra ? para({ fontSize: 24, color: '#5E5257', marginTop: 4 }, cut(extra, 50)) : null,
-      item.cheer ? para({ fontSize: 30, fontWeight: 700, color: '#C23F63', marginTop: 8 }, cut(item.cheer, 34)) : null),
-    h('div', { position: 'absolute', left: 60, top: 572, width: 1080, display: 'flex', justifyContent: 'space-between', fontSize: 20, color: '#7A6E73', borderTop: '2px solid #F3D3DC', paddingTop: 10 },
-      h('div', { display: 'flex', alignItems: 'center' }, { type: 'img', props: { src: loadLogo(), width: 116, height: 26 } }, h('span', { marginLeft: 8 }, '（非公式サポーターサイト）')), h('span', {}, `${SITE.roundLabel}時点`)),
-  );
+export function logoTree() {
+  return h('div', { width: 1200, height: 630, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', fontFamily: 'NotoSansJP' },
+    { type: 'img', props: { src: logoSrc(), width: 900, height: 202 } },
+    h('div', { display: 'flex', marginTop: 36, fontSize: 34, fontWeight: 700, color: '#7A6E73', letterSpacing: 4 }, `${SITE.tagline}（非公式サポーターサイト）`));
 }
 
-export async function renderPng(item) {
-  const svg = await satori(ogTree(item), { width: 1200, height: 630, fonts: loadFonts() });
+export async function renderLogoPng() {
+  const svg = await satori(logoTree(), { width: 1200, height: 630, fonts: loadFonts() });
   return new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } }).render().asPng();
 }

@@ -1,6 +1,6 @@
 // すべてのページで動く小さなスクリプト：スクロール位置・誕生日・紙吹雪・数字のカウントアップ
 import confetti from 'canvas-confetti';
-import { icon, xIntent, flatPost, X_MARK, href } from '../lib/util.js';
+import { icon, xIntent, X_MARK, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -54,85 +54,6 @@ addEventListener('pageshow', () => { navClicked = false; });
     const l = cur.offsetLeft - ul.offsetLeft, r = l + cur.offsetWidth;
     if (r > ul.scrollLeft + ul.clientWidth) ul.scrollLeft = r - ul.clientWidth + 16;
     else if (l < ul.scrollLeft) ul.scrollLeft = Math.max(0, l - 16);
-  }
-}
-
-/* ---------- ポストに画像を添付（スマホの共有メニュー） ----------
-   X の投稿画面を開くリンクでは画像を添付できないので、共有メニューで画像ファイルごと X アプリに渡す。
-   共有メニューは「押した直後」にしか開けない（iPhone の決まり）。画像がまだ読み込めていないときや、
-   開けなかったときは小さな画面を出し、もう一度押してもらって開く。共有メニューがない端末は今までどおり。 */
-{
-  const probe = (() => { try { return new File([new Uint8Array(1)], 'x.png', { type: 'image/png' }); } catch { return null; } })();
-  const canShareFiles = !!probe && typeof navigator.share === 'function' && typeof navigator.canShare === 'function'
-    && (() => { try { return navigator.canShare({ files: [probe] }); } catch { return false; } })()
-    && matchMedia('(pointer: coarse)').matches;
-  document.documentElement.dataset.share = canShareFiles ? 'files' : 'link';
-  if (canShareFiles) {
-    const files = new Map(); // 画像URL → File（読み込み済み）または Promise（読み込み中）
-    const load = a => {
-      const u = a.dataset.img;
-      if (!u) return Promise.resolve(null);
-      const got = files.get(u);
-      if (got) return got instanceof File ? Promise.resolve(got) : got;
-      const p = fetch(u).then(r => r.ok ? r.blob() : Promise.reject(new Error(String(r.status))))
-        .then(b => { const f = new File([b], a.dataset.name || 'tegesta.png', { type: 'image/png' }); files.set(u, f); return f; })
-        .catch(() => { files.delete(u); return null; });
-      files.set(u, p);
-      return p;
-    };
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { load(e.target); io.unobserve(e.target); } }), { rootMargin: '600px 0px' });
-    document.querySelectorAll('a.postbtn[data-img]').forEach(a => { io.observe(a); a.addEventListener('pointerdown', () => load(a), { passive: true }); });
-
-    const textOf = a => `${flatPost(a.dataset.text || '')}${a.dataset.url ? ' ' + a.dataset.url : ''}`;
-    // 共有メニューを開く。開けたら true、押し直しが必要なら false
-    const share = async (a, f) => {
-      try { await navigator.share({ files: [f], text: textOf(a) }); return true; }
-      catch (err) { return !!err && err.name === 'AbortError'; } // 閉じただけなら成功扱い
-    };
-
-    // 押し直し用の小さな画面
-    const sheet = document.createElement('div');
-    sheet.className = 'sharepop'; sheet.popover = 'auto'; sheet.id = 'sharePop';
-    const msg = document.createElement('p'); msg.className = 'sp-msg';
-    const go = document.createElement('button'); go.type = 'button'; go.className = 'sp-go';
-    const plain = document.createElement('a'); plain.className = 'sp-plain'; plain.target = '_blank'; plain.rel = 'noopener noreferrer'; plain.textContent = '画像なしで X の投稿画面を開く';
-    const close = document.createElement('button'); close.type = 'button'; close.className = 'sp-close'; close.textContent = '閉じる';
-    sheet.append(msg, go, plain, close);
-    document.body.append(sheet);
-    close.addEventListener('click', () => sheet.hidePopover());
-    plain.addEventListener('click', () => sheet.hidePopover());
-    let cur = null;
-    const openSheet = a => {
-      cur = a; plain.href = a.href;
-      const ready = files.get(a.dataset.img) instanceof File;
-      msg.textContent = ready ? '画像を添付してポストします。' : '画像を準備しています…';
-      go.innerHTML = X_MARK; go.append(ready ? '画像つきでポスト' : '準備中…'); go.disabled = !ready;
-      sheet.showPopover();
-      if (!ready) load(a).then(f => {
-        if (cur !== a) return;
-        go.innerHTML = X_MARK;
-        if (f) { msg.textContent = '準備ができました。'; go.append('画像つきでポスト'); go.disabled = false; }
-        else { msg.textContent = '画像を読み込めませんでした。'; go.append('画像なしでポスト'); go.disabled = false; go.dataset.plain = '1'; }
-      });
-    };
-    go.addEventListener('click', async () => {
-      const a = cur; if (!a) return;
-      if (go.dataset.plain) { delete go.dataset.plain; sheet.hidePopover(); window.open(a.href, '_blank', 'noopener,noreferrer'); return; }
-      const f = files.get(a.dataset.img);
-      if (!(f instanceof File)) return;
-      sheet.hidePopover();
-      if (!(await share(a, f))) window.open(a.href, '_blank', 'noopener,noreferrer');
-    });
-
-    document.addEventListener('click', async e => {
-      const a = e.target instanceof Element ? e.target.closest('a.postbtn[data-img]') : null;
-      if (!a) return;
-      e.preventDefault();
-      const f = files.get(a.dataset.img);
-      // 画像が読み込み済みなら、押した瞬間に共有メニューを開く（await をはさまない）
-      if (f instanceof File) { if (!(await share(a, f))) openSheet(a); return; }
-      openSheet(a);
-    });
   }
 }
 
