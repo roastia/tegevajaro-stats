@@ -21,7 +21,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
 <Base current="goals" title="ハイライト">
   <section class="card">
     <h2>試合ハイライト</h2>
-    <p class="note">勝った試合も、悔しい試合も、もう一度。ゴールの場面は試合のハイライト（YouTube）で見られます。「スタメン」を押すと、その試合の先発11人の並びが開きます。</p>
+    <p class="note">勝った試合も、悔しい試合も、もう一度。ゴールの場面は試合のハイライト（YouTube）で見られます。「スタメン＆フォーメーション」を押すと、その試合の先発11人と並びが開きます。</p>
     <div class="controls">
       <div class="seg" id="resSeg" role="group" aria-label="結果">
         {['', '勝', '分', '負'].map((r, i) => <button type="button" data-res={r} aria-pressed={i === 0 ? 'true' : 'false'}>{r || '全て'}</button>)}
@@ -31,7 +31,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
         {scorers.map(([n, c]) => <option value={n}>{n}（{c}ゴール）</option>)}
       </select>
       <select id="mOrder" aria-label="並び順"><option value="desc">新しい順</option><option value="asc">古い順</option></select>
-      <button type="button" class="xi-all" id="xiAll" aria-pressed="false">スタメンをすべて開く</button>
+      <button type="button" class="xi-all" id="xiAll" aria-pressed="false">スタメン＆フォーメーションをすべて開く</button>
     </div>
   </section>
   <ul class="grid hl-games" id="matchList">
@@ -51,7 +51,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
           : <p class="glist none">宮崎の得点なし</p>}
         {g && (
           <details class="hl-xi">
-            <summary>スタメン<span class="xi-form">{g.formation}</span></summary>
+            <summary>スタメン＆フォーメーション<span class="xi-form">{g.formation}</span></summary>
             <div class="pitch" role="img" aria-label={`${g.formation}：${g.lines.flat().map(x => `${x.role} ${x.name}`).join('、')}`}>
               <span class="pa" aria-hidden="true"></span><span class="ga" aria-hidden="true"></span><span class="parc" aria-hidden="true"></span>
               <span class="lu-form">{g.formation}</span>
@@ -72,7 +72,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
   </ul>
   <p class="hl-empty" id="hlEmpty" hidden>該当する試合はありません</p>
 
-  <h2 class="lu-h">今季のスタメン</h2>
+  <h2 class="lu-h">今季のスタメン＆フォーメーション</h2>
   <div class="grid two">
     <section class="card reveal lu-sum">
       <h2><Fragment set:html={icon('target')} />今季のフォーメーション</h2>
@@ -125,7 +125,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
   // スタメンをまとめて開く／閉じる
   const all = $('xiAll');
   const xis = [...document.querySelectorAll<HTMLDetailsElement>('.hl-xi')];
-  const sync = () => { const open = xis.every(x => x.open); all.setAttribute('aria-pressed', String(open)); all.textContent = open ? 'スタメンをすべて閉じる' : 'スタメンをすべて開く'; };
+  const sync = () => { const open = xis.every(x => x.open); all.setAttribute('aria-pressed', String(open)); all.textContent = open ? 'スタメン＆フォーメーションをすべて閉じる' : 'スタメン＆フォーメーションをすべて開く'; };
   all.addEventListener('click', () => { const open = all.getAttribute('aria-pressed') !== 'true'; xis.forEach(x => { x.open = open; }); sync(); });
   xis.forEach(x => x.addEventListener('toggle', sync));
 </script>
