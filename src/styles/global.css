@@ -738,3 +738,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .spot-examples b { display: block; color: var(--apri-ink); margin-bottom: 2px; }
 .ag-tiles li { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 10px; }
 .ag-tiles li p, .ag-tiles li .ag-btn { grid-column: 1 / -1; }
+/* 「ようこそみやざきへ！」の手描き文字（public/welcome-miyazaki.svg） */
+.welcome-img { line-height: 0; }
+.welcome-img img { display: block; width: min(100%, 30rem); height: auto; }
+.miya-hero .welcome-img { margin-bottom: 10px; }

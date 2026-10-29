@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { readCsv } from '../lib/data.js';
-import { icon, xUrl, mapsUrl, STADIUM, distanceKm, distanceLabel } from '../lib/util.js';
+import { icon, href, xUrl, mapsUrl, STADIUM, distanceKm, distanceLabel } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 // 載せるのは、こちらで確認して src/data/spots.csv に入れたものだけ（投稿はそのままは出さない）
 // スタジアムから近い順に並べ、直線距離を出す。タップすると Google マップが開く
@@ -12,7 +12,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 ---
 <Base current="spots" title="宮崎情報">
   <section class="miya-hero">
-    <h2 class="welcome-h">宮崎へようこそ！</h2>
+    <h2 class="welcome-h welcome-img"><img src={href('welcome-miyazaki.svg')} alt="ようこそみやざきへ！" width="2020" height="301" /></h2>
     <p>遠くから、ようこそお越しくださいました！試合の前も後も、宮崎をゆっくり楽しんでいってください。地元のテゲサポがおすすめする場所を集めました。「また来たいな」と思ってもらえたら、うれしいです。</p>
     <div class="miya-acts">
       <a class="btn-main" href="#spotList"><Fragment set:html={icon('pin')} />おすすめスポットを見る</a>
