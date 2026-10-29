@@ -53,12 +53,12 @@ export function getData() {
   if (climbs.length) {
     const c = climbs[0];
     const one = climbs.length === 1;
-    topics.unshift({ id: 'climb', emoji: '⤴️', label: '首位浮上', order: 0,
-      headline: one ? `${c.names.join('・')}が「${c.title}」で首位に！` : `首位交代が${climbs.length}件！ランキングが動いた`,
+    topics.unshift({ id: 'climb', emoji: '⤴️', label: 'ランキング首位浮上', order: 0,
+      headline: one ? `${c.names.join('・')}が、テゲスタ！ランキング「${c.title}」で首位に！` : `テゲスタ！ランキングで首位交代が${climbs.length}件！`,
       big: one ? c.names.join('・') : `${climbs.length}件`,
       sub: one ? (c.from ? `第${prevRound}節の${c.from}位から一気にトップへ` : `第${prevRound}節はランク外から、一気にトップへ`)
         : climbs.slice(0, 3).map(x => `${x.title}：${x.names.join('・')}`).join('／') + (climbs.length > 3 ? ' ほか' : ''),
-      cheer: 'ランキングは毎節動く。次に上がるのは誰だ？' });
+      cheer: 'テゲスタ！の選手ランキングは毎節動く。次に上がるのは誰だ？' });
   }
 
   // 記録まであと少し
