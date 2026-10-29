@@ -677,3 +677,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
   .hl-games { align-items: stretch; }
   .hl-game .hl-xi { margin-top: auto; }
 }
+/* 公式試合ページ：押せるとわかる枠つきボタン（別のサイトが開く印つき） */
+.hl-official { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--brand); background: #fff; color: var(--ink); font-weight: 700; font-size: .8rem; text-decoration: none; }
+.hl-official::after { content: '↗'; font-size: .8em; }
+.hl-official:hover { background: var(--soft); }
