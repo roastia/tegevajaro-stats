@@ -3,9 +3,11 @@
 import { xIntent, X_MARK } from '../lib/util.js';
 interface Props { what: string; text: string; url?: string }
 const { what, text, url } = Astro.props;
+// 選手の背景（/b/）のポストには「（第〇節時点）」を付けない
+const asOf = /\/b\//.test(url || '') ? '' : undefined;
 ---
 <div class="post">
-  <a class="postbtn" href={xIntent(text, url)} target="_blank" rel="noopener noreferrer">
+  <a class="postbtn" href={xIntent(text, url, asOf)} target="_blank" rel="noopener noreferrer">
     <Fragment set:html={X_MARK} /><span><b class="nw">「{what}」</b><span class="nw">をXでポスト</span></span>
   </a>
 </div>
