@@ -106,3 +106,4 @@
    - `added` は載せた日（YYYY-MM-DD）
 5. `npm test` → `npm run build` → `npm run preview` で一覧と距離を確認 → コミット（push は人）。載せた／見送った id を人に伝え、必要なら `worker/README.md` の status 更新コマンドを案内する
 6. 消してほしいと連絡があった場所は、`spots.csv` から行を消してコミットする
+7. ダッシュボード版（Claude のダッシュボード）にも同じ `spots.csv` を入れる（データセット `spots`）。ダッシュボード版はヘッダーの「宮崎へようこそ！」で一覧を見られるが、投稿フォームは見た目だけで送れない
