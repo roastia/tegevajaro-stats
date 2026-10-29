@@ -22,7 +22,7 @@ export function xIntent(text, url) {
 
 /** ポスト文。見出し・補足・応援・ハッシュタグ */
 export const postText = (headline, sub, cheer) =>
-  `【${SITE.short}】${headline}\n${sub}${cheer ? '\n' + cheer : ''}\n${SITE.hashtags}`;
+  `#テゲスタ ${headline}\n${sub}${cheer ? '\n' + cheer : ''}\n${SITE.hashtags}`;
 
 /** X の文字数（全角は2として数え、URL は23） */
 export const xLength = (text, url) => [...text].reduce((n, c) => n + (c.codePointAt(0) > 0x10ff ? 2 : 1), 0) + (url ? 24 : 0);
