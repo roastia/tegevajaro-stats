@@ -624,7 +624,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 /* スタメン */
 .lu-res.win { background: var(--brand); border-color: var(--brand); }
 .pitch { background: #E8F3EA; }
-/* ゴール動画 */
+/* ハイライト */
 .vlist .lk a.yt { border-color: var(--ink); color: var(--ink); }
 /* 宮崎情報 */
 .welcome-h { color: var(--apri-ink); }
@@ -637,3 +637,11 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
   .site-nav a.nav-miya[aria-current='page'] { background: var(--apri); border-color: var(--apri); color: var(--fg); }
 }
 .spot-ask { margin: 0; font-weight: 500; }
+/* 試合ハイライト：試合ごとに、その試合のゴールを並べる */
+.hl-list .glist { grid-column: 1 / -1; list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.hl-list .glist li { display: inline-flex; align-items: center; gap: 4px; padding: 1px 9px; border: 1px solid var(--line); border-radius: 999px; font-size: .8rem; border-bottom: 1px solid var(--line); }
+.hl-list .glist li .ic { color: var(--ink); width: 1em; height: 1em; }
+.hl-list .glist li .gt { color: var(--muted); }
+.hl-list .glist li.me { background: var(--soft2); border-color: var(--brand); }
+.hl-list .glist li.dim { opacity: .5; }
+.hl-list .glist.none { font-size: .8rem; color: var(--muted); }
