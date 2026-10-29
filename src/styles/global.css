@@ -686,3 +686,13 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .hl-game .glist li { padding: 0; border: 0; border-radius: 0; background: none; font-size: .85rem; }
 .hl-game .glist li.me { background: none; border: 0; color: var(--ink); }
 .hl-game .glist li.me b { color: var(--ink); }
+/* スタメン＆フォーメーション：開けるとわかる帯（右に「開く ▾」） */
+.hl-xi { border-top: 0; padding-top: 0; }
+.hl-xi summary { padding: 8px 12px; border-radius: 10px; background: var(--soft); border: 1px solid var(--line); transition: background .15s; }
+.hl-xi summary:hover { background: var(--soft2); }
+.hl-xi summary::before { content: none; }
+.hl-xi summary::after { content: '開く ▾'; margin-left: auto; font-size: .78rem; font-weight: 700; color: var(--ink); background: #fff; border: 1px solid var(--brand); border-radius: 999px; padding: 1px 10px; white-space: nowrap; }
+.hl-xi[open] summary::after { content: '閉じる ▴'; }
+.hl-xi summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.hl-xi summary { white-space: nowrap; gap: 6px; padding: 8px 10px; font-size: .82rem; }
+.hl-xi summary .xi-form { white-space: nowrap; }
