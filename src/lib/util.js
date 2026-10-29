@@ -14,12 +14,15 @@ export const X_MARK = '<svg class="xm" viewBox="0 0 24 24" aria-hidden="true"><p
 export const href = p => (import.meta.env?.BASE_URL || '/').replace(/\/$/, '') + '/' + String(p).replace(/^\//, '');
 
 /** X の投稿画面へのリンク。url を付けるとリンクカード（画像つき）が出る */
-/** ポスト文は改行を使わず1行に：行の終わりに句点（。）を足し、！？のあとは空白、ハッシュタグの前は空白でつなぐ */
-export const flatPost = text => {
+/** ポスト文は改行を使わず1行に（最後に「（第〇節時点）」を付ける）：行の終わりに句点（。）を足し、！？のあとは空白、ハッシュタグの前は空白でつなぐ */
+export const flatPost = (text, asOf = '') => {
   const parts = String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
+  const tag = asOf ? `（${asOf}時点）` : '';
+  if (tag && !parts.some(p => p.startsWith('#'))) parts.push(parts.pop() + tag);
   return parts.map((p, i) => {
     const next = parts[i + 1];
     if (!next) return p;
+    if (next.startsWith('#') && !p.startsWith('#')) return p + tag + ' ';
     if (next.startsWith('#') || p.startsWith('#')) return p + ' ';
     if (/[。]$/.test(p)) return p;
     if (/[！？!?]$/.test(p)) return p + ' ';
@@ -27,7 +30,7 @@ export const flatPost = text => {
   }).join('');
 };
 export function xIntent(text, url) {
-  const q = new URLSearchParams({ text: flatPost(text) });
+  const q = new URLSearchParams({ text: flatPost(text, SITE.roundLabel) });
   if (url) q.set('url', url);
   return 'https://twitter.com/intent/tweet?' + q.toString();
 }
