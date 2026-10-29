@@ -2,6 +2,7 @@
 import confetti from 'canvas-confetti';
 import { icon, xIntent, X_MARK, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
+import { nextMatch } from '../lib/nextmatch.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -221,3 +222,27 @@ document.addEventListener('click', e => {
   const b = e.target.closest?.('[data-bday-open]');
   if (b) { e.preventDefault(); e.stopPropagation(); openBday(b.dataset.bdayOpen); }
 });
+
+
+/* ---------- 次の試合（トップ）：今日の日時（日本時間）に合わせてカウントダウンを書き換える ---------- */
+{
+  const card = document.getElementById('next');
+  let data = null;
+  try { data = JSON.parse(document.getElementById('next-data')?.textContent || 'null'); } catch { data = null; }
+  if (card && data) {
+    const set = (k, v) => { const e = card.querySelector(`[data-nx="${k}"]`); if (e) e.textContent = v; };
+    const draw = () => {
+      const nx = nextMatch(data.fixtures, data.matches, new Date());
+      if (!nx) { card.hidden = true; return; }
+      card.dataset.mode = nx.mode;
+      set('tag', nx.tag); set('big', nx.big); set('vs', 'vs ' + nx.vs.replace(/戦$/, '')); set('when', nx.when);
+      set('venue', nx.fx.venue); set('hook', nx.hook); set('sub', nx.sub);
+      const ha = card.querySelector('[data-nx="ha"]');
+      if (ha) { ha.textContent = nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ'; ha.className = 'nx-ha ' + (nx.fx.ha === 'H' ? 'h' : 'a'); }
+      const sub = card.querySelector('[data-nx="sub"]'); if (sub) sub.hidden = !nx.sub;
+      const a = card.querySelector('[data-nx="post"]'); if (a) a.href = xIntent(`${nx.post}\n${SITE.hashtags}`, SITE.url + '/', '');
+    };
+    draw();
+    setInterval(draw, 60e3);   // 当日はキックオフまでの時間を1分ごとに更新
+  }
+}

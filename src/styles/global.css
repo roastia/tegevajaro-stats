@@ -754,3 +754,27 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
   .formcard > .post { grid-area: post; padding-top: 8px; }
 }
 .formcard > .cheer { font-size: 1.15rem; }
+
+/* 次の試合（トップ） */
+.nextcard { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+.nextcard .nx-tag { margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: var(--soft2); color: var(--ink); font-size: .72rem; font-weight: 700; }
+.nx-big { font-weight: 700; font-size: clamp(1.9rem, 8vw, 2.6rem); line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.nx-info { display: flex; flex-direction: column; gap: 2px; }
+.nx-vs { font-weight: 700; font-size: 1.25rem; color: var(--fg); }
+.nx-when { font-weight: 700; color: var(--fg); }
+.nx-where { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: .85rem; color: var(--muted); }
+.nx-ha { padding: 1px 8px; border-radius: 999px; font-size: .72rem; font-weight: 700; border: 1px solid var(--brand); }
+.nx-ha.h { background: var(--brand); color: #fff; }
+.nx-ha.a { background: #fff; color: var(--ink); }
+.nx-sub { margin: 0; font-weight: 700; color: var(--ink); }
+.nextcard > .nx-hook { font-size: 1.05rem; }
+.nextcard[data-mode="today"], .nextcard[data-mode="live"] { background: var(--soft); border-color: var(--brand); }
+@media (min-width: 641px) {
+  .nextcard { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "label label label" "big info post" "big sub post" "hook hook post"; column-gap: 24px; row-gap: 4px; align-items: center; }
+  .nextcard > .label { grid-area: label; }
+  .nextcard > .nx-big { grid-area: big; font-size: 2.6rem; padding-right: 8px; border-right: 1px solid var(--line); align-self: stretch; display: flex; align-items: center; }
+  .nextcard > .nx-info { grid-area: info; }
+  .nextcard > .nx-sub { grid-area: sub; }
+  .nextcard > .nx-hook { grid-area: hook; }
+  .nextcard > .post { grid-area: post; padding-top: 0; align-self: center; }
+}
