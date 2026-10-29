@@ -15,7 +15,7 @@ const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
   <div class="grid two">
     <section class="card">
       <h2>選手別ゴール集</h2>
-      <p class="note">あのゴールをもう一度。ゴールと試合のハイライトへのリンクです（ハイライトに入っていない場面もあります）。</p>
+      <p class="note">あのゴールをもう一度。ゴールだけの動画はないので、そのゴールが決まった試合のハイライト（YouTube）が開きます。</p>
       <div class="controls gap">
         <select id="scorerSel" aria-label="選手を選ぶ">
           <option value="">全員（{d.goals.length}ゴール）</option>
@@ -24,12 +24,11 @@ const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
         <select id="gOrder" aria-label="並び順"><option value="desc">新しい順</option><option value="asc">古い順</option><option value="min">時間帯順</option></select>
       </div>
       <ul class="vlist" id="goalList">
-        {goals.map(g => { const m = byRound.get(String(g.round)) || {}; const v = safeUrl(m.video_url), p = safeUrl(m.match_url); return (
+        {goals.map(g => { const m = byRound.get(String(g.round)) || {}; const v = safeUrl(m.video_url) || safeUrl(m.match_url); return (
           <li data-scorer={g.scorer} data-round={g.round} data-minute={g.minute}>
             <div class="gh"><b>{g.scorer}</b>　{g.time}</div>
             <div class="lk">
-              {v && <a class="yt" href={v} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />ハイライト</a>}
-              {p && <a href={p} target="_blank" rel="noopener noreferrer">公式試合ページ</a>}
+              {v && <a class="yt" href={v} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />試合のハイライト</a>}
             </div>
             <div class="sub">第{g.round}節 {m.opponent}（{ha(m)}）{m.gf}-{m.ga}</div>
           </li>); })}
@@ -37,7 +36,7 @@ const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
     </section>
     <section class="card">
       <h2>試合ハイライト</h2>
-      <p class="note">勝った試合も、悔しい試合も、もう一度。「ハイライト」はJリーグ公式ハイライト（YouTube）、動画がない試合は公式試合ページへ。</p>
+      <p class="note">勝った試合も、悔しい試合も、もう一度。「ハイライト」は試合のハイライト動画（YouTube）です。</p>
       <div class="controls gap">
         <div class="seg" id="resSeg" role="group" aria-label="結果">
           {['', '勝', '分', '負'].map((r, i) => <button type="button" data-res={r} aria-pressed={i === 0 ? 'true' : 'false'}>{r || '全て'}</button>)}
