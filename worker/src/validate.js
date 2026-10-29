@@ -33,6 +33,17 @@ export function validateSubmission(input) {
   return { ok: true, value: { name, area, info, x_handle: x } };
 }
 
+/** 同じ内容かどうかを比べるためのキー（大文字小文字・空白・記号のちがいは同じとみなす） */
+export const contentKey = (name, info) => [name, info]
+  .map(s => String(s || '').normalize('NFKC').toLowerCase().replace(/[\s\p{P}\p{S}ー〜～]/gu, ''))
+  .join('|');
+
+/** 文字列の SHA-256（16進） */
+export async function sha256(s) {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(s)));
+  return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 /** 日本時間の日付 YYYY-MM-DD */
 export const jstDay = (d = new Date()) => new Date(d.getTime() + 9 * 3600e3).toISOString().slice(0, 10);
 

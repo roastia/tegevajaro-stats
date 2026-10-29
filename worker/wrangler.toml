@@ -6,6 +6,8 @@ compatibility_date = "2026-10-01"
 # 受け付けるサイト（カンマ区切り）。手元で試すときは http://localhost:4321 を足す
 [vars]
 ALLOWED_ORIGIN = "https://roastia.github.io"
+# 同じ回線（IP）からの1日の投稿数の上限。スタジアムの Wi-Fi など、みんなで同じ回線を使う場所を考えて10件
+IP_DAILY_LIMIT = "10"
 
 # `npx wrangler d1 create tegesta-spots` で出た database_id をここに貼る
 [[d1_databases]]

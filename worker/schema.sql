@@ -9,9 +9,17 @@ CREATE TABLE IF NOT EXISTS submissions (
   status     TEXT    NOT NULL DEFAULT 'pending'  -- pending / approved / rejected（載せたかどうかのメモ）
 );
 
--- 1日1件の制限。IP アドレスそのものは保存せず、日ごとに変わる鍵でハッシュ化した値だけを置く。2日たったら消す
-CREATE TABLE IF NOT EXISTS daily_limits (
-  day     TEXT NOT NULL,   -- 日本時間の日付 YYYY-MM-DD
-  ip_hash TEXT NOT NULL,
+-- 同じ回線（IP）からは1日 IP_DAILY_LIMIT 件まで。IP アドレスそのものは保存せず、日ごとに変わる鍵でハッシュ化した値だけを置く。2日たったら消す
+CREATE TABLE IF NOT EXISTS ip_counts (
+  day     TEXT    NOT NULL,   -- 日本時間の日付 YYYY-MM-DD
+  ip_hash TEXT    NOT NULL,
+  n       INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (day, ip_hash)
+);
+
+-- 同じ日に、場所の名前とひとことが同じ投稿は受けない。内容から作ったハッシュを2日間だけ置く
+CREATE TABLE IF NOT EXISTS dup_hashes (
+  day  TEXT NOT NULL,
+  hash TEXT NOT NULL,
+  PRIMARY KEY (day, hash)
 );

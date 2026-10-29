@@ -36,7 +36,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 
   <section class="card reveal spot-form-card" id="post">
     <h2><Fragment set:html={icon('sparkle')} />おすすめを教えて！</h2>
-    <p class="note">送ってもらった内容は、すぐにはページに載りません。確認してから、このページに載せます。投稿は1日1件までです。</p>
+    <p class="note">送ってもらった内容は、すぐにはページに載りません。確認してから、このページに載せます。同じ回線（Wi-Fi など）からの投稿は1日10件まで、同じ内容は1回だけ受け付けます。</p>
     {ready ? (
       <form class="spot-form" id="spotForm" novalidate data-api={SITE.spots.api} data-sitekey={SITE.spots.turnstileSiteKey}>
         <label>場所の名前<span class="req">必須</span><input name="name" required maxlength="60" autocomplete="off" placeholder="例：〇〇食堂" /></label>
@@ -56,7 +56,8 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
       <summary>送った内容の扱い</summary>
       <ul>
         <li>送ってもらうのは「場所の名前・エリア・ひとこと・X アカウント（任意）」だけです。</li>
-        <li>1日1件の確認のため、IP アドレスを、元に戻せない形（日ごとに変わる鍵でハッシュ化した値）にして2日間だけ使い、そのあと消します。IP アドレスそのものは保存しません。</li>
+        <li>同じ回線から1日10件までの確認のため、IP アドレスを、元に戻せない形（日ごとに変わる鍵でハッシュ化した値）にして2日間だけ使い、そのあと消します。IP アドレスそのものは保存しません。</li>
+        <li>同じ内容の投稿かどうかの確認のため、場所の名前とひとことから作った値を2日間だけ使い、そのあと消します。</li>
         <li>ボット対策に Cloudflare Turnstile を使っています。</li>
         <li>載せるかどうか・載せる文面は、こちらで判断します（個人のお宅、宣伝、悪口などは載せません）。載せた内容を消してほしいときは、X でご連絡ください。</li>
       </ul>

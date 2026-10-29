@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateSubmission, jstDay, ipHash } from '../src/validate.js';
+import { validateSubmission, jstDay, ipHash, contentKey, sha256 } from '../src/validate.js';
 
 test('ふつうの投稿は通る', () => {
   const r = validateSubmission({ name: '道の駅 日向', area: '日向市', info: '試合前の腹ごしらえに', x_handle: '@tegesapo_1' });
@@ -30,4 +30,11 @@ test('IP のハッシュは日が変わると別の値になり、元の IP は�
   assert.notEqual(a, b);
   assert.match(a, /^[0-9a-f]{64}$/);
   assert.equal(jstDay(new Date('2026-10-29T15:30:00Z')), '2026-10-30');
+});
+
+test('同じ内容の判定：空白・記号・大文字小文字・全角半角のちがいは同じとみなす', async () => {
+  assert.equal(contentKey('テゲバ食堂', 'チキン南蛮が おいしい！'), contentKey(' テゲバ食堂 ', 'チキン南蛮がおいしい!!'));
+  assert.equal(contentKey('Cafe ABC', 'Good'), contentKey('ｃａｆｅ　abc', 'good.'));
+  assert.notEqual(contentKey('テゲバ食堂', 'チキン南蛮'), contentKey('テゲバ食堂', 'からあげ'));
+  assert.match(await sha256('x'), /^[0-9a-f]{64}$/);
 });

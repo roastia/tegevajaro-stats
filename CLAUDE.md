@@ -51,7 +51,7 @@
 - `tests/` … 検算テスト（Node 標準のテストランナー）。`worker/test/` も `npm test` で動く
 
 ## セキュリティ
-- サーバー側のプログラム・データベース・フォームは置かない（静的ファイルのみ）。**例外はおすすめスポットの投稿受付だけ**で、GitHub Pages とは別の Cloudflare Workers（`worker/`）に置く。投稿の中身を返す API は作らない（取り出しは `npm run spots:pull`）。
+- サーバー側のプログラム・データベース・フォームは置かない（静的ファイルのみ）。**例外はおすすめスポットの投稿受付だけ**で、GitHub Pages とは別の Cloudflare Workers（`worker/`）に置く。投稿の中身を返す API は作らない（取り出しは `npm run spots:pull`）。連投対策は Turnstile 毎回必須・同じ回線から1日10件まで（`worker/wrangler.toml` の `IP_DAILY_LIMIT`）・同じ日の同じ内容は受けない。
 - CSP は `astro.config.mjs` の `security.csp`。HTML に `style="..."` 属性やインラインのイベント属性を書かない（CSP で止まる）。幅や色はクラス（`w0`〜`w100`、`pos-GK` など）で指定する。
 - 外部から読み込むのは Google Fonts だけ。スクリプトの CDN は使わない（npm で入れてバンドルする）。例外：おすすめスポットのボット対策の Cloudflare Turnstile（スクリプトと iframe）だけ。地図は埋め込まず、各スポットから Google マップを開く。
 - 部品の追加は最小限に。`npm install --save-exact` で版を固定し、出て2週間以内の版は避ける。
