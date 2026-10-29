@@ -740,3 +740,16 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .ag-tiles li .ag-btn { align-self: end; }
 .hl-controls { margin-top: 14px; }
 .hl-controls .controls { margin: 0; } .hl-controls + .hl-games { margin-top: 12px; }
+
+/* 直近5試合：PCだけ横並びにして縦幅を詰める */
+@media (min-width: 641px) {
+  .formcard { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); grid-template-areas: "label chips" "title chips" "badges chips" "sub chips" "cheer post"; column-gap: 20px; row-gap: 4px; align-items: start; }
+  .formcard > .label { grid-area: label; }
+  .formcard > .ftitle { grid-area: title; font-size: 1.5rem; }
+  .formcard > .fbadges { grid-area: badges; }
+  .formcard > .sub { grid-area: sub; }
+  .formcard > .form { grid-area: chips; align-self: center; margin-top: 0; }
+  .formcard > .form > div { padding: 8px 4px 6px; }
+  .formcard > .cheer { grid-area: cheer; align-self: center; margin-top: 8px; }
+  .formcard > .post { grid-area: post; padding-top: 8px; }
+}
