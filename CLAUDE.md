@@ -64,6 +64,8 @@
 - CSP は `astro.config.mjs` の `security.csp`。HTML に `style="..."` 属性やインラインのイベント属性を書かない（CSP で止まる）。幅や色はクラス（`w0`〜`w100`、`pos-GK` など）で指定する。
 - 外部から読み込むのは Google Fonts だけ。スクリプトの CDN は使わない（npm で入れてバンドルする）。例外：おすすめスポットのボット対策の Cloudflare Turnstile（スクリプトと iframe）だけ。地図は埋め込まず、各スポットから Google マップを開く。
 - 部品の追加は最小限に。`npm install --save-exact` で版を固定し、出て2週間以内の版は避ける。
+- 部品の更新は Dependabot（`.github/dependabot.yml`、月1回・出て14日以上の版だけ）がプルリクエストで知らせる。取り込む前に `npm test` と `npm run build` が通ることを確かめる。Node.js は LTS（`.nvmrc`）。
+- 背番号の画像は 256色に減色した PNG（`tools/jersey_numbers.py`）。画像を足すときも軽くする。
 - GitHub Actions の外部 Action は公式のみ、コミット SHA で固定する。
 - 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。
 - 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：宮崎情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。

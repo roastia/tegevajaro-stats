@@ -17,7 +17,8 @@ const json = (status, body, origin) => new Response(JSON.stringify(body), {
   headers: { ...SECURITY_HEADERS, ...(origin ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' } : {}) },
 });
 
-async function verifyTurnstile(token, secret, ip) {
+// hosts：Turnstile を解いたページのホスト名がこの中にあるかも確かめる（ほかのサイトで取ったトークンを使い回させない）
+async function verifyTurnstile(token, secret, ip, hosts) {
   if (!token || typeof token !== 'string' || token.length > 2048) return false;
   const form = new FormData();
   form.append('secret', secret);
@@ -27,7 +28,7 @@ async function verifyTurnstile(token, secret, ip) {
     const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form });
     if (!r.ok) return false;
     const d = await r.json();
-    return d.success === true && (!d.action || d.action === 'spot');
+    return d.success === true && (!d.action || d.action === 'spot') && hosts.includes(d.hostname);
   } catch { return false; }  // 確認できないときは受け付けない
 }
 
@@ -64,7 +65,7 @@ export default {
     if (!v.ok) return json(400, { ok: false, error: v.error }, okOrigin);
 
     const ip = request.headers.get('CF-Connecting-IP') || '';
-    if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip))) {
+    if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, allowed.map(o => new URL(o).hostname)))) {
       return json(403, { ok: false, error: '確認に失敗しました。ページを開き直してもう一度お試しください' }, okOrigin);
     }
 

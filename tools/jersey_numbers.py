@@ -56,7 +56,9 @@ if __name__ == '__main__':
     starters = {r['name'] for r in rd('lineups.csv')} if os.path.exists(os.path.join(ROOT, 'src/data/lineups.csv')) else set()
     nos = sorted({r['no'] for r in rd('profiles.csv') if r['no']} | {r['no'] for r in rd('players.csv') if r['no'] and r['name'] in starters}, key=int)
     os.makedirs(OUT + '-s', exist_ok=True)
+    # 256色に減色して保存する（見た目はほぼ同じで、ファイルは約5分の1になる）
+    save = lambda im, f: im.quantize(256, method=Image.Quantize.FASTOCTREE).save(f, optimize=True)
     for no in nos:
-        make(no).save(os.path.join(OUT, f'{no}.png'), optimize=True)
-        make(no, **{k: v for k, v in SMALL.items() if k != 'size'}, size_out=SMALL['size']).save(os.path.join(OUT + '-s', f'{no}.png'), optimize=True)
+        save(make(no), os.path.join(OUT, f'{no}.png'))
+        save(make(no, **{k: v for k, v in SMALL.items() if k != 'size'}, size_out=SMALL['size']), os.path.join(OUT + '-s', f'{no}.png'))
     print(len(nos), 'images')

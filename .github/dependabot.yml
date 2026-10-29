@@ -1,13 +1,18 @@
-# 部品の更新を週1回提案する。出たばかりの版は7日待ってから（乗っ取られた版を避けるため）
+# 部品の更新を GitHub が知らせる（プルリクエストを作る。取り込むかどうかは人が決める）
+# cooldown：出て14日たっていない版は提案しない（「出て2週間以内の版は避ける」のルール）
+# 脆弱性の修正（セキュリティアップデート）は cooldown に関係なくすぐ届く
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
-    schedule: { interval: weekly, day: monday, time: '09:00', timezone: Asia/Tokyo }
-    cooldown: { default-days: 7 }
+    schedule: { interval: monthly }
+    cooldown: { default-days: 14 }
+    versioning-strategy: increase
     groups:
-      astro: { patterns: ['astro', '@astrojs/*'] }
+      all: { patterns: ['*'] }
   - package-ecosystem: github-actions
     directory: /
-    schedule: { interval: weekly, day: monday, time: '09:00', timezone: Asia/Tokyo }
-    cooldown: { default-days: 7 }
+    schedule: { interval: monthly }
+    cooldown: { default-days: 14 }
+    groups:
+      actions: { patterns: ['*'] }
