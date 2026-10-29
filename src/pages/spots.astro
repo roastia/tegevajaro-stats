@@ -11,17 +11,42 @@ const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 ---
 <Base current="spots" title="宮崎情報">
-  <h2 class="welcome-h">宮崎へようこそ！</h2>
-  <p class="take">遠くから、ようこそお越しくださいました！試合の前も後も、宮崎をゆっくり楽しんでいってください。地元のテゲサポがおすすめする場所を集めました。「また来たいな」と思ってもらえたら、うれしいです。</p>
+  <section class="miya-hero">
+    <h2 class="welcome-h">宮崎へようこそ！</h2>
+    <p>遠くから、ようこそお越しくださいました！試合の前も後も、宮崎をゆっくり楽しんでいってください。地元のテゲサポがおすすめする場所を集めました。「また来たいな」と思ってもらえたら、うれしいです。</p>
+    <div class="miya-acts">
+      <a class="btn-main" href="#spotList"><Fragment set:html={icon('pin')} />おすすめスポットを見る</a>
+      <a class="btn-sub" href="#post">おすすめを教える</a>
+    </div>
+  </section>
 
   <section class="card away-guide" aria-label="アウェイからお越しのみなさんへ">
     <h2><Fragment set:html={icon('plane')} />アウェイからお越しのみなさんへ</h2>
-    <ul class="ag-list">
-      <li><b>スタジアム</b><span>いちご宮崎新富サッカー場（宮崎県児湯郡新富町）</span><a class="ag-go ext" href="https://www.google.com/maps/search/?api=1&amp;query=32.0737818,131.4909384" target="_blank" rel="noopener noreferrer">地図を開く</a></li>
-    <li><b>アクセス</b><span>飛行機・電車・車でのお越しかたと駐車場の案内は、クラブ公式のアクセスページにまとまっています。</span><a class="ag-go ext" href="https://www.tegevajaro.com/club/stadium/access" target="_blank" rel="noopener noreferrer">アクセス・駐車場</a></li>
-      <li><b>観戦ルール</b><span>入場や応援のルールは、クラブ公式の観戦ガイドで確認できます。</span><a class="ag-go ext" href="https://www.tegevajaro.com/news/850" target="_blank" rel="noopener noreferrer">観戦ガイド</a></li>
-      <li><b>来場案内</b><span>試合ごとの来場案内（マッチデーガイド）は、クラブ公式サイトのお知らせに出ます。</span><a class="ag-go ext" href="https://www.tegevajaro.com/" target="_blank" rel="noopener noreferrer">クラブ公式サイト</a></li>
-      <li><b>おすすめ</b><span>下のおすすめは、スタジアムから近い順です。場所を押すと Google マップが開きます。</span><a class="ag-go in" href="#spotList">おすすめを見る</a></li>
+    <ul class="ag-tiles">
+      <li>
+        <span class="ag-ic"><Fragment set:html={icon('pin')} /></span>
+        <b>スタジアム</b>
+        <p>いちご宮崎新富サッカー場（宮崎県児湯郡新富町）</p>
+        <a class="ag-btn" href="https://www.google.com/maps/search/?api=1&amp;query=32.0737818,131.4909384" target="_blank" rel="noopener noreferrer">地図を開く</a>
+      </li>
+      <li>
+        <span class="ag-ic"><Fragment set:html={icon('plane')} /></span>
+        <b>アクセス</b>
+        <p>飛行機・電車・車でのお越しかたと駐車場の案内は、クラブ公式のアクセスページにまとまっています。</p>
+        <a class="ag-btn" href="https://www.tegevajaro.com/club/stadium/access" target="_blank" rel="noopener noreferrer">アクセス・駐車場</a>
+      </li>
+      <li>
+        <span class="ag-ic"><Fragment set:html={icon('flag')} /></span>
+        <b>観戦ルール</b>
+        <p>入場や応援のルールは、クラブ公式の観戦ガイドで確認できます。</p>
+        <a class="ag-btn" href="https://www.tegevajaro.com/news/850" target="_blank" rel="noopener noreferrer">観戦ガイド</a>
+      </li>
+      <li>
+        <span class="ag-ic"><Fragment set:html={icon('calendar')} /></span>
+        <b>来場案内</b>
+        <p>試合ごとの来場案内（マッチデーガイド）は、クラブ公式サイトのお知らせに出ます。</p>
+        <a class="ag-btn" href="https://www.tegevajaro.com/" target="_blank" rel="noopener noreferrer">クラブ公式サイト</a>
+      </li>
     </ul>
   </section>
 
@@ -29,7 +54,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     <h2><Fragment set:html={icon('pin')} />テゲサポおすすめスポット</h2>
     {spots.length > 0
       ? <p class="note">{STADIUM.name}から近い順。距離は直線距離です。場所を押すと Google マップが開きます。</p>
-      : <p class="note">まだありません。最初のおすすめを、下のフォームから教えてください！</p>}
+      : <div class="spot-empty"><p>まだありません。最初のおすすめを教えてください！</p><a class="btn-main" href="#post">おすすめを教える</a></div>}
     {spots.length > 0 && (
       <ul class="spot-list">
         {spots.map(s => (
@@ -49,7 +74,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
   <section class="card reveal spot-form-card" id="post">
     <h2><Fragment set:html={icon('sparkle')} />おすすめを教えて！</h2>
     <p class="spot-ask">お店だけじゃなくて、宮崎のいいところなら何でも大歓迎。アウェイから来たみなさんに、見てほしい・食べてほしい・知ってほしい場所を教えてください！</p>
-    <p class="note">たとえば：ごはん・カフェ／海や山の景色／神社・観光地／温泉・銭湯／お土産が買えるお店／試合の前後にちょっと寄れる場所</p>
+    <p class="spot-examples"><b>たとえば</b>ごはん・カフェ／海や山の景色／神社・観光地／温泉・銭湯／お土産が買えるお店／試合の前後にちょっと寄れる場所</p>
     <p class="note">送ってもらった内容は、すぐにはページに載りません。確認してから、このページに載せます。同じ回線（Wi-Fi など）からの投稿は1日10件まで、同じ内容は1回だけ受け付けます。</p>
     {ready ? (
       <form class="spot-form" id="spotForm" novalidate data-api={SITE.spots.api} data-sitekey={SITE.spots.turnstileSiteKey}>
