@@ -753,3 +753,4 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
   .formcard > .cheer { grid-area: cheer; align-self: center; margin-top: 8px; }
   .formcard > .post { grid-area: post; padding-top: 8px; }
 }
+.formcard > .cheer { font-size: 1.15rem; }

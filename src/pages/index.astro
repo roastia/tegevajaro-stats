@@ -12,7 +12,7 @@ const items = getShareables().filter(s => s.kind === 't');
 <Base current="topics">
   <section class="card formcard reveal" id="form">
     <div class="label"><Fragment set:html={icon('chartup')} />直近5試合</div>
-    <div class="ftitle">{fs.title}</div>
+    <div class="ftitle">{fs.show}</div>
     {fs.badges.length > 0 && <div class="fbadges">{fs.badges.map(b => <span class="fbadge"><Fragment set:html={icon('flame')} />{b}</span>)}</div>}
     <div class="sub">{fs.sub}</div>
     <div class="form">

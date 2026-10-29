@@ -10,6 +10,8 @@ export function formSummary(matches) {
   const back = ok => { let c = 0; for (let i = ms.length - 1; i >= 0 && ok(ms[i]); i--) c++; return c; };
   const winRun = back(m => m.result === '勝'), unbeaten = back(m => m.result !== '負');
   const title = w === last.length ? `${w}連勝！止まらない！` : l === 0 ? '直近5試合 負けなし！' : w >= 3 ? `直近5試合で${w}勝！` : '直近5試合';
+  // 画面の見出し（上に「直近5試合」のラベルがあるので、ここではくり返さない）
+  const show = w === last.length ? `${w}連勝！止まらない！` : l === 0 ? '負けなし！' : w >= 3 ? `${w}勝！` : `${w}勝${d}分${l}敗`;
   const badges = [];
   if (winRun >= 2) badges.push(`${winRun}連勝中`);
   if (unbeaten >= 3) badges.push(`${unbeaten}試合負けなし`);
@@ -18,7 +20,7 @@ export function formSummary(matches) {
   const sub = `${range}は${w}勝${d}分${l}敗（${gf}得点・${ga}失点）`;
   const line = last.map(m => `${m.opponent} ${m.gf}-${m.ga} ${RES_WORD[m.result] || m.result}`).join('／');
   const head = `${title}${badges.length ? '（' + badges.join('・') + '）' : ''}`;
-  return { last, title, badges, sub, cheer, text: postText(head, `${sub}\n${line}`, cheer) };
+  return { last, title, show, badges, sub, cheer, text: postText(head, `${sub}\n${line}`, cheer) };
 }
 
 /** 今季の成績（勝・分・敗・勝ち点・得失点） */
