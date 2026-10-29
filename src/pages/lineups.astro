@@ -1,60 +1,16 @@
 ---
-import Base from '../layouts/Base.astro';
-import { readCsv } from '../lib/data.js';
-import { buildLineups } from '../lib/lineups.js';
-import { href, icon } from '../lib/util.js';
-const L = buildLineups({ lineups: readCsv('lineups'), matches: readCsv('matches'), players: readCsv('players') });
-const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
-const md = s => { const [, m, d] = s.split('-').map(Number); return `${m}/${d}`; };
-const ranges = ns => ns.reduce((o, n) => { const l = o[o.length - 1]; if (l && n === l[1] + 1) l[1] = n; else o.push([n, n]); return o; }, []).map(([a, b]) => a === b ? `${a}` : `${a}〜${b}`).join('・');
-const main = L.formations[0];
-const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
-const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
+// 「スタメン」は「ハイライト」のページにまとめた（試合ごとのスタメン図と、今季のスタメンの傾向）。前のURLは新しいページへ移す
+import { href } from '../lib/util.js';
+const to = href('goals/');
 ---
-<Base current="lineups" title="スタメン">
-  <div class="grid two">
-    <section class="card reveal lu-sum">
-      <h2><Fragment set:html={icon('target')} />今季のフォーメーション</h2>
-      <div class="lu-big">{main.formation}</div>
-      <p class="lu-cap">{main.games === L.total ? `${L.total}試合すべてこの形でスタート！` : `${L.total}試合中${main.games}試合でこの形`}</p>
-      {L.formations.length > 1 && <p class="note">ほか：{L.formations.slice(1).map(f => `${f.formation}（${f.games}試合）`).join('・')}</p>}
-      {L.ironmen.length > 0 && <p class="lu-iron"><b>全{L.total}試合スタメン</b>：{L.ironmen.join('・')}</p>}
-      {L.unsure.length > 0 && <p class="note">{L.unsure.length === L.total ? '' : `第${ranges(L.unsure)}節の`}センターバックとボランチの2人は、左右を区別せずに並べています。</p>}
-    </section>
-    <section class="card reveal">
-      <h2><Fragment set:html={icon('network')} />ポジション別の顔ぶれ</h2>
-      <p class="note">そのポジションで先発した選手と試合数。</p>
-      <dl class="lu-roles">
-        {L.roles.filter(r => r.players.length).map(r => (
-          <div><dt>{r.role}</dt><dd>{r.players.map((p, i) => <span class="nw">{p.name}<small>{p.games}</small>{i < r.players.length - 1 ? '・' : ''}</span>)}</dd></div>
-        ))}
-      </dl>
-    </section>
-  </div>
-  <h2 class="lu-h">試合ごとのスタメン</h2>
-  <div class="grid lu-games">
-    {L.games.map(g => (
-      <section class="card lu-game reveal" aria-label={`第${g.round}節 ${g.opponent}戦のスタメン`}>
-        <div class="lu-head">
-          <span class="lu-rd">第{g.round}節</span>
-          <span class="lu-vs">{md(g.date)} {g.opponent}<small>（{ha(g)}）</small></span>
-          <span class={`lu-res ${resCls[g.result] || ''}`}>{g.gf}-{g.ga} {resWord[g.result] || ''}</span>
-        </div>
-        <div class="pitch" role="img" aria-label={`${g.formation}：${g.lines.flat().map(p => `${p.role} ${p.name}`).join('、')}`}>
-          <span class="pa" aria-hidden="true"></span><span class="ga" aria-hidden="true"></span><span class="parc" aria-hidden="true"></span>
-          <span class="lu-form">{g.formation}</span>
-          {g.lines.map(line => (
-            <div class={`pl-row n${line.length}`}>
-              {line.map(p => (
-                <div class="pl">
-                  {p.no ? <img class="jersey pl-j" src={href(`chars/numbers-s/${p.no}.png`)} alt={`背番号${p.no}`} width="128" height="128" loading="lazy" /> : <span class="pl-j" />}
-                  <span class="pl-n">{p.short}</span>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </section>
-    ))}
-  </div>
-</Base>
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex" />
+  <meta http-equiv="refresh" content={`0; url=${to}`} />
+  <link rel="canonical" href={to} />
+  <title>ハイライト｜テゲスタ！</title>
+</head>
+<body><p><a href={to}>「ハイライト」のページへ移りました</a></p></body>
+</html>

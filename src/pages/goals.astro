@@ -1,19 +1,28 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getData } from '../lib/data.js';
-import { icon, safeUrl } from '../lib/util.js';
+import { getData, readCsv } from '../lib/data.js';
+import { buildLineups } from '../lib/lineups.js';
+import { icon, safeUrl, href } from '../lib/util.js';
+// ハイライト：試合ごとに「ハイライト動画・その試合のゴール・スタメン」をまとめ、下に今季のスタメンの傾向
 const d = getData();
+const L = buildLineups({ lineups: readCsv('lineups'), matches: readCsv('matches'), players: readCsv('players') });
+const xiOf = new Map(L.games.map(g => [String(g.round), g]));
 const counts = {};
 d.goals.forEach(g => { counts[g.scorer] = (counts[g.scorer] || 0) + 1; });
 const scorers = Object.entries(counts).sort((a, b) => b[1] - a[1]);
 const matches = [...d.matches].sort((a, b) => Number(b.round) - Number(a.round));
 const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
+const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}`; };
+const ranges = ns => ns.reduce((o, n) => { const l = o[o.length - 1]; if (l && n === l[1] + 1) l[1] = n; else o.push([n, n]); return o; }, []).map(([a, b]) => a === b ? `${a}` : `${a}〜${b}`).join('・');
+const main = L.formations[0];
+const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
+const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
 ---
 <Base current="goals" title="ハイライト">
   <section class="card">
     <h2>試合ハイライト</h2>
-    <p class="note">勝った試合も、悔しい試合も、もう一度。ゴールだけの動画はないので、ゴールの場面は試合のハイライト（YouTube）で見られます。選手を選ぶと、その選手がゴールを決めた試合だけを表示します。</p>
-    <div class="controls gap">
+    <p class="note">勝った試合も、悔しい試合も、もう一度。ゴールの場面は試合のハイライト（YouTube）で見られます。「スタメン」を押すと、その試合の先発11人の並びが開きます。</p>
+    <div class="controls">
       <div class="seg" id="resSeg" role="group" aria-label="結果">
         {['', '勝', '分', '負'].map((r, i) => <button type="button" data-res={r} aria-pressed={i === 0 ? 'true' : 'false'}>{r || '全て'}</button>)}
       </div>
@@ -22,29 +31,73 @@ const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
         {scorers.map(([n, c]) => <option value={n}>{n}（{c}ゴール）</option>)}
       </select>
       <select id="mOrder" aria-label="並び順"><option value="desc">新しい順</option><option value="asc">古い順</option></select>
+      <button type="button" class="xi-all" id="xiAll" aria-pressed="false">スタメンをすべて開く</button>
     </div>
-    <ul class="vlist hl-list" id="matchList">
-      {matches.map(m => { const gs = d.goals.filter(g => String(g.round) === String(m.round)).sort((a, b) => Number(a.minute) - Number(b.minute)); const v = safeUrl(m.video_url), p = safeUrl(m.match_url); return (
-        <li data-res={m.result} data-round={m.round} data-scorers={[...new Set(gs.map(g => g.scorer))].join('|')}>
-          <div>第{m.round}節 {m.opponent}（{ha(m)}）{m.gf}-{m.ga} <span class={m.result === '勝' ? 'res-w' : m.result === '負' ? 'res-l' : ''}>{m.result}</span></div>
-          <div class="lk">
-            {v && <a class="yt" href={v} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />ハイライト</a>}
-            {p && <a href={p} target="_blank" rel="noopener noreferrer">公式試合ページ</a>}
-          </div>
-          <div class="sub">{m.date.slice(5).replace('-', '/')}</div>
-          {gs.length
-            ? <ul class="glist">{gs.map(g => <li data-scorer={g.scorer}><Fragment set:html={icon('ball')} /><span class="gt">{g.time}</span><b>{g.scorer}</b></li>)}</ul>
-            : <p class="glist none">宮崎の得点なし</p>}
-        </li>); })}
-    </ul>
   </section>
+  <ul class="grid hl-games" id="matchList">
+    {matches.map(m => { const gs = d.goals.filter(g => String(g.round) === String(m.round)).sort((a, b) => Number(a.minute) - Number(b.minute)); const v = safeUrl(m.video_url), p = safeUrl(m.match_url); const g = xiOf.get(String(m.round)); return (
+      <li class="card hl-game" data-res={m.result} data-round={m.round} data-scorers={[...new Set(gs.map(x => x.scorer))].join('|')}>
+        <div class="lu-head">
+          <span class="lu-rd">第{m.round}節</span>
+          <span class="lu-vs">{md(m.date)} {m.opponent}<small>（{ha(m)}）</small></span>
+          <span class={`lu-res ${resCls[m.result] || ''}`}>{m.gf}-{m.ga} {resWord[m.result] || ''}</span>
+        </div>
+        <div class="hl-acts">
+          {v && <a class="hl-play" href={v} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />ハイライトを見る</a>}
+          {p && <a class="hl-official" href={p} target="_blank" rel="noopener noreferrer">公式試合ページ</a>}
+        </div>
+        {gs.length
+          ? <ul class="glist">{gs.map(x => <li data-scorer={x.scorer}><Fragment set:html={icon('ball')} /><span class="gt">{x.time}</span><b>{x.scorer}</b></li>)}</ul>
+          : <p class="glist none">宮崎の得点なし</p>}
+        {g && (
+          <details class="hl-xi">
+            <summary>スタメン<span class="xi-form">{g.formation}</span></summary>
+            <div class="pitch" role="img" aria-label={`${g.formation}：${g.lines.flat().map(x => `${x.role} ${x.name}`).join('、')}`}>
+              <span class="pa" aria-hidden="true"></span><span class="ga" aria-hidden="true"></span><span class="parc" aria-hidden="true"></span>
+              <span class="lu-form">{g.formation}</span>
+              {g.lines.map(line => (
+                <div class={`pl-row n${line.length}`}>
+                  {line.map(x => (
+                    <div class="pl" data-name={x.name}>
+                      {x.no ? <img class="jersey pl-j" src={href(`chars/numbers-s/${x.no}.png`)} alt={`背番号${x.no}`} width="128" height="128" loading="lazy" /> : <span class="pl-j" />}
+                      <span class="pl-n">{x.short}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
+      </li>); })}
+  </ul>
+  <p class="hl-empty" id="hlEmpty" hidden>該当する試合はありません</p>
+
+  <h2 class="lu-h">今季のスタメン</h2>
+  <div class="grid two">
+    <section class="card reveal lu-sum">
+      <h2><Fragment set:html={icon('target')} />今季のフォーメーション</h2>
+      <div class="lu-big">{main.formation}</div>
+      <p class="lu-cap">{main.games === L.total ? `${L.total}試合すべてこの形でスタート！` : `${L.total}試合中${main.games}試合でこの形`}</p>
+      {L.formations.length > 1 && <p class="note">ほか：{L.formations.slice(1).map(f => `${f.formation}（${f.games}試合）`).join('・')}</p>}
+      {L.ironmen.length > 0 && <p class="lu-iron"><b>全{L.total}試合スタメン</b>：{L.ironmen.join('・')}</p>}
+      {L.unsure.length > 0 && <p class="note">{L.unsure.length === L.total ? '' : `第${ranges(L.unsure)}節の`}センターバックとボランチの2人は、左右を区別せずに並べています。</p>}
+    </section>
+    <section class="card reveal">
+      <h2><Fragment set:html={icon('network')} />ポジション別の顔ぶれ</h2>
+      <p class="note">そのポジションで先発した選手と試合数。</p>
+      <dl class="lu-roles">
+        {L.roles.filter(r => r.players.length).map(r => (
+          <div><dt>{r.role}</dt><dd>{r.players.map((x, i) => <span class="nw">{x.name}<small>{x.games}</small>{i < r.players.length - 1 ? '・' : ''}</span>)}</dd></div>
+        ))}
+      </dl>
+    </section>
+  </div>
 </Base>
 <style>
-  .gap { margin-bottom: 10px; }
-  .vlist { display: flex; flex-direction: column; }
+  .two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
 </style>
 <script>
-  // 結果・ゴールを決めた選手・並び順で絞り込む。選手を選ぶと、その選手のゴールに印をつける
+  // 結果・ゴールを決めた選手・並び順で絞り込む。選手を選ぶと、その選手のゴールとスタメン図の位置に印をつける
   const $ = (id: string) => document.getElementById(id)!;
   const ml = [...$('matchList').querySelectorAll<HTMLElement>(':scope > li')];
   let res = '';
@@ -52,11 +105,15 @@ const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
     const who = ($('scorerSel') as HTMLSelectElement).value;
     const desc = ($('mOrder') as HTMLSelectElement).value === 'desc';
     const n = (e: HTMLElement) => Number(e.dataset.round);
+    let shown = 0;
     [...ml].sort((a, b) => (desc ? -1 : 1) * (n(a) - n(b))).forEach((e, i) => {
       e.style.order = String(i);
       e.hidden = (!!res && e.dataset.res !== res) || (!!who && !(e.dataset.scorers || '').split('|').includes(who));
+      if (!e.hidden) shown++;
       e.querySelectorAll<HTMLElement>('.glist li').forEach(g => { g.classList.toggle('me', !!who && g.dataset.scorer === who); g.classList.toggle('dim', !!who && g.dataset.scorer !== who); });
+      e.querySelectorAll<HTMLElement>('.pl').forEach(g => g.classList.toggle('me', !!who && g.dataset.name === who));
     });
+    $('hlEmpty').hidden = shown > 0;
   };
   ['scorerSel', 'mOrder'].forEach(id => $(id).addEventListener('change', draw));
   $('resSeg').addEventListener('click', e => {
@@ -65,4 +122,10 @@ const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
     $('resSeg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     draw();
   });
+  // スタメンをまとめて開く／閉じる
+  const all = $('xiAll');
+  const xis = [...document.querySelectorAll<HTMLDetailsElement>('.hl-xi')];
+  const sync = () => { const open = xis.every(x => x.open); all.setAttribute('aria-pressed', String(open)); all.textContent = open ? 'スタメンをすべて閉じる' : 'スタメンをすべて開く'; };
+  all.addEventListener('click', () => { const open = all.getAttribute('aria-pressed') !== 'true'; xis.forEach(x => { x.open = open; }); sync(); });
+  xis.forEach(x => x.addEventListener('toggle', sync));
 </script>

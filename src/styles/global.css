@@ -523,7 +523,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
   .site-nav a { display: flex; align-items: center; justify-content: center; gap: 2px; height: 34px; padding: 0 2px; font-size: 12.5px; letter-spacing: -.02em;
     border: 1px solid var(--line); border-bottom-width: 1px; border-radius: 9px; background: #fff; color: var(--fg); }
   .site-nav a[aria-current='page'] { background: var(--brand-deep); border-color: var(--brand-deep); color: #fff; font-weight: 700; }
-  .site-nav li:has(> a.nav-miya) { grid-column: span 3; }
+  .site-nav li:has(> a.nav-miya) { grid-column: span 4; }
   .site-nav a.nav-miya { border-color: #E8A06A; color: #B8571A; background: #FFF6EE; font-weight: 700; }
   .site-nav a.nav-miya[aria-current='page'] { background: #E8833A; border-color: #E8833A; color: #fff; }
   .site-nav a.nav-miya::before { content: ''; width: 1em; height: 1em; background: currentColor; flex: none;
@@ -645,3 +645,30 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .hl-list .glist li.me { background: var(--soft2); border-color: var(--brand); }
 .hl-list .glist li.dim { opacity: .5; }
 .hl-list .glist.none { font-size: .8rem; color: var(--muted); }
+/* ハイライト：試合ごとのカード（ハイライト動画・ゴール・スタメン） */
+.hl-games { list-style: none; margin: 14px 0 0; padding: 0; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); align-items: start; }
+.hl-game { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.hl-game .lu-head { margin-bottom: 0; }
+.hl-acts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.hl-play { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: var(--brand); color: #fff; font-weight: 700; font-size: .85rem; text-decoration: none; }
+.hl-play .ic { width: 1.1em; height: 1.1em; }
+.hl-official { font-size: .8rem; color: var(--muted); }
+.hl-game .glist { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.hl-game .glist li { display: inline-flex; align-items: center; gap: 4px; padding: 1px 9px; border: 1px solid var(--line); border-radius: 999px; font-size: .8rem; }
+.hl-game .glist li .ic { color: var(--ink); width: 1em; height: 1em; }
+.hl-game .glist li .gt { color: var(--muted); }
+.hl-game .glist li.me { background: var(--soft2); border-color: var(--brand); }
+.hl-game .glist li.dim { opacity: .5; }
+.hl-game .glist.none { font-size: .8rem; color: var(--muted); }
+.hl-xi { border-top: 1px dashed var(--line); padding-top: 6px; }
+.hl-xi summary { cursor: pointer; font-size: .85rem; font-weight: 700; color: var(--ink); list-style: none; display: flex; align-items: center; gap: 8px; }
+.hl-xi summary::-webkit-details-marker { display: none; }
+.hl-xi summary::before { content: '▸'; transition: transform .15s; }
+.hl-xi[open] summary::before { transform: rotate(90deg); }
+.hl-xi .xi-form { font-weight: 500; color: var(--muted); }
+.hl-xi .pitch { margin-top: 8px; }
+.pl.me .pl-n { background: var(--brand); color: #fff; }
+.xi-all { font: inherit; font-size: .85rem; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--brand); background: #fff; color: var(--ink); cursor: pointer; }
+.xi-all[aria-pressed='true'] { background: var(--soft2); }
+.hl-empty { color: var(--muted); }
+.hl-xi .pitch { aspect-ratio: auto; min-height: 22rem; padding-bottom: 12px; }
