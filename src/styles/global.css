@@ -264,7 +264,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .postbtn .nw { white-space: nowrap; }
 
 /* 直近5試合：結果は「勝ち／引き分け／負け」と言葉で、勝ちはブランド色で目立たせる */
-.formcard { display: flex; flex-direction: column; gap: 8px; }
+.formcard { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
 .ftitle { font-weight: 700; font-size: clamp(1.4rem, 5vw, 1.9rem); line-height: 1.25; color: var(--ink); }
 .fbadges { display: flex; flex-wrap: wrap; gap: 6px; }
 .fbadge { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: .8rem; color: #fff; background: linear-gradient(120deg, var(--brand-deep), var(--brand)); border-radius: 999px; padding: 3px 12px; }
