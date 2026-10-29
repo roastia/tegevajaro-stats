@@ -1,11 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getData } from '../lib/data.js';
+import PostBox from '../components/PostBox.astro';
+import { getData, getShareables } from '../lib/data.js';
 import { icon, playerUrl, href } from '../lib/util.js';
 import { ICON_OF_RECORD, plainTitle } from '../lib/meta.js';
+import { SITE } from '../config/site.js';
+// 上段：選手の背景（経歴・出身・年齢）／下段：選手の称号
 const d = getData();
-const urlOf = new Map(d.players.map(p => [p.name, p.jl_url]));
+const facts = getShareables().filter(s => s.kind === 'b');
 const ageOf = new Map(d.ages.map(a => [a.name, a.age]));
+const known = d.profiles.filter(p => ageOf.get(p.name) !== '' && ageOf.get(p.name) != null);
+const ages = known.map(p => Number(ageOf.get(p.name)));
+const lo = Math.min(...ages), hi = Math.max(...ages);
+const rows = [...d.profiles].sort((a, b) => (b.birth || '0').localeCompare(a.birth || '0'));
+const kyushu = ['福岡', '佐賀', '長崎', '熊本', '大分', '宮崎', '鹿児島'];
+const pmax = Math.max(...d.prefs.map(p => p.n));
+const posCls = p => `pos-${['GK', 'DF', 'MF', 'FW'].includes(p) ? p : 'x'}`;
+const urlOf = new Map(d.players.map(p => [p.name, p.jl_url]));
 // ランキング3位以内で称号。見せ方で優劣をつけない（並びはランキングの定義順、装飾は全員同じ）
 const titles = new Map();
 d.rankings.forEach(({ meta, rows }, idx) => {
@@ -18,8 +29,57 @@ d.rankings.forEach(({ meta, rows }, idx) => {
 });
 const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
 ---
-<Base current="players" title="選手の称号">
+<Base current="players" title="選手">
+  <div class="sec-h"><h2>選手の背景</h2><a href="#titles">選手の称号へ ↓</a></div>
+  <div class="grid">
+    {facts.map(f => (
+      <article class={`card fact reveal vt-b-${f.id}`} id={`b-${f.id}`}>
+        <div class="label"><Fragment set:html={icon(f.icon)} />{f.label}</div>
+        <a class="big factlink" href={href(`b/${f.id}/`)} data-count>{f.big}</a>
+        <div class="hl">{f.headline}</div>
+        <div class="sub">{f.sub}</div>
+        <p class="cheer">{f.cheer}</p>
+        <PostBox what={f.label} text={f.text} url={`${SITE.url}/b/${f.id}/`} />
+      </article>
+    ))}
+  </div>
+  <section class="bday" data-bday hidden></section>
   <section class="card">
+    <h2><Fragment set:html={icon('cake')} /> 年齢一覧</h2>
+    <p class="note">今日時点の満年齢。左の数字が並び順で、上から順に読みます（2段のときは左の段の下から右の段へ続きます）。ピンクの枠は1か月以内に誕生日を迎える選手です。</p>
+    <div class="controls gap">
+      <div class="seg" id="ageSeg" role="group" aria-label="並び順">
+        {[['young', '若い順'], ['old', '年上順'], ['no', '背番号順'], ['bday', '誕生日が近い順']].map(([v, l], i) => <button type="button" data-ord={v} aria-pressed={i === 0 ? 'true' : 'false'}>{l}</button>)}
+      </div>
+      <div class="seg" id="agePos" role="group" aria-label="ポジション">
+        {['', 'GK', 'DF', 'MF', 'FW'].map((p, i) => <button type="button" data-pos={p} aria-pressed={i === 0 ? 'true' : 'false'}>{p || '全員'}</button>)}
+      </div>
+    </div>
+    <ol class="ages" id="ageList">
+      {rows.map(p => { const a = ageOf.get(p.name); const has = a !== '' && a != null; const [y, m, dd] = (p.birth || '').split('-'); return (
+        <li class={posCls(p.pos)} data-no={p.no} data-pos={p.pos} data-birth={p.birth || undefined} data-age-out={p.birth ? `ag-${p.no}` : undefined}>
+          <span class={`bar w${has && hi > lo ? Math.round(20 + 80 * (Number(a) - lo) / (hi - lo)) : 0}`}></span>
+          <img class="jersey jersey-sm" src={href(`chars/numbers-s/${p.no}.png`)} alt={`背番号${p.no}`} width="44" height="44" loading="lazy" decoding="async" />
+          <span class="nm">{p.name}<span data-bslot="soon"></span><small>{p.pos}{p.birth && <>・<button class="bdbtn" type="button" data-bday-open={p.birth}><Fragment set:html={icon('cake')} />{Number(y)}年{Number(m)}月{Number(dd)}日生まれ</button></>}</small></span>
+          <span class="ag">{has ? <><span id={`ag-${p.no}`}>{a}</span><small>歳</small></> : '—'}</span>
+        </li>); })}
+    </ol>
+  </section>
+  <div class="grid two">
+    <section class="card">
+      <h2><Fragment set:html={icon('link')} /> 同じ学校・チームの出身</h2>
+      <p class="note">高校・ユース・大学が同じ選手。宮崎でまた同じピッチに。</p>
+      <table class="simple"><thead><tr><th>学校・チーム</th><th>選手</th></tr></thead>
+        <tbody>{d.school_links.map(r => <tr><td>{r.school}</td><td>{r.members}</td></tr>)}</tbody></table>
+    </section>
+    <section class="card prefs">
+      <h2><Fragment set:html={icon('pin')} /> 出身地</h2>
+      <p class="note">都道府県ごとの人数（ピンクは九州）</p>
+      {d.prefs.map(p => <div class={`row ${kyushu.includes(p.pref) ? 'ky' : ''}`}><span>{p.pref}</span><span class={`bar2 w${Math.round(p.n / pmax * 100)}`}></span><span>{p.n}</span></div>)}
+    </section>
+  </div>
+
+  <section class="card" id="titles">
     <h2>選手の称号</h2>
     <p class="note">ランキングで3位以内に入ると称号ゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>
     <div class="controls">
@@ -62,12 +122,54 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
   </div>
 </Base>
 <style>
+  .sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 4px; }
+  .sec-h h2 { margin: 0; font-size: 1.15rem; }
+  .sec-h a { font-size: .85rem; white-space: nowrap; }
+  .two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+  .gap { margin-bottom: 10px; }
+  .factlink { text-decoration: none; }
+
   .legend-gap { margin-top: 10px; }
   a.chip { color: inherit; text-decoration: none; }
   a.chip:hover { border-color: var(--brand); color: var(--ink); }
 </style>
 <script>
   import { nameKeys, matchName } from '../lib/namesearch.js';
+  // ---- 年齢一覧 ----
+  {
+  const list = document.getElementById('ageList')!;
+  const items = [...list.querySelectorAll<HTMLElement>('li')];
+  let ord = 'young', pos = '';
+  const daysTo = (b?: string) => {
+    if (!b) return 999;
+    const [, m, d] = b.split('-').map(Number);
+    const t = new Date(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date()) + 'T00:00:00Z');
+    let n = Date.UTC(t.getUTCFullYear(), m - 1, d); if (n < +t) n = Date.UTC(t.getUTCFullYear() + 1, m - 1, d);
+    return Math.round((n - +t) / 86400000);
+  };
+  const draw = () => {
+    [...items].sort((a, b) => {
+      if (ord === 'no') return Number(a.dataset.no) - Number(b.dataset.no);
+      if (ord === 'bday') return daysTo(a.dataset.birth) - daysTo(b.dataset.birth);
+      const x = a.dataset.birth || '', y = b.dataset.birth || '';
+      if (!x || !y) return x ? -1 : y ? 1 : 0;
+      return ord === 'young' ? y.localeCompare(x) : x.localeCompare(y);
+    }).forEach(e => { e.hidden = !!pos && e.dataset.pos !== pos; list.append(e); });
+  };
+  const bind = (id: string, key: string, fn: (v: string) => void) => {
+    const s = document.getElementById(id)!;
+    s.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest('button'); if (!b) return;
+      fn(b.dataset[key] || '');
+      s.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      draw();
+    });
+  };
+  bind('ageSeg', 'ord', v => { ord = v; });
+  bind('agePos', 'pos', v => { pos = v; });
+  }
+  // ---- 選手の称号 ----
+  {
   const grid = document.getElementById('pGrid')!;
   const cards = [...grid.querySelectorAll<HTMLElement>('.pcard')];
   const keys = new Map(cards.map(c => [c, nameKeys({ name: c.dataset.name, kana: c.dataset.kana, romaji: c.dataset.roma })]));
@@ -75,7 +177,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
   const ord = document.getElementById('pOrder') as HTMLSelectElement;
   const seg = document.getElementById('posSeg')!;
   let pos = '';
-  const draw = () => {
+  const drawCards = () => {
     const s = q.value.trim();
     const sorted = [...cards].sort((a, b) => {
       if (ord.value === 'age') return (a.dataset.birth ? -1 : 1) - (b.dataset.birth ? -1 : 1) || String(b.dataset.birth).localeCompare(String(a.dataset.birth)) || Number(a.dataset.no) - Number(b.dataset.no);
@@ -84,11 +186,12 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
     });
     sorted.forEach((c, i) => { c.style.order = String(i); c.hidden = (!!s && !matchName(keys.get(c)!, s)) || (!!pos && c.dataset.pos !== pos); });
   };
-  q.addEventListener('input', draw); ord.addEventListener('change', draw);
+  q.addEventListener('input', drawCards); ord.addEventListener('change', drawCards);
   seg.addEventListener('click', e => {
     const b = (e.target as HTMLElement).closest('button'); if (!b) return;
     pos = b.dataset.pos || '';
     seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-    draw();
+    drawCards();
   });
+  }
 </script>

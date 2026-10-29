@@ -523,7 +523,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
   .site-nav a { display: flex; align-items: center; justify-content: center; gap: 2px; height: 34px; padding: 0 2px; font-size: 12.5px; letter-spacing: -.02em;
     border: 1px solid var(--line); border-bottom-width: 1px; border-radius: 9px; background: #fff; color: var(--fg); }
   .site-nav a[aria-current='page'] { background: var(--brand-deep); border-color: var(--brand-deep); color: #fff; font-weight: 700; }
-  .site-nav li:has(> a.nav-miya) { grid-column: span 2; }
+  .site-nav li:has(> a.nav-miya) { grid-column: span 3; }
   .site-nav a.nav-miya { border-color: #E8A06A; color: #B8571A; background: #FFF6EE; font-weight: 700; }
   .site-nav a.nav-miya[aria-current='page'] { background: #E8833A; border-color: #E8833A; color: #fff; }
   .site-nav a.nav-miya::before { content: ''; width: 1em; height: 1em; background: currentColor; flex: none;

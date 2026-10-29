@@ -16,8 +16,8 @@ const sr = seasonRecord(d.matches);
 // 誕生日はブラウザ側で「今日」から数えるので、必要な項目だけ渡す
 const bdays = d.profiles.filter(p => p.birth).map(p => ({ no: p.no, name: p.name, pos: p.pos, birth: p.birth }));
 const nav = [
-  ['', 'topics', '注目トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手の称号'],
-  ['goals/', 'goals', 'ハイライト'], ['roots/', 'roots', '選手の背景'],
+  ['', 'topics', '注目トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手'],
+  ['goals/', 'goals', 'ハイライト'],
   ['lineups/', 'lineups', 'スタメン'],
   ['spots/', 'spots', '宮崎情報'],
 ];

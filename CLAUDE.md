@@ -45,7 +45,7 @@
 - `src/lib/meta.js` … ランキングの定義（タイトル・応援のひとこと・説明・出典）、アイコン、称号キャラ
 - `src/lib/data.js` … CSV 読み込み → 計算 → ページへ。`getShareables()` がポストできるもの（トピック・ランキング・背景）
 - `src/lib/og.js` … ポスト用画像（1200×630 PNG）を Satori + resvg でビルド時に生成
-- `src/pages/` … 注目トピック（/）・ランキング・選手の称号・ハイライト（`goals.astro`）・選手の背景・スタメン（`lineups.astro`、`src/lib/lineups.js`）、個別ページ `/t/` `/r/` `/b/`、画像 `/og/`
+- `src/pages/` … 注目トピック（/）・ランキング・選手（`players.astro`：上段に選手の背景、下段に選手の称号。前の `/roots/` は `/players/` へ移す）・ハイライト（`goals.astro`）・スタメン（`lineups.astro`、`src/lib/lineups.js`）、個別ページ `/t/` `/r/` `/b/`、画像 `/og/`
 - `public/logo-tegesta.svg` … サイトのロゴ（テゲスタ！の手描き文字をなぞった SVG）。ヘッダーとポスト用画像（白にして）で使う。`favicon.svg`・`apple-touch-icon.png` はロゴの「テ」
 - `src/scripts/site.js` … ポストの画像添付（スマホは共有メニューで `/og/` の画像を渡す。使えない端末は X の投稿画面）・スクロール位置・誕生日（日本時間の今日から計算）・紙吹雪・カウントアップ
 - `src/pages/spots.astro` … メニューの「宮崎情報」（オレンジ色の項目）のページ。見出しは「宮崎へようこそ！」。上に載せたおすすめスポット、下に投稿フォーム（スタジアムから近い順の一覧・投稿フォーム）。押すと Google マップが開き、いちご宮崎新富サッカー場からの直線距離を出す（位置は `src/lib/util.js` の `STADIUM`）。載せるのは `src/data/spots.csv` だけ
@@ -78,7 +78,7 @@
    - 値にカンマを使わない
 3. `src/data/players.csv` に1行追加する（出場がまだなら数字は 0）。`jl_url` に公式の選手ページURL
 4. `python3 tools/jersey_numbers.py` で背番号イラストを作る
-5. `npm run roster` で名簿を点検 → `npm test` → `npm run build` → `npm run preview` で選手の称号・年齢一覧に出ることを確認
+5. `npm run roster` で名簿を点検 → `npm test` → `npm run build` → `npm run preview` で「選手」ページの年齢一覧・選手の称号に出ることを確認
 6. コミット（push は人が行う）。例：「〇〇選手（MF・背番号△）の加入を反映」
 
 ### 退団（移籍・期限付き移籍・契約満了）
