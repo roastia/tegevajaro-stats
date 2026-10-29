@@ -41,10 +41,10 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     {ready ? (
       <form class="spot-form" id="spotForm" novalidate data-api={SITE.spots.api} data-sitekey={SITE.spots.turnstileSiteKey}>
         <label>場所の名前<span class="req">必須</span><input name="name" required maxlength="60" autocomplete="off" placeholder="例：〇〇食堂" /></label>
-        <label>エリア<input name="area" maxlength="30" autocomplete="off" placeholder="例：新富町" /></label>
-        <label>ひとこと<span class="req">必須</span><textarea name="info" required maxlength="300" rows="3" placeholder="例：試合前に寄りたい、チキン南蛮がおいしいお店"></textarea></label>
-        <label>あなたの X アカウント<input name="x_handle" maxlength="16" autocomplete="off" inputmode="latin" placeholder="例：@tegesapo" /></label>
-        <p class="note">X アカウントを入れると、載せるときに「@〇〇 さんのおすすめ」として、入力どおりに表示します。</p>
+        <label>ひとこと<span class="req">必須</span><textarea name="info" required maxlength="300" rows="3" aria-describedby="infoHint" placeholder="例：新富町の国道沿い。試合前に寄りたい、チキン南蛮がおいしいお店"></textarea></label>
+        <p class="note field-hint" id="infoHint">同じ名前のお店がほかにあるかもしれないので、場所がわかる特徴（町名・近くの目印・何のお店か など）も書いてください。</p>
+        <label>あなたの X アカウント<input name="x_handle" maxlength="16" autocomplete="off" inputmode="latin" aria-describedby="xHint" placeholder="例：@tegesapo" /></label>
+        <p class="note field-hint" id="xHint">X アカウントを書くと、おすすめしてくれた人として「@〇〇 さんのおすすめ」と、入力どおりに載せます（書かなくても送れます）。</p>
         <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
         <div class="ts" id="spotTs"></div>
         <button class="spot-send" type="submit">送る</button>
@@ -56,7 +56,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     <details class="spot-privacy">
       <summary>送った内容の扱い</summary>
       <ul>
-        <li>送ってもらうのは「場所の名前・エリア・ひとこと・X アカウント（任意）」だけです。</li>
+        <li>送ってもらうのは「場所の名前・ひとこと・X アカウント（任意）」だけです。</li>
         <li>同じ回線から1日10件までの確認のため、IP アドレスを、元に戻せない形（日ごとに変わる鍵でハッシュ化した値）にして2日間だけ使い、そのあと消します。IP アドレスそのものは保存しません。</li>
         <li>同じ内容の投稿かどうかの確認のため、場所の名前とひとことから作った値を2日間だけ使い、そのあと消します。</li>
         <li>ボット対策に Cloudflare Turnstile を使っています。</li>
@@ -97,7 +97,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const f = new FormData(form);
-      const body = Object.fromEntries(['name', 'area', 'info', 'x_handle', 'website'].map(k => [k, String(f.get(k) || '')]));
+      const body = Object.fromEntries(['name', 'info', 'x_handle', 'website'].map(k => [k, String(f.get(k) || '')]));
       if (!body.name.trim() || !body.info.trim()) { say('「場所の名前」と「ひとこと」を入れてください'); return; }
       if (!token) { say('確認中です。少し待ってから、もう一度「送る」を押してください'); return; }
       send.disabled = true; say('送っています…');

@@ -516,13 +516,19 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .site-nav a.nav-miya:hover { color: #A44E14; }
 .site-nav a.nav-miya[aria-current='page'] { color: #A44E14; border-bottom-color: #E8833A; }
 
-/* スマホ：メニューの「宮崎情報」を右端に固定して、横にスクロールしなくても見えるように */
-@media (max-width: 640px), (pointer: coarse) {
-  .site-nav ul:has(a.nav-miya) { padding-right: 0; }
-  .site-nav li:has(> a.nav-miya) { position: sticky; right: 0; z-index: 1; margin-left: auto; padding: 0 16px 0 14px;
-    background: linear-gradient(to right, transparent, var(--bg) 12px); }
-  .site-nav a.nav-miya { display: inline-flex; align-items: center; gap: 2px; }
-  .site-nav a.nav-miya::before { content: ''; width: .9em; height: .9em; background: currentColor; flex: none;
+/* スマホ：メニューは横スクロールをやめ、タブを2段に並べる（どこに何があるか一目でわかる）。「宮崎情報」は2マス分のオレンジのタブ */
+@media (max-width: 640px) {
+  .site-nav ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 8px 16px; overflow: visible; touch-action: auto; }
+  .site-nav li { min-width: 0; }
+  .site-nav a { display: flex; align-items: center; justify-content: center; gap: 2px; height: 34px; padding: 0 2px; font-size: 12.5px; letter-spacing: -.02em;
+    border: 1px solid var(--line); border-bottom-width: 1px; border-radius: 9px; background: #fff; color: var(--fg); }
+  .site-nav a[aria-current='page'] { background: var(--brand-deep); border-color: var(--brand-deep); color: #fff; font-weight: 700; }
+  .site-nav li:has(> a.nav-miya) { grid-column: span 2; }
+  .site-nav a.nav-miya { border-color: #E8A06A; color: #B8571A; background: #FFF6EE; font-weight: 700; }
+  .site-nav a.nav-miya[aria-current='page'] { background: #E8833A; border-color: #E8833A; color: #fff; }
+  .site-nav a.nav-miya::before { content: ''; width: 1em; height: 1em; background: currentColor; flex: none;
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-6.2-6-6.2-11.2a6.2 6.2 0 0112.4 0C18.2 15 12 21 12 21z'/%3E%3Ccircle cx='12' cy='9.8' r='2.2'/%3E%3C/svg%3E") center / contain no-repeat;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-6.2-6-6.2-11.2a6.2 6.2 0 0112.4 0C18.2 15 12 21 12 21z'/%3E%3Ccircle cx='12' cy='9.8' r='2.2'/%3E%3C/svg%3E") center / contain no-repeat; }
 }
+.spot-form .field-hint { margin: -6px 0 0; font-size: .78rem; }
+@media (max-width: 345px) { .site-nav ul { gap: 4px; padding-inline: 12px; } .site-nav a { font-size: 11px; letter-spacing: -.04em; } }
