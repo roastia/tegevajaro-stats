@@ -11,7 +11,7 @@ export const SITE = {
   roundLabel: '第13節',        // 「第13節時点」の表記
   lastMatch: '10/25 山形戦',   // ページ冒頭の「〜までの記録」
   rank: 7,                     // J2 の現在の順位（Jリーグ公式の順位表の値）
-  hashtags: '#テゲバジャーロ宮崎 #テゲバ #テゲスタ！',
+  hashtags: '#テゲバジャーロ宮崎 #テゲバ #テゲスタ',
   // Football LAB 由来のデータを表示するか（問い合わせ結果で切り替える）
   footballLab: true,
   // おすすめスポットの投稿受付（Cloudflare Workers。worker/README.md の手順で用意してから入れる）

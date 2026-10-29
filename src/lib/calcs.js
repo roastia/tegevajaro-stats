@@ -60,7 +60,7 @@ dash.calc('roots_facts', {
   description: '選手プロフィール（生年月日・身長・出身地・高校/ユース・大学・経歴）から、ポストしたくなる背景トピックを作る。年齢は2026年10月27日時点。',
   fn: (profiles, ages) => {
     const F = [];
-    const add = (id, icon, label, headline, big, sub, cheer) => F.push({ id, icon, label, headline, big, sub, cheer, post: `${headline}\n${sub}\n${cheer}\n#テゲバジャーロ宮崎 #テゲバ #テゲスタ！` });
+    const add = (id, icon, label, headline, big, sub, cheer) => F.push({ id, icon, label, headline, big, sub, cheer, post: `${headline}\n${sub}\n${cheer}\n#テゲバジャーロ宮崎 #テゲバ #テゲスタ` });
     const N = profiles.length;
     const ageOf = Object.fromEntries(ages.map(a => [a.name, a.age]));
     const kyushu = ['福岡', '佐賀', '長崎', '熊本', '大分', '宮崎', '鹿児島'];
@@ -422,7 +422,7 @@ dash.calc('topics', {
     if (pm) { add('plusminus', '➕', '影のMVP', `${pm.name}がいると点差が開く！`, `${pm.value > 0 ? '+' : ''}${pm.value}`, pm.display.replace(/^[+-]?\d+/, '').replace(/[（）]/g, ''), '数字が貢献を証明'); used.add(pm.name); }
     const gp = sorted('golden_pair').find(r => r.name.split('＆').every(nm => !used.has(nm))) || sorted('golden_pair').find(r => !lk || !r.name.split('＆').includes(lk.name));
     if (gp) add('pair', '💞', '黄金コンビ', /0敗/.test(gp.display.split('（')[0]) ? `${gp.name.replace('＆', '×')}、2人そろえば負けない！` : `${gp.name.replace('＆', '×')}、2人そろえば勝ち点が積み上がる！`, gp.display.split('（')[0], `${gp.display.split('（')[1].replace('）', '')}で${gp.display.split('（')[0]}`, 'この2人、セットで見たい');
-    return T.map((t, i) => ({ ...t, order: i + 1, post: `${t.headline}\n${t.sub}\n${t.cheer}\n#テゲバジャーロ宮崎 #テゲバ #テゲスタ！` }));
+    return T.map((t, i) => ({ ...t, order: i + 1, post: `${t.headline}\n${t.sub}\n${t.cheer}\n#テゲバジャーロ宮崎 #テゲバ #テゲスタ` }));
   }
 });
 
