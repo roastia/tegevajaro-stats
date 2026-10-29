@@ -35,6 +35,13 @@
 4. `npm run build` → `npm run preview` で表示を確認する。
 5. 変更をコミットする（**push は人が行う**）。コミットメッセージは「第14節（11/1 大分戦）を反映」のように。
 
+## 公開URLが決まったら
+ポストのボタンを押すと、文のあとにテゲスタ！のURL（トピック・ランキング・背景はそれぞれの画像つきページ、ほかはトップ）が付く。URLはまだ仮（`https://roastia.github.io/tegevajaro-stats`）。決まったら次の3か所をそろえて変える。
+1. `src/config/site.js` の `url`
+2. `astro.config.mjs` の `site`（ドメイン）と `base`（ドメイン直下なら `/`）
+3. ダッシュボード版の `SITE_URL`（`index.html` の中）
+変えたら `npm run build` → ポスト用画像のページ（`/t/〇〇/`）とポストのリンクを確認する。
+
 ## Football LAB の切り替え
 - `src/config/site.js` の `footballLab` を `false` にすると、Football LAB 出典のランキングとフッターの表記が消える。
 - 問い合わせの結果「掲載不可」なら、`false` にしたうえで Football LAB 由来の CSV・列も**リポジトリから削除**する（公開リポジトリに置くこと自体が転載になるため）。
