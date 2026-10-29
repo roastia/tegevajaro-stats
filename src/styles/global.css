@@ -681,3 +681,8 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .hl-official { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--brand); background: #fff; color: var(--ink); font-weight: 700; font-size: .8rem; text-decoration: none; }
 .hl-official::after { content: '↗'; font-size: .8em; }
 .hl-official:hover { background: var(--soft); }
+/* ゴールした選手はボタンに見えないよう、枠なしの文字で並べる */
+.hl-game .glist { gap: 2px 14px; }
+.hl-game .glist li { padding: 0; border: 0; border-radius: 0; background: none; font-size: .85rem; }
+.hl-game .glist li.me { background: none; border: 0; color: var(--ink); }
+.hl-game .glist li.me b { color: var(--ink); }
