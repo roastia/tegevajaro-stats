@@ -46,7 +46,7 @@
 - `src/pages/` … 注目トピック（/）・ランキング・選手の称号・ゴール動画・選手の背景・スタメン（`lineups.astro`、`src/lib/lineups.js`）、個別ページ `/t/` `/r/` `/b/`、画像 `/og/`
 - `public/logo-tegesta.svg` … サイトのロゴ（テゲスタ！の手描き文字をなぞった SVG）。ヘッダーとポスト用画像（白にして）で使う。`favicon.svg`・`apple-touch-icon.png` はロゴの「テ」
 - `src/scripts/site.js` … ポストの画像添付（スマホは共有メニューで `/og/` の画像を渡す。使えない端末は X の投稿画面）・スクロール位置・誕生日（日本時間の今日から計算）・紙吹雪・カウントアップ
-- `src/pages/spots.astro` … 「宮崎へようこそ！」のページ。メニューには入れず、ヘッダー右上の「宮崎へようこそ！」ボタンから開く。上に載せたおすすめスポット、下に投稿フォーム（スタジアムから近い順の一覧・投稿フォーム）。押すと Google マップが開き、いちご宮崎新富サッカー場からの直線距離を出す（位置は `src/lib/util.js` の `STADIUM`）。載せるのは `src/data/spots.csv` だけ
+- `src/pages/spots.astro` … メニューの「宮崎情報」（オレンジ色の項目）のページ。見出しは「宮崎へようこそ！」。上に載せたおすすめスポット、下に投稿フォーム（スタジアムから近い順の一覧・投稿フォーム）。押すと Google マップが開き、いちご宮崎新富サッカー場からの直線距離を出す（位置は `src/lib/util.js` の `STADIUM`）。載せるのは `src/data/spots.csv` だけ
 - `worker/` … おすすめスポットの投稿受付（Cloudflare Workers + D1 + Turnstile）。準備の手順は `worker/README.md`
 - `tests/` … 検算テスト（Node 標準のテストランナー）。`worker/test/` も `npm test` で動く
 
@@ -106,4 +106,4 @@
    - `added` は載せた日（YYYY-MM-DD）
 5. `npm test` → `npm run build` → `npm run preview` で一覧と距離を確認 → コミット（push は人）。載せた／見送った id を人に伝え、必要なら `worker/README.md` の status 更新コマンドを案内する
 6. 消してほしいと連絡があった場所は、`spots.csv` から行を消してコミットする
-7. ダッシュボード版（Claude のダッシュボード）にも同じ `spots.csv` を入れる（データセット `spots`）。ダッシュボード版はヘッダーの「宮崎へようこそ！」で一覧を見られるが、投稿フォームは見た目だけで送れない
+7. ダッシュボード版（Claude のダッシュボード）にも同じ `spots.csv` を入れる（データセット `spots`）。ダッシュボード版もメニューの「宮崎情報」で一覧を見られるが、投稿フォームは見た目だけで送れない

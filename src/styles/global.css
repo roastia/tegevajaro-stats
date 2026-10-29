@@ -506,16 +506,12 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .spot-x { display: inline-block; font-size: .8rem; color: var(--ink); margin-top: 2px; }
 .spot-list li { padding: 4px 0 10px; }
 
-/* 「宮崎へようこそ！」ボタン（ヘッダー右上。メニューとは別に目立たせる） */
-.welcome-btn { display: inline-flex; align-items: center; gap: 4px; flex: none; font-size: .85rem; font-weight: 700; color: #fff; text-decoration: none;
-  background: linear-gradient(135deg, #E8833A, #F2A93B); border-radius: 999px; padding: 6px 14px; box-shadow: 0 3px 0 #B8571A; white-space: nowrap; }
-.welcome-btn .ic { width: 1.1em; height: 1.1em; }
-.welcome-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 0 #B8571A; }
-.welcome-btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #B8571A; }
-.welcome-btn:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
-.welcome-btn[aria-current='page'] { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #E8833A; }
 .welcome-h { margin: 8px 0 0; font-size: 1.4rem; color: #B8571A; }
 .badge { white-space: nowrap; }
 .site-head .row { flex-wrap: wrap; row-gap: 8px; }
-@media (max-width: 360px) { .welcome-btn { font-size: .78rem; padding: 5px 11px; } }
 .welcome-h + .take { margin-top: 4px; }
+
+/* メニューの「宮崎情報」だけ色を変える（宮崎の太陽のオレンジ） */
+.site-nav a.nav-miya { color: #C2611F; }
+.site-nav a.nav-miya:hover { color: #A44E14; }
+.site-nav a.nav-miya[aria-current='page'] { color: #A44E14; border-bottom-color: #E8833A; }
