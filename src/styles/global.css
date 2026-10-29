@@ -747,3 +747,5 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .ag-tiles li { grid-template-rows: auto 1fr auto; }
 .ag-tiles li p { align-self: start; }
 .ag-tiles li .ag-btn { align-self: end; }
+.hl-controls { margin-top: 14px; }
+.hl-controls .controls { margin: 0; } .hl-controls + .hl-games { margin-top: 12px; }
