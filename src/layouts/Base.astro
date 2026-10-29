@@ -19,7 +19,6 @@ const nav = [
   ['', 'topics', '注目トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手の称号'],
   ['goals/', 'goals', 'ゴール動画'], ['roots/', 'roots', '選手の背景'],
   ['lineups/', 'lineups', 'スタメン'],
-  ['spots/', 'spots', 'おすすめスポット'],
 ];
 ---
 <!doctype html>
@@ -53,6 +52,7 @@ const nav = [
     <div class="wrap">
       <div class="row">
         <span class="badge">非公式サポーターサイト</span>
+        <a class="welcome-btn" href={href('spots/')} aria-current={current === 'spots' ? 'page' : undefined}><Fragment set:html={icon('pin')} />宮崎へようこそ！</a>
       </div>
       <h1><a href={href('')} class="logo-link"><img class="logo" src={href('logo-tegesta.svg')} alt={SITE.name} width="1731" height="388" /></a><span class="tagline">{SITE.tagline}</span></h1>
       <p class="lead">数字で見ると、今季のテゲバはもっとアツい。テゲサポが語りたくなるランキングを集めました。</p>

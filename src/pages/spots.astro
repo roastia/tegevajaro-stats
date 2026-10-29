@@ -10,7 +10,8 @@ const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '
   .sort((a, b) => a.km - b.km);
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 ---
-<Base current="spots" title="おすすめスポット">
+<Base current="spots" title="宮崎へようこそ！">
+  <h2 class="welcome-h">宮崎へようこそ！</h2>
   <p class="take">試合の前も後も、宮崎を楽しもう。テゲサポが教えてくれた、おすすめの場所です。</p>
 
   <section class="card reveal">
