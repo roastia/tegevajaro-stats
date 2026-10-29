@@ -6,12 +6,18 @@ import { SITE } from '../config/site.js';
 interface Props { meta: any; rows: any[]; share?: any }
 const { meta, rows, share } = Astro.props;
 const champs = rows.filter(r => r._rank === 1);
+// 首位浮上：前の節で1位でなかった人が1位
+const climbed = champs.some(r => r._new || r._move > 0);
 const vals = rows.map(r => r.value), lo = Math.min(...vals), hi = Math.max(...vals);
 const width = v => Math.round(meta.asc ? (hi === lo ? 100 : 25 + 75 * (hi - v) / (hi - lo)) : (hi > 0 ? Math.max(4, v / hi * 100) : 4));
 // 1行ぶん：メインの数字だけ見せ、内訳はタップで開く（ranking.astro のスクリプト）
 const row = r => {
   const [main, det] = meta.hideValue ? ['', ''] : splitDisp(r.display);
-  return { ...r, main, det, cls: [r._rank === 1 ? 'r1' : '', det ? 'has-det' : ''].filter(Boolean).join(' '), w: width(r.value) };
+  // 前の節からの順位の動き（↑2・↓1・NEW）。同じ順位なら何も出さない
+  const mv = r._new ? { cls: 'mv new', txt: 'NEW', lb: '前の節はランク外' }
+    : r._move > 0 ? { cls: 'mv up', txt: `↑${r._move}`, lb: `前の節から${r._move}つ上がった` }
+    : r._move < 0 ? { cls: 'mv down', txt: `↓${-r._move}`, lb: `前の節から${-r._move}つ下がった` } : null;
+  return { ...r, main, det, mv, cls: [r._rank === 1 ? 'r1' : '', det ? 'has-det' : ''].filter(Boolean).join(' '), w: width(r.value) };
 };
 const top = rows.filter(r => r._rank <= 5).slice(0, 5).map(row);
 const rest = rows.slice(top.length).map(row);
@@ -27,13 +33,13 @@ const title = plainTitle(meta.title);
   <div class="pop" id={pid} popover><b>{title}</b><br />{meta.note}</div>
   {meta.cheer && <p class="cheer">{meta.cheer}</p>}
   <div class="champ">
-    <span class="nm">{champs.map(r => r.name).join('・')}</span>
+    <span class="nm">{climbed && <span class="climb">首位浮上！</span>}{champs.map(r => r.name).join('・')}</span>
     <span class="vl">{champs.length > 1 ? `${champs.length}人が並ぶ` : (meta.hideValue ? '' : splitDisp(champs[0].display)[0])}</span>
   </div>
   <ol class="rank">
     {top.map(r => (
       <li class={r.cls} tabindex={r.det ? 0 : undefined} role={r.det ? 'button' : undefined} aria-expanded={r.det ? 'false' : undefined}>
-        <span class={`bar w${r.w}`}></span><span class="rk">{r._rank}</span><span class="nm">{r.name}</span><span class="dv">{r.main}</span>
+        <span class={`bar w${r.w}`}></span><span class="rk">{r._rank}</span><span class="nm">{r.name}{r.mv && <span class={r.mv.cls} title={r.mv.lb}><span class="vh">{r.mv.lb}</span><span aria-hidden="true">{r.mv.txt}</span></span>}</span><span class="dv">{r.main}</span>
         {r.det && <span class="det" hidden>{r.det}</span>}
       </li>
     ))}
@@ -44,7 +50,7 @@ const title = plainTitle(meta.title);
       <ol class="rank" start={top.length + 1}>
         {rest.map(r => (
           <li class={r.cls} tabindex={r.det ? 0 : undefined} role={r.det ? 'button' : undefined} aria-expanded={r.det ? 'false' : undefined}>
-            <span class={`bar w${r.w}`}></span><span class="rk">{r._rank}</span><span class="nm">{r.name}</span><span class="dv">{r.main}</span>
+            <span class={`bar w${r.w}`}></span><span class="rk">{r._rank}</span><span class="nm">{r.name}{r.mv && <span class={r.mv.cls} title={r.mv.lb}><span class="vh">{r.mv.lb}</span><span aria-hidden="true">{r.mv.txt}</span></span>}</span><span class="dv">{r.main}</span>
             {r.det && <span class="det" hidden>{r.det}</span>}
           </li>
         ))}

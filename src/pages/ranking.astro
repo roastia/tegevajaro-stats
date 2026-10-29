@@ -14,6 +14,7 @@ const cats = [['', 'すべて'], ['goal', 'ゴール'], ['time', '出場'], ['te
       {cats.map(([c, l], i) => <button type="button" data-cat={c} aria-pressed={i === 0 ? 'true' : 'false'}>{l}</button>)}
     </div>
   </div>
+  {d.prevRound > 0 && <p class="page-lead mv-lead"><span class="mv up" aria-hidden="true">↑2</span><span class="mv down" aria-hidden="true">↓1</span><span class="mv new" aria-hidden="true">NEW</span>は第{d.prevRound}節からの順位の動き（NEW は第{d.prevRound}節でランク外）</p>}
   <div class="grid" id="recGrid">
     {d.rankings.filter(r => r.rows.length).map(({ meta, rows }) => <RankCard meta={meta} rows={rows} share={share.get(meta.id)} />)}
   </div>

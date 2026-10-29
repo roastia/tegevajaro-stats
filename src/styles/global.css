@@ -805,3 +805,32 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .nx-club[href]:hover { color: var(--ink); }
 .nx-club:not([href]) { text-decoration: none; }
 .nx-club:not([href]) .ext { display: none; }
+
+/* 記録まであと少し（トップ） */
+.mscard { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.ms-block { display: flex; flex-direction: column; gap: 6px; }
+.ms-h { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 1rem; font-weight: 700; color: var(--ink); }
+.ms-h .ic { width: 1.2em; height: 1.2em; }
+.ms-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ms-list li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; }
+.ms-list li > .ic { width: 1.4em; height: 1.4em; flex: none; color: var(--ink); }
+.ms-list li > span { display: flex; flex-wrap: wrap; column-gap: 8px; }
+.ms-list .who { color: var(--fg); }
+.ms-list .tx { color: var(--fg); }
+.ms-list li.done { background: var(--soft); border-color: var(--brand); }
+.ms-list li.done .tx { color: var(--ink); font-weight: 700; }
+@media (min-width: 641px) {
+  .mscard { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; align-items: start; }
+  .mscard > .label, .mscard > .post { grid-column: 1 / -1; }
+  .mscard > .post { justify-self: end; width: min(100%, 420px); padding-top: 0; }
+}
+
+/* ランキングの順位の動き（↑2・↓1・NEW） */
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.mv { display: inline-block; margin-left: 6px; padding: 0 5px; border-radius: 999px; font-size: .68rem; font-weight: 700; line-height: 1.5; vertical-align: .1em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.mv.up { background: var(--brand); color: #fff; }
+.mv.down { background: #fff; color: var(--muted); border: 1px solid var(--line); }
+.mv.new { background: #fff; color: var(--ink); border: 1px solid var(--brand); }
+.mv-lead .mv { margin: 0 2px 0 0; }
+.mv-lead .mv:last-of-type { margin-right: 6px; }
+.champ .climb { display: inline-block; margin-right: 8px; padding: 1px 8px; border-radius: 999px; background: var(--brand); color: #fff; font-size: .72rem; font-weight: 700; vertical-align: .2em; }

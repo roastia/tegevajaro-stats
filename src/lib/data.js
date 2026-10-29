@@ -2,7 +2,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { computeAll } from './calcs.js';
-import { RECORDS, rankRows } from './meta.js';
+import { RECORDS, rankRows, plainTitle as pTitle } from './meta.js';
+import { ranksOf, movesOf, newLeaders } from './history.js';
+import { milestones } from './milestones.js';
 import { SITE } from '../config/site.js';
 
 // ビルドはプロジェクトの直下で実行する前提（npm run build）
@@ -17,6 +19,11 @@ export function readCsv(name) {
   return rows.map(line => { const v = line.split(','); return Object.fromEntries(keys.map((k, i) => [k, v[i] ?? ''])); });
 }
 
+function readHistory() {
+  const f = path.join(DATA_DIR, 'rank_history.json');
+  try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return {}; }
+}
+
 let cache;
 export function getData() {
   if (cache) return cache;
@@ -25,7 +32,38 @@ export function getData() {
   const records = RECORDS
     .filter(r => SITE.footballLab || r.src !== 'Football LAB')
     .map(meta => ({ meta, rows: rankRows(meta, all.records) }));
-  cache = { ...all, rankings: records };
+
+  // ランキングの変動：前の節（rank_history.json にある、今より前のいちばん新しい節）とくらべる
+  const round = Math.max(0, ...D.matches.map(m => Number(m.round)));
+  const hist = readHistory();
+  const prevRound = Math.max(0, ...Object.keys(hist).map(Number).filter(r => r < round));
+  const prev = prevRound ? hist[prevRound] : null;
+  const now = ranksOf(all);
+  const moves = movesOf(now, prev);
+  for (const { meta, rows } of records) {
+    const mv = moves[meta.id];
+    if (mv) rows.forEach(r => { const x = mv[r.name]; if (x) { r._move = x.move; r._new = x.isNew; } });
+  }
+  // 首位浮上（記録ごとにまとめる）→ 注目トピックの先頭に
+  const shown = new Set(records.map(r => r.meta.id));
+  const byRec = new Map();
+  for (const l of newLeaders(now, prev).filter(l => shown.has(l.id))) { if (!byRec.has(l.id)) byRec.set(l.id, []); byRec.get(l.id).push(l); }
+  const climbs = [...byRec.entries()].map(([id, ls]) => ({ id, title: pTitle(RECORDS.find(r => r.id === id).title), names: ls.map(l => l.name), from: ls[0].from }));
+  const topics = [...all.topics];
+  if (climbs.length) {
+    const c = climbs[0];
+    const one = climbs.length === 1;
+    topics.unshift({ id: 'climb', emoji: '⤴️', label: '首位浮上', order: 0,
+      headline: one ? `${c.names.join('・')}が「${c.title}」で首位に！` : `首位交代が${climbs.length}件！ランキングが動いた`,
+      big: one ? c.names.join('・') : `${climbs.length}件`,
+      sub: one ? (c.from ? `第${prevRound}節の${c.from}位から一気にトップへ` : `第${prevRound}節はランク外から、一気にトップへ`)
+        : climbs.slice(0, 3).map(x => `${x.title}：${x.names.join('・')}`).join('／') + (climbs.length > 3 ? ' ほか' : ''),
+      cheer: 'ランキングは毎節動く。次に上がるのは誰だ？' });
+  }
+
+  // 記録まであと少し
+  const ms = milestones(D);
+  cache = { ...all, topics, rankings: records, prevRound, climbs, milestones: ms };
   return cache;
 }
 

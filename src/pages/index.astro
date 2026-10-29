@@ -3,8 +3,9 @@ import Base from '../layouts/Base.astro';
 import ShareCard from '../components/ShareCard.astro';
 import { getData, getShareables, readCsv } from '../lib/data.js';
 import { nextMatch } from '../lib/nextmatch.js';
+import { milestonePost } from '../lib/milestones.js';
 import PostBox from '../components/PostBox.astro';
-import { icon, xIntent, X_MARK } from '../lib/util.js';
+import { icon, xIntent, X_MARK, xLength, flatPost } from '../lib/util.js';
 import { formSummary, RES_WORD } from '../lib/form.js';
 import { SITE } from '../config/site.js';
 const fs = formSummary(getData().matches);
@@ -15,6 +16,11 @@ const lite = getData().matches.map(m => ({ round: m.round, opponent: m.opponent,
 // 相手チームの公式サイト（クリックで開く）。clubs.csv にないチームは名前だけ
 const clubs = Object.fromEntries(readCsv('clubs').filter(c => /^https:\/\//.test(c.url)).map(c => [c.opponent, c.url]));
 const nx = nextMatch(fixtures, lite);
+// 記録まであと少し：ポスト文は X に収まるだけ載せる
+const ms = getData().milestones;
+const msUrl = `${SITE.url}/`;
+const msText = milestonePost(ms, t => xLength(flatPost(`${t}\n${SITE.hashtags}`, SITE.roundLabel), msUrl) <= 280) + `\n${SITE.hashtags}`;
+const msNear = ms.near.slice(0, 6);
 const nxPost = nx ? xIntent(`${nx.post}\n${SITE.hashtags}`, `${SITE.url}/`, '') : '';
 ---
 <Base current="topics">
@@ -38,6 +44,28 @@ const nxPost = nx ? xIntent(`${nx.post}\n${SITE.hashtags}`, `${SITE.url}/`, '') 
           <Fragment set:html={X_MARK} /><span><b class="nw">「次の試合」</b><span class="nw">をXでポスト</span></span>
         </a>
       </div>
+    </section>
+  )}
+  {(ms.near.length > 0 || ms.done.length > 0) && (
+    <section class="card mscard reveal" id="milestones">
+      <div class="label"><Fragment set:html={icon('flag')} />記録まであと少し</div>
+      {ms.done.length > 0 && (
+        <div class="ms-block">
+          <h2 class="ms-h done"><Fragment set:html={icon('party')} />第{ms.round}節で達成！</h2>
+          <ul class="ms-list">
+            {ms.done.map(x => <li class="done"><Fragment set:html={icon(x.icon)} /><span><b class="who">{x.who}</b><span class="tx">{x.text}</span></span></li>)}
+          </ul>
+        </div>
+      )}
+      {msNear.length > 0 && (
+        <div class="ms-block">
+          <h2 class="ms-h"><Fragment set:html={icon('target')} />次の試合で記録がかかる</h2>
+          <ul class="ms-list">
+            {msNear.map(x => <li><Fragment set:html={icon(x.icon)} /><span><b class="who">{x.who}</b><span class="tx">{x.text}</span></span></li>)}
+          </ul>
+        </div>
+      )}
+      <PostBox what="記録まであと少し" text={msText} url={msUrl} />
     </section>
   )}
   <section class="card formcard reveal" id="form">

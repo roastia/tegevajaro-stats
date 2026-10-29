@@ -8,7 +8,8 @@
     "preview": "astro preview",
     "test": "node --test tests/*.test.js worker/test/*.test.js",
     "roster": "node tools/check_roster.mjs",
-    "spots:pull": "sh tools/pull_spots.sh"
+    "spots:pull": "sh tools/pull_spots.sh",
+    "snapshot": "node tools/rank_snapshot.mjs"
   },
   "dependencies": {
     "astro": "7.3.8",
