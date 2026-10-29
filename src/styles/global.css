@@ -593,10 +593,12 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .rank li.r1 .bar { background: var(--gold-soft); }
 .rank li.r1 .rk { background: var(--gold); color: var(--fg); }
 .seg button[aria-pressed='true'] { background: var(--brand); border-color: var(--brand); color: #fff; }
-/* 選手の称号：GK は黄色、ほかはピンク（どちらも淡い面に濃い文字） */
+/* ポジションの色：GK 黄色・DF 空色・MF ミント・FW ピンク（どれも淡い面に濃い文字。ピンクと並べてもやさしく、見分けやすい） */
 .pos-GK { --pc: var(--gold); --pc-soft: var(--gold-soft); --pc-ink: var(--gold-ink); --pc-on: var(--fg); }
-.pos-DF, .pos-MF, .pos-FW { --pc: var(--brand); --pc-soft: var(--soft); --pc-ink: var(--ink); --pc-on: #fff; }
-.pos-x { --pc: #B9AEB3; --pc-soft: #F5F2F3; --pc-ink: var(--muted); --pc-on: #fff; }
+.pos-DF { --pc: #6FA8DC; --pc-soft: #EAF3FB; --pc-ink: #2F6A9E; --pc-on: var(--fg); }
+.pos-MF { --pc: #6CC0A0; --pc-soft: #E8F6F0; --pc-ink: #2E7A5E; --pc-on: var(--fg); }
+.pos-FW { --pc: var(--brand); --pc-soft: var(--soft); --pc-ink: var(--ink); --pc-on: var(--fg); }
+.pos-x { --pc: #B9AEB3; --pc-soft: #F5F2F3; --pc-ink: var(--muted); --pc-on: var(--fg); }
 .pband { background: var(--pc-soft); color: var(--fg); border-bottom: 3px solid var(--pc); }
 .pband .jersey.on-color { filter: none; opacity: .85; }
 .pnum { -webkit-text-stroke-color: var(--pc-ink); }
