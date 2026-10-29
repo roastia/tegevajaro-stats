@@ -8,7 +8,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 // 表示は白背景だけ（ダーク表示はなし）
 try { localStorage.removeItem('theme'); } catch { /* 保存できなくても動く */ }
 
-/* ---------- ページごとのスクロール位置（スマホだけ） ----------
+/* ---------- ページごとのスクロール位置（スマホ・パソコン） ----------
    メニューで初めて開くページは、メニューが画面の一番上に来る位置（ページの頭）から。
    一度見たページは、前に見ていた位置から（ページの頭より上にいたときは、ページの頭から）。 */
 const ss = {
@@ -22,11 +22,12 @@ document.querySelectorAll('.site-nav a').forEach(a => a.addEventListener('click'
 addEventListener('pagehide', savePos);
 {
   const nav = performance.getEntriesByType('navigation')[0];
-  // スマホだけ（パソコンはブラウザのふつうの動きのまま）
   const phone = matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 640px)').matches;
-  if (phone && ss.get('tg:navjump') && (!nav || nav.type === 'navigate')) {
+  // パソコンは、前に見たことのあるページだけ前の位置に戻す（初めてのページはブラウザのふつうの動き＝上から）
+  const seen = ss.get(posKey()) !== null;
+  if ((phone || seen) && ss.get('tg:navjump') && (!nav || nav.type === 'navigate')) {
     const saved = Number(ss.get(posKey()) || 0);
-    const target = () => Math.max(saved, navTopY());
+    const target = () => phone ? Math.max(saved, navTopY()) : saved;
     const go = () => scrollTo({ top: target(), behavior: 'instant' });
     go(); requestAnimationFrame(go);
     // 文字や誕生日の表示でページの高さが変わったあとに、もう一度合わせる（その間に自分でスクロールしていたら何もしない）
