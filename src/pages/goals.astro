@@ -20,7 +20,6 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
 ---
 <Base current="goals" title="ハイライト">
   <section class="card">
-    <h2>試合ハイライト</h2>
     <div class="controls">
       <div class="seg" id="resSeg" role="group" aria-label="結果">
         {['', '勝', '分', '負'].map((r, i) => <button type="button" data-res={r} aria-pressed={i === 0 ? 'true' : 'false'}>{r || '全て'}</button>)}
