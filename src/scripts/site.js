@@ -8,7 +8,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 // 表示は白背景だけ（ダーク表示はなし）
 try { localStorage.removeItem('theme'); } catch { /* 保存できなくても動く */ }
 
-/* ---------- ページごとのスクロール位置 ----------
+/* ---------- ページごとのスクロール位置（スマホだけ） ----------
    メニューで初めて開くページは、メニューが画面の一番上に来る位置（ページの頭）から。
    一度見たページは、前に見ていた位置から（ページの頭より上にいたときは、ページの頭から）。 */
 const ss = {
@@ -22,7 +22,9 @@ document.querySelectorAll('.site-nav a').forEach(a => a.addEventListener('click'
 addEventListener('pagehide', savePos);
 {
   const nav = performance.getEntriesByType('navigation')[0];
-  if (ss.get('tg:navjump') && (!nav || nav.type === 'navigate')) {
+  // スマホだけ（パソコンはブラウザのふつうの動きのまま）
+  const phone = matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 640px)').matches;
+  if (phone && ss.get('tg:navjump') && (!nav || nav.type === 'navigate')) {
     const saved = Number(ss.get(posKey()) || 0);
     const target = () => Math.max(saved, navTopY());
     const go = () => scrollTo({ top: target(), behavior: 'instant' });
