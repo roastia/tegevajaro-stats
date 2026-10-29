@@ -696,3 +696,5 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .hl-xi summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .hl-xi summary { white-space: nowrap; gap: 6px; padding: 8px 10px; font-size: .82rem; }
 .hl-xi summary .xi-form { white-space: nowrap; }
+/* 箱はすべて、細い線だけのシンプルな形（上のピンクの太線はつけない） */
+.card { border-top: 1px solid var(--line); }
