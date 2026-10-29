@@ -14,8 +14,20 @@ export const X_MARK = '<svg class="xm" viewBox="0 0 24 24" aria-hidden="true"><p
 export const href = p => (import.meta.env?.BASE_URL || '/').replace(/\/$/, '') + '/' + String(p).replace(/^\//, '');
 
 /** X の投稿画面へのリンク。url を付けるとリンクカード（画像つき）が出る */
+/** ポスト文は改行を使わず1行に：行の終わりに句点（。）を足し、！？のあとは空白、ハッシュタグの前は空白でつなぐ */
+export const flatPost = text => {
+  const parts = String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
+  return parts.map((p, i) => {
+    const next = parts[i + 1];
+    if (!next) return p;
+    if (next.startsWith('#') || p.startsWith('#')) return p + ' ';
+    if (/[。]$/.test(p)) return p;
+    if (/[！？!?]$/.test(p)) return p + ' ';
+    return p + '。';
+  }).join('');
+};
 export function xIntent(text, url) {
-  const q = new URLSearchParams({ text });
+  const q = new URLSearchParams({ text: flatPost(text) });
   if (url) q.set('url', url);
   return 'https://twitter.com/intent/tweet?' + q.toString();
 }

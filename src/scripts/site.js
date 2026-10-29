@@ -1,6 +1,6 @@
 // すべてのページで動く小さなスクリプト：スクロール位置・誕生日・紙吹雪・数字のカウントアップ
 import confetti from 'canvas-confetti';
-import { icon, xIntent, X_MARK, href } from '../lib/util.js';
+import { icon, xIntent, flatPost, X_MARK, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -83,7 +83,7 @@ addEventListener('pageshow', () => { navClicked = false; });
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { load(e.target); io.unobserve(e.target); } }), { rootMargin: '600px 0px' });
     document.querySelectorAll('a.postbtn[data-img]').forEach(a => { io.observe(a); a.addEventListener('pointerdown', () => load(a), { passive: true }); });
 
-    const textOf = a => `${a.dataset.text || ''}${a.dataset.url ? '\n' + a.dataset.url : ''}`;
+    const textOf = a => `${flatPost(a.dataset.text || '')}${a.dataset.url ? ' ' + a.dataset.url : ''}`;
     // 共有メニューを開く。開けたら true、押し直しが必要なら false
     const share = async (a, f) => {
       try { await navigator.share({ files: [f], text: textOf(a) }); return true; }
