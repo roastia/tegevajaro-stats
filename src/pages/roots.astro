@@ -16,7 +16,6 @@ const pmax = Math.max(...d.prefs.map(p => p.n));
 const posCls = p => `pos-${['GK', 'DF', 'MF', 'FW'].includes(p) ? p : 'x'}`;
 ---
 <Base current="roots" title="選手の背景">
-  <p class="page-lead">どこから来て、どんな道を歩んできたのか。経歴を知ると、応援がもっとアツくなる。グッときたらXでポストしよう！</p>
   <div class="grid">
     {facts.map(f => (
       <article class={`card fact reveal vt-b-${f.id}`} id={`b-${f.id}`}>
