@@ -799,3 +799,9 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 @keyframes fl-top { from { transform: rotateX(0); } to { transform: rotateX(-90deg); } }
 @keyframes fl-bot { from { transform: rotateX(90deg); } to { transform: rotateX(0); } }
 @media (prefers-reduced-motion: reduce) { .fl.go .fl-ft, .fl.go .fl-fb { animation: none; visibility: hidden; } }
+/* 次の試合：相手チーム名は相手の公式サイトへのリンク */
+.nx-club { color: inherit; text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.nx-club .ext { margin-left: 4px; font-size: .8em; color: var(--ink); }
+.nx-club[href]:hover { color: var(--ink); }
+.nx-club:not([href]) { text-decoration: none; }
+.nx-club:not([href]) .ext { display: none; }

@@ -243,7 +243,9 @@ document.addEventListener('click', e => {
       card.dataset.mode = nx.mode;
       card.classList.toggle('is-count', nx.count);
       if (boardBox) boardBox.hidden = !nx.count;
-      set('tag', nx.tag); set('big', nx.count ? nx.cap : nx.big); set('vs', 'vs ' + nx.vs.replace(/戦$/, '')); set('when', nx.when);
+      set('tag', nx.tag); set('big', nx.count ? nx.cap : nx.big); set('vs', nx.vs.replace(/戦$/, ''));
+      const club = card.querySelector('[data-nx="club"]'), cu = (data.clubs || {})[nx.fx.opponent];
+      if (club) { if (cu) { club.href = cu; club.setAttribute('aria-label', `${nx.vs.replace(/戦$/, '')}の公式サイト（別のタブで開く）`); } else { club.removeAttribute('href'); club.removeAttribute('aria-label'); } } set('when', nx.when);
       set('venue', nx.fx.venue); set('hook', nx.hook); set('sub', nx.sub);
       const ha = card.querySelector('[data-nx="ha"]');
       if (ha) { ha.textContent = nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ'; ha.className = 'nx-ha ' + (nx.fx.ha === 'H' ? 'h' : 'a'); }

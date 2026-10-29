@@ -30,6 +30,7 @@
    - Football LAB 由来：`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列
    - 選手の加入・退団があれば `profiles.csv`（経歴は「宮崎に来る直前まで」を `→` でつなぐ）
    - `fixtures.csv`：これからの試合の日程（`round,date,kickoff,opponent,opponent_full,ha,venue`）。出典はクラブ公式の試合日程（https://www.tegevajaro.com/matches?type=all&year=2026）。`opponent` は `matches.csv` と同じ略称（前回の対戦を探すのに使う）。キックオフ時間が未定なら空。日程が発表されたら足し、変更があれば直す。結果が入った節は表示されないので消さなくてよい。トップの「次の試合」（`src/lib/nextmatch.js`）がブラウザで日本時間の今日からキックオフまでの秒読み（パタパタめくれる得点板ふうの表示。`src/lib/flipboard.js`）と「今日は試合の日！」「試合中！」を切り替える。ダッシュボード版は `index.html` の `FIXTURES` に同じ日程を入れる
+   - `clubs.csv`：相手チームの公式サイト（`opponent,name,url`。`opponent` は略称）。「次の試合」の相手チーム名を押すと開く。URL は Jリーグ公式のクラブページ（`https://www.jleague.jp/club/〇〇/`）の「クラブ公式サイト」で確かめ、`https://` で書く。日程に新しい相手を足したらここにも足す（ないと名前だけになり、`npm test` が知らせる）。ダッシュボード版は `index.html` の `CLUBS` に同じものを入れる
 2. `src/config/site.js` の `asOf`・`roundLabel`・`lastMatch`・`rank`（Jリーグ公式の順位表の現在順位）を書き換える。
    - 背番号の変更・新加入があったら `python3 tools/jersey_numbers.py` で背番号入りシャツのイラスト（`public/chars/numbers/`・小さい表示用 `numbers-s/`）を作り直す。
 3. `npm test` で検算する（出場時間の合計・スコアとゴール数・勝敗・ポスト文の長さなど）。失敗したらデータを直す。
@@ -76,7 +77,7 @@
 - 背番号の画像は 256色に減色した PNG（`tools/jersey_numbers.py`）。画像を足すときも軽くする。
 - GitHub Actions の外部 Action は公式のみ、コミット SHA で固定する。
 - 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。
-- 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：宮崎情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。
+- 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：宮崎情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。もうひとつの例外は「次の試合」の相手チーム名で、`clubs.csv` に書いた相手クラブの公式サイト（https のみ）へリンクする。
 
 ## 選手の加入・退団・背番号変更
 依頼の例：「新加入：〇〇選手（MF・背番号△）。サイトに追加して」「〇〇選手が退団。サイトから外して」「〇〇選手の背番号が△に変わった」
