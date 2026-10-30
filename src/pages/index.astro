@@ -1,51 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
 import ShareCard from '../components/ShareCard.astro';
-import { getData, getShareables, readCsv } from '../lib/data.js';
-import { nextMatch } from '../lib/nextmatch.js';
+import { getData, getShareables } from '../lib/data.js';
 import { milestonePost } from '../lib/milestones.js';
 import PostBox from '../components/PostBox.astro';
-import { icon, xIntent, X_MARK, xLength, flatPost } from '../lib/util.js';
+import { icon, xLength, flatPost } from '../lib/util.js';
 import { formSummary, RES_WORD } from '../lib/form.js';
 import { SITE } from '../config/site.js';
 const fs = formSummary(getData().matches);
 const items = getShareables().filter(s => s.kind === 't');
-// 次の試合：ビルドした時点の表示を入れておき、ブラウザで今日の日時（日本時間）に合わせて書き換える（site.js）
-const fixtures = readCsv('fixtures');
-const lite = getData().matches.map(m => ({ round: m.round, opponent: m.opponent, gf: m.gf, ga: m.ga, result: m.result }));
-// 相手チームの公式サイト（クリックで開く）。clubs.csv にないチームは名前だけ
-const clubs = Object.fromEntries(readCsv('clubs').filter(c => /^https:\/\//.test(c.url)).map(c => [c.opponent, c.url]));
-const nx = nextMatch(fixtures, lite);
 // 記録まであと少し：ポスト文は X に収まるだけ載せる
 const ms = getData().milestones;
 const msUrl = `${SITE.url}/`;
 const msText = milestonePost(ms, t => xLength(flatPost(`${t}\n${SITE.hashtags}`, SITE.roundLabel), msUrl) <= 280) + `\n${SITE.hashtags}`;
 const msNear = ms.near.slice(0, 6);
-const nxPost = nx ? xIntent(`${nx.post}\n${SITE.hashtags}`, `${SITE.url}/`, '') : '';
 ---
 <Base current="topics">
-  {nx && (
-    <section class="card nextcard reveal" id="next" data-mode={nx.mode}>
-      <script type="application/json" id="next-data" is:inline set:html={JSON.stringify({ fixtures, matches: lite, clubs }).replace(/</g, '\\u003c')}></script>
-      <div class="label"><Fragment set:html={icon('calendar')} />次の試合<span class="nx-tag" data-nx="tag">{nx.tag}</span></div>
-      <div class="nx-main">
-        <div class="nx-big" data-nx="big">{nx.big}</div>
-        <div class="nx-board" data-nx="board" hidden></div>
-      </div>
-      <div class="nx-info">
-        <div class="nx-vs">vs <a class="nx-club" data-nx="club" href={clubs[nx.fx.opponent]} target="_blank" rel="noopener noreferrer" aria-label={`${nx.vs.replace(/戦$/, '')}の公式サイト（別のタブで開く）`}><span data-nx="vs">{nx.vs.replace(/戦$/, '')}</span><span class="ext" aria-hidden="true">↗</span></a></div>
-        <div class="nx-when" data-nx="when">{nx.when}</div>
-        <div class="nx-where"><span class={`nx-ha ${nx.fx.ha === 'H' ? 'h' : 'a'}`} data-nx="ha">{nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ'}</span><span data-nx="venue">{nx.fx.venue}</span></div>
-      </div>
-      <p class="nx-sub" data-nx="sub" hidden={!nx.sub}>{nx.sub}</p>
-      <p class="cheer nx-hook" data-nx="hook">{nx.hook}</p>
-      <div class="post">
-        <a class="postbtn" data-nx="post" href={nxPost} target="_blank" rel="noopener noreferrer">
-          <Fragment set:html={X_MARK} /><span><b class="nw">「次の試合」</b><span class="nw">をXでポスト</span></span>
-        </a>
-      </div>
-    </section>
-  )}
   {(ms.near.length > 0 || ms.done.length > 0) && (
     <section class="card mscard reveal" id="milestones">
       <div class="label"><Fragment set:html={icon('flag')} />記録まであと少し</div>

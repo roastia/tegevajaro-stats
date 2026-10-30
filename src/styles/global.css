@@ -755,34 +755,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 }
 .formcard > .cheer { font-size: 1.15rem; }
 
-/* 次の試合（トップ） */
-.nextcard { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
-.nextcard .nx-tag { margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: var(--soft2); color: var(--ink); font-size: .72rem; font-weight: 700; }
-.nx-big { font-weight: 700; font-size: clamp(1.9rem, 8vw, 2.6rem); line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums; }
-.nx-info { display: flex; flex-direction: column; gap: 2px; }
-.nx-vs { font-weight: 700; font-size: 1.25rem; color: var(--fg); }
-.nx-when { font-weight: 700; color: var(--fg); }
-.nx-where { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: .85rem; color: var(--muted); }
-.nx-ha { padding: 1px 8px; border-radius: 999px; font-size: .72rem; font-weight: 700; border: 1px solid var(--brand); }
-.nx-ha.h { background: var(--brand); color: #fff; }
-.nx-ha.a { background: #fff; color: var(--ink); }
-.nx-sub { margin: 0; font-weight: 700; color: var(--ink); }
-.nextcard > .nx-hook { font-size: 1.05rem; }
-.nextcard[data-mode="today"], .nextcard[data-mode="live"] { background: var(--soft); border-color: var(--brand); }
-@media (min-width: 641px) {
-  .nextcard { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "label label label" "big info post" "big sub post" "hook hook post"; column-gap: 24px; row-gap: 4px; align-items: center; }
-  .nextcard > .label { grid-area: label; }
-  .nextcard > .nx-main { grid-area: big; padding-right: 20px; border-right: 1px solid var(--line); align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
-  .nextcard:not(.is-count) .nx-big { font-size: 2.6rem; }
-  .nextcard > .nx-info { grid-area: info; }
-  .nextcard > .nx-sub { grid-area: sub; }
-  .nextcard > .nx-hook { grid-area: hook; }
-  .nextcard > .post { grid-area: post; padding-top: 0; align-self: center; }
-}
-
 /* 次の試合：パタパタ（めくり式）の得点板 */
-.nx-main { display: flex; flex-direction: column; gap: 6px; }
-.nextcard.is-count .nx-big { font-size: 1rem; }
 .fb { display: flex; gap: clamp(6px, 2vw, 10px); }
 .fb-g { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .fb-ds { display: flex; gap: 3px; }
@@ -792,19 +765,14 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .fl-t, .fl-ft { clip-path: inset(0 0 50% 0); }
 .fl-b, .fl-fb { clip-path: inset(50% 0 0 0); background: #332C30 !important; }
 .fl::after { content: ''; position: absolute; left: 0; right: 0; top: calc(50% - .5px); height: 1px; background: #1E191B; z-index: 5; }
-.fl::before { content: ''; position: absolute; left: -1px; top: calc(50% - 3px); width: 3px; height: 6px; border-radius: 1px; background: #1E191B; z-index: 5; box-shadow: calc(1.12em - 1px) 0 0 #1E191B; }
+.fl::before { content: ''; position: absolute; left: -.03em; top: calc(50% - .07em); width: .08em; height: .14em; border-radius: 1px; background: #1E191B; z-index: 5; box-shadow: 1.07em 0 0 #1E191B; }
 .fl:not(.go) .fl-ft, .fl:not(.go) .fl-fb { visibility: hidden; }
 .fl.go .fl-ft { z-index: 3; transform-origin: 50% 50%; animation: fl-top .22s ease-in forwards; }
 .fl.go .fl-fb { z-index: 3; transform-origin: 50% 50%; animation: fl-bot .22s .22s ease-out both; }
 @keyframes fl-top { from { transform: rotateX(0); } to { transform: rotateX(-90deg); } }
 @keyframes fl-bot { from { transform: rotateX(90deg); } to { transform: rotateX(0); } }
 @media (prefers-reduced-motion: reduce) { .fl.go .fl-ft, .fl.go .fl-fb { animation: none; visibility: hidden; } }
-/* 次の試合：相手チーム名は相手の公式サイトへのリンク */
-.nx-club { color: inherit; text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 4px; }
-.nx-club .ext { margin-left: 4px; font-size: .8em; color: var(--ink); }
-.nx-club[href]:hover { color: var(--ink); }
-.nx-club:not([href]) { text-decoration: none; }
-.nx-club:not([href]) .ext { display: none; }
+
 
 /* 記録まであと少し（トップ） */
 .mscard { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
@@ -834,3 +802,23 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .mv-lead .mv { margin: 0 2px 0 0; }
 .mv-lead .mv:last-of-type { margin-right: 6px; }
 .champ .climb { display: inline-block; margin-right: 8px; padding: 1px 8px; border-radius: 999px; background: var(--brand); color: #fff; font-size: .72rem; font-weight: 700; vertical-align: .2em; }
+
+/* 次の試合（ヘッダー：今季の成績の横） */
+.season-next { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+.sn-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; }
+.sn-vs { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; color: var(--fg); }
+.sn-ha { padding: 0 8px; border-radius: 999px; font-size: .72rem; font-weight: 700; background: #fff; color: var(--ink); }
+.sn-count { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.sn-big { font-weight: 700; color: var(--ink); font-size: 1.05rem; white-space: nowrap; }
+.season-next.is-count .sn-big { font-size: .78rem; color: var(--muted); }
+.season-next .fb { gap: 6px; }
+.season-next .fl { font-size: 24px; }
+.season-next .fl > span { border-radius: 4px; }
+.season-next .fb-u { font-size: .62rem; }
+.season-next[data-mode="today"] .sn-big, .season-next[data-mode="live"] .sn-big { color: var(--ink); }
+@media (min-width: 761px) {
+  .season { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 20px; }
+  .season > .season-h, .season > .season-rec { grid-column: 1; }
+  .season > .season-next { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; padding-top: 0; padding-left: 20px; border-top: 0; border-left: 1px solid var(--line); justify-content: center; }
+  .sn-row { flex-direction: column; align-items: flex-start; }
+}

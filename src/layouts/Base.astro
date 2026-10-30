@@ -4,6 +4,8 @@ import { SITE } from '../config/site.js';
 import { getData } from '../lib/data.js';
 import { icon, href } from '../lib/util.js';
 import { seasonRecord } from '../lib/form.js';
+import { readCsv } from '../lib/data.js';
+import { nextMatch } from '../lib/nextmatch.js';
 
 interface Props { title?: string; description?: string; image?: string; path?: string; current?: string }
 const { title, description, image = 'og/site.png', path = '', current = '' } = Astro.props;
@@ -22,6 +24,11 @@ if (title) ld.push({ '@context': 'https://schema.org', '@type': 'BreadcrumbList'
 const imageUrl = SITE.url + '/' + image;
 const d = getData();
 const sr = seasonRecord(d.matches);
+// 次の試合（今季の成績の横）：ビルド時点の表示を入れておき、ブラウザで日本時間の今に合わせて書き換える（site.js）
+const fixtures = readCsv('fixtures');
+const lite = d.matches.map(m => ({ round: m.round, opponent: m.opponent, gf: m.gf, ga: m.ga, result: m.result }));
+const nx = nextMatch(fixtures, lite);
+const nxWhen = nx ? `${nx.tag}・${nx.when.replace(' キックオフ', '')}` : '';
 // 誕生日はブラウザ側で「今日」から数えるので、必要な項目だけ渡す
 const bdays = d.profiles.filter(p => p.birth).map(p => ({ no: p.no, name: p.name, pos: p.pos, birth: p.birth }));
 const nav = [
@@ -72,6 +79,19 @@ const nav = [
           <span class="pts">勝ち点<b>{sr.pts}</b></span>
           <span class="gl">{sr.gf}得点・{sr.ga}失点（{sr.gd > 0 ? '+' : ''}{sr.gd}）</span>
         </div>
+        {nx && (
+          <div class="season-next" id="seasonNext" data-mode={nx.mode}>
+            <script type="application/json" id="next-data" is:inline set:html={JSON.stringify({ fixtures, matches: lite }).replace(/</g, '\\u003c')}></script>
+            <div class="season-h"><span class="season-k">次の試合</span><span class="season-when" data-sn="when">{nxWhen}</span></div>
+            <div class="sn-row">
+              <span class="sn-vs"><span class="sn-ha" data-sn="ha">{nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ'}</span><span data-sn="vs">vs {nx.vs.replace(/戦$/, '')}</span></span>
+              <span class="sn-count">
+                <span class="sn-big" data-sn="big">{nx.big}</span>
+                <span class="sn-board" data-sn="board" hidden></span>
+              </span>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   </header>

@@ -29,8 +29,7 @@
    - `lineups.csv`：スタメンの配置（`round,formation,line,slot,name`）。line は 0=GK・1=最終ライン…、slot は宮崎が上に攻める向きで左から1。出典は Jリーグ公式の試合ページ（`https://www.jleague.jp/match/j2/2026/月日番号/`）のフォーメーション図。ページの中のデータに宮崎の `formation` と各選手の `playerNumber`・`positionX`（小さいほど後ろ。GK がいちばん小さい）・`positionY`（マイナスが宮崎の左）が入っているので、positionX で列に分け、列の中を positionY の小さい順に 1, 2, … と番号をふる。背番号は `players.csv` で名前にする。図だけ見るときは、宮崎が下に攻める向きで描かれている試合があるので左右を入れかえて読む。確かめられないときだけ CB を `2-3`、ボランチを `1-2` と書く（同じ行に並べるだけになる）
    - Football LAB 由来：`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列
    - 選手の加入・退団があれば `profiles.csv`（経歴は「宮崎に来る直前まで」を `→` でつなぐ）
-   - `fixtures.csv`：これからの試合の日程（`round,date,kickoff,opponent,opponent_full,ha,venue`）。出典はクラブ公式の試合日程（https://www.tegevajaro.com/matches?type=all&year=2026）。`opponent` は `matches.csv` と同じ略称（前回の対戦を探すのに使う）。キックオフ時間が未定なら空。日程が発表されたら足し、変更があれば直す。結果が入った節は表示されないので消さなくてよい。トップの「次の試合」（`src/lib/nextmatch.js`）がブラウザで日本時間の今日からキックオフまでの秒読み（パタパタめくれる得点板ふうの表示。`src/lib/flipboard.js`）と「今日は試合の日！」「試合中！」を切り替える。ダッシュボード版は `index.html` の `FIXTURES` に同じ日程を入れる
-   - `clubs.csv`：相手チームの公式サイト（`opponent,name,url`。`opponent` は略称）。「次の試合」の相手チーム名を押すと開く。URL は Jリーグ公式のクラブページ（`https://www.jleague.jp/club/〇〇/`）の「クラブ公式サイト」で確かめ、`https://` で書く。日程に新しい相手を足したらここにも足す（ないと名前だけになり、`npm test` が知らせる）。ダッシュボード版は `index.html` の `CLUBS` に同じものを入れる
+   - `fixtures.csv`：これからの試合の日程（`round,date,kickoff,opponent,opponent_full,ha,venue`）。出典はクラブ公式の試合日程（https://www.tegevajaro.com/matches?type=all&year=2026）。`opponent` は `matches.csv` と同じ略称（前回の対戦を探すのに使う）。キックオフ時間が未定なら空。日程が発表されたら足し、変更があれば直す。結果が入った節は表示されないので消さなくてよい。全ページのヘッダー（今季の成績の横）の「次の試合」（節・日時・ホーム／アウェイ・相手。`src/lib/nextmatch.js`）が、ブラウザで日本時間の今からキックオフまでの秒読み（パタパタめくれる得点板ふうの表示。`src/lib/flipboard.js`）と「試合中！」「おつかれさまでした！」を切り替える。ダッシュボード版は `index.html` の `FIXTURES` に同じ日程を入れる
 2. `src/config/site.js` の `asOf`・`roundLabel`・`lastMatch`・`rank`（Jリーグ公式の順位表の現在順位）を書き換える。
    - 背番号の変更・新加入があったら `python3 tools/jersey_numbers.py` で背番号入りシャツのイラスト（`public/chars/numbers/`・小さい表示用 `numbers-s/`）を作り直す。
 3. `npm run snapshot` でその節のランキングの順位を `src/data/rank_history.json` に記録する（次の節で「↑2」「↓1」「NEW」「首位浮上」を出すのに使う。忘れると `npm test` が知らせる）。ダッシュボード版は `index.html` の `RANK_PREV` を、最新の節の1つ前の順位に入れかえる（名前を番号にした形。作り方は前回と同じ）
@@ -39,7 +38,7 @@
 6. 変更をコミットする（**push は人が行う**）。コミットメッセージは「第14節（10/31 大分戦）を反映」のように。
 
 ## 公開URLが決まったら
-ポストのボタンを押すと X の投稿画面が開き（画像の添付や共有メニューは使わない）、文のあとにテゲスタ！のURL（トピック・ランキング・背景はそれぞれの個別ページ、ほかはトップ）が付く。X ではそのURLにテゲスタ！のロゴのサムネイルが出る。ポスト文は改行を使わず1行（句点・空白でつなぐ）、本文の最後に「（第〇節時点）」（`site.js` の `roundLabel`。ダッシュボード版は試合データの最新の節。選手の背景・誕生日・次の試合のポストには付けない）、最後に `#テゲバジャーロ宮崎 #テゲバ #テゲスタ`。URLはまだ仮（`https://roastia.github.io/tegevajaro-stats`）。決まったら次の3か所をそろえて変える。
+ポストのボタンを押すと X の投稿画面が開き（画像の添付や共有メニューは使わない）、文のあとにテゲスタ！のURL（トピック・ランキング・背景はそれぞれの個別ページ、ほかはトップ）が付く。X ではそのURLにテゲスタ！のロゴのサムネイルが出る。ポスト文は改行を使わず1行（句点・空白でつなぐ）、本文の最後に「（第〇節時点）」（`site.js` の `roundLabel`。ダッシュボード版は試合データの最新の節。選手の背景・誕生日のポストには付けない）、最後に `#テゲバジャーロ宮崎 #テゲバ #テゲスタ`。URLはまだ仮（`https://roastia.github.io/tegevajaro-stats`）。決まったら次の3か所をそろえて変える。
 1. `src/config/site.js` の `url`
 2. `astro.config.mjs` の `site`（ドメイン）と `base`（ドメイン直下なら `/`）
 3. ダッシュボード版の `SITE_URL`（`index.html` の中）
@@ -85,7 +84,7 @@
 - 背番号の画像は 256色に減色した PNG（`tools/jersey_numbers.py`）。画像を足すときも軽くする。
 - GitHub Actions の外部 Action は公式のみ、コミット SHA で固定する。
 - 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。
-- 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：宮崎情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。もうひとつの例外は「次の試合」の相手チーム名で、`clubs.csv` に書いた相手クラブの公式サイト（https のみ）へリンクする。
+- 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：宮崎情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。
 
 ## 選手の加入・退団・背番号変更
 依頼の例：「新加入：〇〇選手（MF・背番号△）。サイトに追加して」「〇〇選手が退団。サイトから外して」「〇〇選手の背番号が△に変わった」

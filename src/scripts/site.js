@@ -225,35 +225,32 @@ document.addEventListener('click', e => {
 });
 
 
-/* ---------- 次の試合（トップ）：今日の日時（日本時間）に合わせてカウントダウンを書き換える ---------- */
+/* ---------- 次の試合（ヘッダーの今季の成績の横）：日本時間の今に合わせて秒読みを書き換える ---------- */
 {
-  const card = document.getElementById('next');
+  const box = document.getElementById('seasonNext');
   let data = null;
   try { data = JSON.parse(document.getElementById('next-data')?.textContent || 'null'); } catch { data = null; }
-  if (card && data) {
-    const set = (k, v) => { const e = card.querySelector(`[data-nx="${k}"]`); if (e) e.textContent = v; };
-    const boardBox = card.querySelector('[data-nx="board"]');
+  if (box && data) {
+    const q = k => box.querySelector(`[data-sn="${k}"]`);
+    const set = (k, v) => { const e = q(k); if (e) e.textContent = v; };
+    const boardBox = q('board');
     const board = makeFlipBoard();
     boardBox?.appendChild(board.el);
     let nx = null;
     const tick = () => { if (nx?.count) board.set(splitLeft(nx.target - Date.now())); };
     const draw = () => {
       nx = nextMatch(data.fixtures, data.matches, new Date());
-      if (!nx) { card.hidden = true; return; }
-      card.dataset.mode = nx.mode;
-      card.classList.toggle('is-count', nx.count);
+      if (!nx) { box.hidden = true; return; }
+      box.dataset.mode = nx.mode;
+      box.classList.toggle('is-count', nx.count);
       if (boardBox) boardBox.hidden = !nx.count;
-      set('tag', nx.tag); set('big', nx.count ? nx.cap : nx.big); set('vs', nx.vs.replace(/戦$/, ''));
-      const club = card.querySelector('[data-nx="club"]'), cu = (data.clubs || {})[nx.fx.opponent];
-      if (club) { if (cu) { club.href = cu; club.setAttribute('aria-label', `${nx.vs.replace(/戦$/, '')}の公式サイト（別のタブで開く）`); } else { club.removeAttribute('href'); club.removeAttribute('aria-label'); } } set('when', nx.when);
-      set('venue', nx.fx.venue); set('hook', nx.hook); set('sub', nx.sub);
-      const ha = card.querySelector('[data-nx="ha"]');
-      if (ha) { ha.textContent = nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ'; ha.className = 'nx-ha ' + (nx.fx.ha === 'H' ? 'h' : 'a'); }
-      const sub = card.querySelector('[data-nx="sub"]'); if (sub) sub.hidden = !nx.sub;
-      const a = card.querySelector('[data-nx="post"]'); if (a) a.href = xIntent(`${nx.post}\n${SITE.hashtags}`, SITE.url + '/', '');
+      set('when', `${nx.tag}・${nx.when.replace(' キックオフ', '')}`);
+      set('ha', nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ');
+      set('vs', 'vs ' + nx.vs.replace(/戦$/, ''));
+      set('big', nx.count ? (nx.mode === 'today' ? '今日！キックオフまで' : 'キックオフまで') : nx.big);
     };
     draw(); tick();
-    // 秒読み：毎秒めくる。表示の切り替わり（前日・当日・試合中など）は1分ごとに見直す
+    // 秒読み：毎秒めくる。表示の切り替わり（当日・試合中など）は1分ごとに見直す
     let last = -1;
     setInterval(() => {
       const sec = Math.floor(Date.now() / 1000);

@@ -43,9 +43,3 @@ test('前回の対戦をふまえたひとこと', () => {
   assert.match(nextMatch(fx, [], at('2026-11-20T12:00+09:00')).hook, /スタジアムで一緒に勝ち点3/);
 });
 
-test('相手チームの公式サイト：https で、日程の相手がすべてそろっている', () => {
-  const clubs = readCsv('clubs');
-  for (const c of clubs) assert.match(c.url, /^https:\/\/[a-z0-9.-]+\/$/, c.opponent);
-  const have = new Set(clubs.map(c => c.opponent));
-  for (const f of fixtures) assert.ok(have.has(f.opponent), `clubs.csv に ${f.opponent} がない`);
-});
