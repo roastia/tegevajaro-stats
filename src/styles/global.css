@@ -659,8 +659,6 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .hl-xi .xi-form { font-weight: 500; color: var(--muted); }
 .hl-xi .pitch { margin-top: 8px; }
 .pl.me .pl-n { background: var(--brand); color: #fff; }
-.xi-all { font: inherit; font-size: .85rem; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--brand); background: #fff; color: var(--ink); cursor: pointer; }
-.xi-all[aria-pressed='true'] { background: var(--soft2); }
 .hl-empty { color: var(--muted); }
 .hl-xi .pitch { aspect-ratio: auto; min-height: 22rem; padding-bottom: 12px; }
 /* パソコン：同じ段のカードは高さをそろえ、「スタメン」は下にそろえる */

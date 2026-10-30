@@ -28,7 +28,6 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
         {scorers.map(([n, c]) => <option value={n}>{n}（{c}ゴール）</option>)}
       </select>
       <select id="mOrder" aria-label="並び順"><option value="desc">新しい順</option><option value="asc">古い順</option></select>
-      <button type="button" class="xi-all" id="xiAll" aria-pressed="false">スタメン＆フォーメーションをすべて開く</button>
     </div>
   </section>
   <ul class="grid hl-games" id="matchList">
@@ -99,10 +98,4 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
     $('resSeg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     draw();
   });
-  // スタメンをまとめて開く／閉じる
-  const all = $('xiAll');
-  const xis = [...document.querySelectorAll<HTMLDetailsElement>('.hl-xi')];
-  const sync = () => { const open = xis.every(x => x.open); all.setAttribute('aria-pressed', String(open)); all.textContent = open ? 'スタメン＆フォーメーションをすべて閉じる' : 'スタメン＆フォーメーションをすべて開く'; };
-  all.addEventListener('click', () => { const open = all.getAttribute('aria-pressed') !== 'true'; xis.forEach(x => { x.open = open; }); sync(); });
-  xis.forEach(x => x.addEventListener('toggle', sync));
 </script>
