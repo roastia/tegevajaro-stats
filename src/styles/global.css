@@ -808,7 +808,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .sn-count { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .sn-big { font-weight: 700; color: var(--ink); font-size: 1.05rem; white-space: nowrap; }
 .season-next.is-count .sn-big { font-size: .78rem; color: var(--muted); }
-.season-next .fb { gap: 6px; }
+.season-next .fb { gap: 14px; }
 .season-next .fl { font-size: 24px; }
 .season-next .fl > span { border-radius: 4px; }
 .season-next .fb-u { font-size: .62rem; }
