@@ -115,7 +115,6 @@ input[type=search] { flex: 1 1 10rem; }
 [popover].pop::backdrop { background: rgba(0,0,0,.12); }
 .champ { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 6px 0 8px; }
 .champ .nm { font-weight: 700; font-size: 1.5rem; line-height: 1.2; }
-.champ .vl { color: var(--muted); font-size: .8rem; }
 .rank { list-style: none; margin: 0; padding: 0; }
 .rank li { position: relative; display: grid; grid-template-columns: 1.7rem 1fr auto; gap: 8px; align-items: center; padding: 5px 6px; margin-bottom: 3px; border-radius: 8px; isolation: isolate; }
 .rank li .bar { position: absolute; inset: 0 auto 0 0; width: calc(var(--w, 0) * 1%); z-index: -1; border-radius: 8px; background: color-mix(in srgb, var(--brand) 18%, transparent); transform-origin: left; }

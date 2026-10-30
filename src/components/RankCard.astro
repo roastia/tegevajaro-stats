@@ -34,7 +34,6 @@ const title = plainTitle(meta.title);
   {meta.cheer && <p class="cheer">{meta.cheer}</p>}
   <div class="champ">
     <span class="nm">{climbed && <span class="climb">首位浮上！</span>}{champs.map(r => r.name).join('・')}</span>
-    <span class="vl">{champs.length > 1 ? `${champs.length}人が並ぶ` : (meta.hideValue ? '' : splitDisp(champs[0].display)[0])}</span>
   </div>
   <ol class="rank">
     {top.map(r => (
