@@ -9,7 +9,7 @@ export function getStaticPaths() {
   return all.map(item => ({ params: { kind: item.kind, id: item.id }, props: { item, more: all.filter(s => s.kind === item.kind && s.id !== item.id).slice(0, 6) } }));
 }
 const { item, more } = Astro.props;
-const back = { t: ['', '注目トピック', 'topics'], r: [`ranking/#rank-${item.id}`, 'ランキング', 'ranking'], b: [`players/#b-${item.id}`, '選手', 'players'] }[item.kind];
+const back = item.id === 'climb' ? ['ranking/', 'ランキング', 'ranking'] : { t: ['', '注目トピック', 'topics'], r: [`ranking/#rank-${item.id}`, 'ランキング', 'ranking'], b: [`players/#b-${item.id}`, '選手', 'players'] }[item.kind];
 ---
 <Base title={item.label} description={`${item.headline} ${item.sub || ''}`.trim()} path={`${item.kind}/${item.id}/`} current={back[2]}>
   <div class="share-page">

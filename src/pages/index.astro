@@ -8,7 +8,8 @@ import { icon, xLength, flatPost } from '../lib/util.js';
 import { formSummary, RES_WORD } from '../lib/form.js';
 import { SITE } from '../config/site.js';
 const fs = formSummary(getData().matches);
-const items = getShareables().filter(s => s.kind === 't');
+// 首位浮上はランキングのページの先頭に出す
+const items = getShareables().filter(s => s.kind === 't' && s.id !== 'climb');
 // 記録まであと少し：ポスト文は X に収まるだけ載せる
 const ms = getData().milestones;
 const msUrl = `${SITE.url}/`;
