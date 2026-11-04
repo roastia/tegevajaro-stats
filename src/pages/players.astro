@@ -96,7 +96,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
     </ol>
   </section>
   </Acc>
-  <Acc id="prefs" title="出身地" icon="pin" count={d.prefs.length}>
+  <Acc id="prefs" title="出身都道府県" icon="pin" count={d.prefs.length}>
     <section class="card prefs">
       <p class="note">都道府県ごとの人数（ピンクは九州）。バーにカーソルを重ねる（スマホはタップ）と、その出身の選手が出ます。</p>
       {d.prefs.map(p => (
@@ -106,10 +106,10 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
         </div>))}
     </section>
   </Acc>
-  <Acc id="links" title="同じ学校・チームの出身" icon="link" count={d.school_links.length}>
+  <Acc id="links" title="同じ母校・ユース出身" icon="link" count={d.school_links.length}>
     <section class="card">
       <p class="note">高校・ユース・大学が同じ選手。宮崎でまた同じピッチに。</p>
-      <table class="simple"><thead><tr><th>学校・チーム</th><th>選手</th></tr></thead>
+      <table class="simple"><thead><tr><th>学校・ユース</th><th>選手</th></tr></thead>
         <tbody>{d.school_links.map(r => <tr><td>{r.school}</td><td>{r.members}</td></tr>)}</tbody></table>
     </section>
   </Acc>

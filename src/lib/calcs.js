@@ -113,7 +113,7 @@ dash.calc('roots_facts', {
 });
 dash.calc('school_links', {
   inputs: ['profiles'],
-  title: '同じ学校・チームの出身',
+  title: '同じ母校・ユース出身',
   description: '高校・ユース欄と大学欄が同じ選手を集め、2人以上いるものを並べる。',
   fn: (profiles) => {
     const g = new Map();
