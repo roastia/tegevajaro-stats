@@ -307,8 +307,9 @@ document.addEventListener('click', e => {
 if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
   const place = (b, p) => {
     const r = b.getBoundingClientRect(), w = p.offsetWidth, h = p.offsetHeight;
-    const left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8);
-    const top = r.bottom + 8 + h > innerHeight - 8 ? Math.max(8, r.top - 8 - h) : r.bottom + 8;
+    // 吹き出しの左下を「?」の右上に合わせる（画面からはみ出すときだけずらす）
+    const left = Math.max(8, Math.min(r.right, innerWidth - w - 8));
+    const top = r.top - h < 8 ? r.bottom : r.top - h;
     Object.assign(p.style, { position: 'fixed', inset: 'auto', margin: '0', left: `${left}px`, top: `${top}px` });
   };
   for (const b of document.querySelectorAll('button.info[popovertarget]')) {
