@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { clubUrl } from '../config/clubs.js';
 import ShareCard from '../components/ShareCard.astro';
 import { getData, getShareables } from '../lib/data.js';
 import { milestonePost } from '../lib/milestones.js';
@@ -29,7 +30,7 @@ const msNear = ms.near.slice(0, 6);
           {i === fs.last.length - 1 && <span class="newtag">最新</span>}
           <span class="res">{RES_WORD[m.result] || m.result}</span>
           <span class="sc">{m.gf}-{m.ga}</span>
-          <span class="op">vs {m.opponent}</span>
+          <span class="op">vs {clubUrl(m.opponent) ? <a class="club-link" href={clubUrl(m.opponent)} target="_blank" rel="noopener noreferrer">{m.opponent}</a> : m.opponent}</span>
           <span class="rd">第{m.round}節</span>
           <span class="rd">{m.ha === 'H' ? 'ホーム' : 'アウェイ'}</span>
         </div>

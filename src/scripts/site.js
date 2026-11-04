@@ -4,6 +4,7 @@ import { icon, xIntent, X_MARK, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 import { nextMatch, splitLeft } from '../lib/nextmatch.js';
 import { makeFlipBoard } from '../lib/flipboard.js';
+import { clubUrl } from '../config/clubs.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -247,7 +248,9 @@ document.addEventListener('click', e => {
       set('when', `${nx.tag}・${nx.when.replace(' キックオフ', '')}`);
       set('ha', nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ');
       const haEl = q('ha'); if (haEl) haEl.className = 'sn-ha ' + (nx.fx.ha === 'H' ? 'h' : 'a');
-      set('vs', 'vs ' + nx.vs.replace(/戦$/, ''));
+      set('club', nx.vs.replace(/戦$/, ''));
+      const clubEl = q('club'), cu = clubUrl(nx.fx.opponent_full) || clubUrl(nx.fx.opponent);
+      if (clubEl) { if (cu) clubEl.href = cu; else clubEl.removeAttribute('href'); }
       set('big', nx.count ? (nx.mode === 'today' ? '今日！キックオフまで' : 'キックオフまで') : nx.big);
     };
     draw(); tick();

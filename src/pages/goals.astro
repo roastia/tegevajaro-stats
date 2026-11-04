@@ -5,6 +5,7 @@ import Acc from '../components/Acc.astro';
 import { getData, readCsv } from '../lib/data.js';
 import { buildLineups } from '../lib/lineups.js';
 import { icon, safeUrl, href, playerUrl } from '../lib/util.js';
+import { clubUrl } from '../config/clubs.js';
 // ハイライト：試合ごとに「ハイライト動画・その試合のゴール・スタメン」をまとめる
 const d = getData();
 const L = buildLineups({ lineups: readCsv('lineups'), matches: readCsv('matches'), players: readCsv('players') });
@@ -43,7 +44,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
       <li class="card hl-game" data-res={m.result} data-round={m.round} data-scorers={[...new Set(gs.map(x => x.scorer))].join('|')}>
         <div class="lu-head">
           <span class="lu-rd">第{m.round}節</span>
-          <span class="lu-vs">{md(m.date)} {m.opponent}<small>（{ha(m)}）</small></span>
+          <span class="lu-vs">{md(m.date)} {clubUrl(m.opponent) ? <a class="club-link" href={clubUrl(m.opponent)} target="_blank" rel="noopener noreferrer">{m.opponent}</a> : m.opponent}<small>（{ha(m)}）</small></span>
           <span class={`lu-res ${resCls[m.result] || ''}`}>{m.gf}-{m.ga} {resWord[m.result] || ''}</span>
         </div>
         <div class="hl-acts">

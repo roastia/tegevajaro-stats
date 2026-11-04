@@ -4,6 +4,7 @@
 // 同じ節をもう一度流すと、その節の行を入れかえる（二重にならない）
 import fs from 'node:fs';
 import path from 'node:path';
+import { clubUrl } from '../src/config/clubs.js';
 
 const D = path.resolve('src/data');
 const args = process.argv.slice(2);
@@ -20,6 +21,9 @@ const replaceRound = (t, rows, key = 'round') => { t.rows = [...t.rows.filter(r 
 const players = read('players'), fixtures = read('fixtures'), matches = read('matches');
 const fx = fixtures.rows.find(f => Number(f.round) === R);
 if (!fx) throw new Error(`fixtures.csv に第${R}節がない`);
+// 相手クラブの公式サイト（相手チーム名のリンク先）がなければ知らせる。日程に入っている相手もまとめて見る
+const noClub = [...new Set(fixtures.rows.flatMap(f => [f.opponent]).filter(o => o && !clubUrl(o)))];
+if (noClub.length) console.warn('src/config/clubs.js に公式サイトがない相手：' + noClub.join('・') + '（Jリーグ公式のクラブページで確かめて足す）');
 const idName = Object.fromEntries(players.rows.map(p => [(p.jl_url.match(/player\/(\d+)/) || [])[1], p.name]));
 const known = new Set(players.rows.map(p => p.name));
 

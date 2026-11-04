@@ -22,6 +22,7 @@
    - Football LAB 由来：`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列
    - 選手の加入・退団があれば `profiles.csv`（経歴は「宮崎に来る直前まで」を `→` でつなぐ）
    - `fixtures.csv`：これからの試合の日程（`round,date,kickoff,opponent,opponent_full,ha,venue`）。出典はクラブ公式の試合日程（https://www.tegevajaro.com/matches?type=all&year=2026）。`opponent` は `matches.csv` と同じ略称（前回の対戦を探すのに使う）。キックオフ時間が未定なら空。日程が発表されたら足し、変更があれば直す。結果が入った節は表示されないので消さなくてよい。全ページのヘッダー（今季の成績の横）の「次の試合」（節・日時・ホーム／アウェイ・相手。`src/lib/nextmatch.js`）が、ブラウザで日本時間の今からキックオフまでの秒読み（パタパタめくれる得点板ふうの表示。`src/lib/flipboard.js`）と「試合中！」「おつかれさまでした！」を切り替える。ダッシュボード版は `index.html` の `FIXTURES` に同じ日程を入れる
+   - 相手チーム名（次の試合・直近5試合・ハイライト）は相手クラブの公式サイトへのリンク。URL は `src/config/clubs.js`（J2 全クラブ分を持っている。略称と正式名のどちらでも引ける）。ダッシュボード版は `index.html` の `CLUB_URL` に同じもの。`apply_match.mjs` は日程に clubs.js にない相手がいると知らせるので、そのときは Jリーグ公式のクラブページ（jleague.jp/club/〇〇/）の公式サイトのリンクを確かめて足す（昇格・降格でクラブが入れかわったときも同じ）
 2. `src/config/site.js` の `asOf`・`roundLabel`・`lastMatch`・`rank`（Jリーグ公式の順位表の現在順位）を書き換える。
    - 背番号の変更・新加入があったら `python3 tools/jersey_numbers.py` で背番号入りシャツのイラスト（`public/chars/numbers/`・小さい表示用 `numbers-s/`）を作り直す。
 3. `npm run snapshot` でその節のランキングの順位を `src/data/rank_history.json` に記録する（次の節で「↑2」「↓1」「NEW」「首位浮上」を出すのに使う。忘れると `npm test` が知らせる）。ダッシュボード版は `index.html` の `RANK_PREV` を、最新の節の1つ前の順位に入れかえる（名前を番号にした形。作り方は前回と同じ）
