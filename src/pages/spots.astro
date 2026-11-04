@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Acc from '../components/Acc.astro';
 import { readCsv } from '../lib/data.js';
 import { icon, href, xUrl, mapsUrl, STADIUM, distanceKm, distanceLabel } from '../lib/util.js';
 import { SITE } from '../config/site.js';
@@ -20,8 +21,9 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     </div>
   </section>
 
-  <section class="card reveal" id="spotList">
-    <h2><Fragment set:html={icon('pin')} />テゲサポおすすめスポット</h2>
+  <Acc id="spotList" title="テゲサポおすすめスポット" icon="pin" count={spots.length ? spots.length + '件' : ''} open>
+  <section class="card">
+
     {spots.length > 0
       ? <p class="note">{STADIUM.name}から近い順。距離は直線距離です。場所を押すと Google マップが開きます。</p>
       : <div class="spot-empty"><p>まだありません。最初のおすすめを教えてください！</p><a class="btn-main" href="#post">おすすめを教える</a></div>}
@@ -40,9 +42,11 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
       </ul>
     )}
   </section>
+  </Acc>
 
-  <section class="card reveal spot-form-card" id="post">
-    <h2><Fragment set:html={icon('sparkle')} />おすすめを教えて！</h2>
+  <Acc id="post" title="おすすめを教えて！" icon="sparkle">
+  <section class="card spot-form-card">
+
     <p class="spot-ask">お店だけじゃなくて、宮崎のいいところなら何でも大歓迎。アウェイから来たみなさんに、見てほしい・食べてほしい・知ってほしい場所を教えてください！</p>
     <p class="spot-examples"><b>たとえば</b>ごはん・カフェ／海や山の景色／神社・観光地／温泉・銭湯／お土産が買えるお店／試合の前後にちょっと寄れる場所</p>
     <p class="note">送ってもらった内容は、すぐにはページに載りません。確認してから、このページに載せます。同じ回線（Wi-Fi など）からの投稿は1日10件まで、同じ内容は1回だけ受け付けます。</p>
@@ -72,10 +76,12 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
       </ul>
     </details>
   </section>
+  </Acc>
 
 
+  <Acc id="away" title="アウェイからお越しのみなさんへ" icon="plane">
   <section class="card away-guide" aria-label="アウェイからお越しのみなさんへ">
-    <h2><Fragment set:html={icon('plane')} />アウェイからお越しのみなさんへ</h2>
+
     <ul class="ag-tiles">
       <li>
         <span class="ag-ic"><Fragment set:html={icon('pin')} /></span>
@@ -109,6 +115,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
       </li>
     </ul>
   </section>
+  </Acc>
 </Base>
 
 <script>

@@ -821,3 +821,25 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 }
 /* ランキングのページの先頭：首位浮上 */
 .climb-top { margin: 14px 0 6px; max-width: 560px; }
+
+/* アコーディオン（大項目ごとに開け閉め） */
+.acc { margin-top: 14px; scroll-margin-top: 64px; }
+.acc > summary { list-style: none; }
+.acc > summary::-webkit-details-marker { display: none; }
+.acc-h { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; cursor: pointer; user-select: none; }
+.acc-h:hover { border-color: var(--brand); }
+.acc-h:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.acc-t { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; color: var(--fg); min-width: 0; }
+.acc-t .ic { width: 1.2em; height: 1.2em; flex: none; color: var(--ink); }
+.acc-n { padding: 0 8px; border-radius: 999px; background: var(--soft2); color: var(--ink); font-size: .75rem; font-weight: 700; }
+.acc-note { margin-left: auto; font-size: .78rem; color: var(--muted); white-space: nowrap; }
+.acc-x { margin-left: auto; flex: none; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--brand); position: relative; }
+.acc-note + .acc-x { margin-left: 8px; }
+.acc-x::before { content: ''; position: absolute; left: 50%; top: 45%; width: 8px; height: 8px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: translate(-50%, -50%) rotate(45deg); transition: transform .2s; }
+.acc[open] > .acc-h { background: var(--soft); border-color: var(--brand); }
+.acc[open] > .acc-h .acc-x::before { transform: translate(-50%, -20%) rotate(-135deg); }
+.acc-b { padding-top: 12px; }
+.acc-b > :first-child { margin-top: 0; }
+@media (prefers-reduced-motion: reduce) { .acc-x::before { transition: none; } }
+/* ハイライト：月ごとのまとまり（並び順の切りかえで order を使う） */
+.hl-months { display: flex; flex-direction: column; }

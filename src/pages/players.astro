@@ -1,4 +1,5 @@
 ---
+import Acc from '../components/Acc.astro';
 import Base from '../layouts/Base.astro';
 import PostBox from '../components/PostBox.astro';
 import { getData, getShareables } from '../lib/data.js';
@@ -30,8 +31,9 @@ d.rankings.forEach(({ meta, rows }, idx) => {
 const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
 ---
 <Base current="players" title="選手の背景・称号" description="テゲバジャーロ宮崎の選手の年齢・出身地・出身校・経歴と、今季の記録から決まる選手の称号の一覧（非公式）。">
-  <div class="sec-h"><h2>選手の称号</h2><a href="#roots">選手の背景へ ↓</a></div>
-  <section class="card" id="titles">
+  <section class="bday" data-bday hidden></section>
+  <Acc id="titles" title="選手の称号" icon="medal" count={players.length + '人'}>
+  <section class="card">
     <p class="note">ランキングで3位以内に入ると称号ゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>
     <div class="controls">
       <input id="pq" type="search" placeholder="名前・よみ・ローマ字で検索" aria-label="選手名で検索（漢字・ひらがな・ローマ字）" />
@@ -71,7 +73,8 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
       );
     })}
   </div>
-  <div class="sec-h" id="roots"><h2>選手の背景</h2><a href="#titles">選手の称号へ ↑</a></div>
+  </Acc>
+  <Acc id="roots" title="選手の背景" icon="suitcase" count={facts.length}>
   <div class="grid">
     {facts.map(f => (
       <article class={`card fact reveal vt-b-${f.id}`} id={`b-${f.id}`}>
@@ -84,9 +87,9 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
       </article>
     ))}
   </div>
-  <section class="bday" data-bday hidden></section>
+  </Acc>
+  <Acc id="ages" title="年齢一覧" icon="cake" count={rows.length + '人'}>
   <section class="card">
-    <h2><Fragment set:html={icon('cake')} /> 年齢一覧</h2>
     <p class="note">今日時点の満年齢。左の数字が並び順で、上から順に読みます（2段のときは左の段の下から右の段へ続きます）。ピンクの枠は1か月以内に誕生日を迎える選手です。</p>
     <div class="controls gap">
       <div class="seg" id="ageSeg" role="group" aria-label="並び順">
@@ -106,24 +109,23 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
         </li>); })}
     </ol>
   </section>
-  <div class="grid two">
+  </Acc>
+  <Acc id="links" title="同じ学校・チームの出身" icon="link" count={d.school_links.length}>
     <section class="card">
-      <h2><Fragment set:html={icon('link')} /> 同じ学校・チームの出身</h2>
       <p class="note">高校・ユース・大学が同じ選手。宮崎でまた同じピッチに。</p>
       <table class="simple"><thead><tr><th>学校・チーム</th><th>選手</th></tr></thead>
         <tbody>{d.school_links.map(r => <tr><td>{r.school}</td><td>{r.members}</td></tr>)}</tbody></table>
     </section>
+  </Acc>
+  <Acc id="prefs" title="出身地" icon="pin" count={d.prefs.length + '都道府県'}>
     <section class="card prefs">
-      <h2><Fragment set:html={icon('pin')} /> 出身地</h2>
       <p class="note">都道府県ごとの人数（ピンクは九州）</p>
       {d.prefs.map(p => <div class={`row ${kyushu.includes(p.pref) ? 'ky' : ''}`}><span>{p.pref}</span><span class={`bar2 w${Math.round(p.n / pmax * 100)}`}></span><span>{p.n}</span></div>)}
     </section>
-  </div>
+  </Acc>
 </Base>
 <style>
   .sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 4px; }
-  #roots { margin-top: 28px; scroll-margin-top: 70px; }
-  #titles { scroll-margin-top: 70px; }
   .sec-h h2 { margin: 0; font-size: 1.15rem; }
   .sec-h a { font-size: .85rem; white-space: nowrap; }
   .two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }

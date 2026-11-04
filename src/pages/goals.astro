@@ -1,6 +1,7 @@
 ---
 import { SITE } from '../config/site.js';
 import Base from '../layouts/Base.astro';
+import Acc from '../components/Acc.astro';
 import { getData, readCsv } from '../lib/data.js';
 import { buildLineups } from '../lib/lineups.js';
 import { icon, safeUrl, href } from '../lib/util.js';
@@ -12,6 +13,8 @@ const counts = {};
 d.goals.forEach(g => { counts[g.scorer] = (counts[g.scorer] || 0) + 1; });
 const scorers = Object.entries(counts).sort((a, b) => b[1] - a[1]);
 const matches = [...d.matches].sort((a, b) => Number(b.round) - Number(a.round));
+// 大項目（アコーディオン）：月ごと。いちばん新しい月だけ開いておく
+const months = [...new Set(matches.map(m => m.date.slice(0, 7)))].map(k => [k, matches.filter(m => m.date.slice(0, 7) === k)]);
 const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
 const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}`; };
 const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
@@ -30,8 +33,11 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
       <select id="mOrder" aria-label="並び順"><option value="desc">新しい順</option><option value="asc">古い順</option></select>
     </div>
   </section>
-  <ul class="grid hl-games" id="matchList">
-    {matches.map(m => { const gs = d.goals.filter(g => String(g.round) === String(m.round)).sort((a, b) => Number(a.minute) - Number(b.minute)); const v = safeUrl(m.video_url), p = safeUrl(m.match_url); const g = xiOf.get(String(m.round)); return (
+  <div class="hl-months" id="matchList">
+    {months.map(([mk, list], gi) => (
+    <Acc id={`m-${mk}`} title={`${Number(mk.slice(5))}月の試合`} icon="calendar" count={`${list.length}試合`} open={gi === 0}>
+    <ul class="grid hl-games" data-month={mk}>
+    {list.map(m => { const gs = d.goals.filter(g => String(g.round) === String(m.round)).sort((a, b) => Number(a.minute) - Number(b.minute)); const v = safeUrl(m.video_url), p = safeUrl(m.match_url); const g = xiOf.get(String(m.round)); return (
       <li class="card hl-game" data-res={m.result} data-round={m.round} data-scorers={[...new Set(gs.map(x => x.scorer))].join('|')}>
         <div class="lu-head">
           <span class="lu-rd">第{m.round}節</span>
@@ -65,7 +71,9 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
           </details>
         )}
       </li>); })}
-  </ul>
+    </ul>
+    </Acc>))}
+  </div>
   <p class="hl-empty" id="hlEmpty" hidden>該当する試合はありません</p>
 
 </Base>
@@ -75,7 +83,8 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
 <script>
   // 結果・ゴールを決めた選手・並び順で絞り込む。選手を選ぶと、その選手のゴールとスタメン図の位置に印をつける
   const $ = (id: string) => document.getElementById(id)!;
-  const ml = [...$('matchList').querySelectorAll<HTMLElement>(':scope > li')];
+  const ml = [...$('matchList').querySelectorAll<HTMLElement>('li.hl-game')];
+  const groups = [...$('matchList').querySelectorAll<HTMLDetailsElement>('details.acc')];
   let res = '';
   const draw = () => {
     const who = ($('scorerSel') as HTMLSelectElement).value;
@@ -90,6 +99,14 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
       e.querySelectorAll<HTMLElement>('.pl').forEach(g => g.classList.toggle('me', !!who && g.dataset.name === who));
     });
     $('hlEmpty').hidden = shown > 0;
+    // 月のまとまり：並び順に合わせて並べ、絞り込みで0試合になった月は隠す。絞り込んだときは該当のある月を開く
+    groups.forEach((g, i) => {
+      g.style.order = String(desc ? i : groups.length - i);
+      const n = g.querySelectorAll('li.hl-game:not([hidden])').length;
+      g.hidden = n === 0;
+      const c = g.querySelector('.acc-n'); if (c) c.textContent = `${n}試合`;
+      if ((res || who) && n > 0) g.open = true;
+    });
   };
   ['scorerSel', 'mOrder'].forEach(id => $(id).addEventListener('change', draw));
   $('resSeg').addEventListener('click', e => {

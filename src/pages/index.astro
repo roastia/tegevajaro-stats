@@ -4,6 +4,7 @@ import ShareCard from '../components/ShareCard.astro';
 import { getData, getShareables } from '../lib/data.js';
 import { milestonePost } from '../lib/milestones.js';
 import PostBox from '../components/PostBox.astro';
+import Acc from '../components/Acc.astro';
 import { icon, xLength, flatPost } from '../lib/util.js';
 import { formSummary, RES_WORD } from '../lib/form.js';
 import { SITE } from '../config/site.js';
@@ -37,15 +38,17 @@ const msNear = ms.near.slice(0, 6);
     <p class="cheer">{fs.cheer}</p>
     <PostBox what="直近5試合" text={fs.text} url={`${SITE.url}/`} />
   </section>
-  <p class="page-lead">カードを押すと、ポスト用の画像つきページが開きます。</p>
   <section class="bday" data-bday hidden></section>
-  <div class="grid">
-    {items.map(item => <ShareCard item={item} />)}
-  </div>
+  <Acc id="topics" title="今季の話題" icon="sparkle" count={items.length} open>
+    <p class="page-lead">カードを押すと、ポスト用の画像つきページが開きます。</p>
+    <div class="grid">
+      {items.map(item => <ShareCard item={item} />)}
+    </div>
+  </Acc>
   {(ms.near.length > 0 || ms.done.length > 0) && (
-    <section class="card mscard reveal" id="milestones">
-      <div class="label"><Fragment set:html={icon('flag')} />記録まであと少し</div>
-      {ms.done.length > 0 && (
+    <Acc id="milestones" title="記録まであと少し" icon="flag" count={ms.done.length + msNear.length}>
+    <section class="card mscard reveal">
+            {ms.done.length > 0 && (
         <div class="ms-block">
           <h2 class="ms-h done"><Fragment set:html={icon('party')} />第{ms.round}節で達成！</h2>
           <ul class="ms-list">
@@ -63,5 +66,6 @@ const msNear = ms.near.slice(0, 6);
       )}
       <PostBox what="記録まであと少し" text={msText} url={msUrl} />
     </section>
+    </Acc>
   )}
 </Base>

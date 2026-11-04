@@ -260,3 +260,30 @@ document.addEventListener('click', e => {
     }, 200);
   }
 }
+
+
+/* ---------- アコーディオン：開け閉めを覚える（同じタブの間）・#id へのリンクで中を開く ---------- */
+{
+  const accs = [...document.querySelectorAll('details[data-acc][id]')];
+  const key = (d) => `tg:acc:${location.pathname}:${d.id}`;
+  for (const d of accs) {
+    const v = ss.get(key(d));
+    if (v !== null) d.open = v === '1';
+    d.addEventListener('toggle', () => ss.set(key(d), d.open ? '1' : '0'));
+  }
+  // リンク先（#rank-〇〇 など）がたたまれた中にあれば、まわりを開いてからそこへ
+  const reveal = (hash, smooth) => {
+    if (!hash || hash === '#') return;
+    let t = null;
+    try { t = document.getElementById(decodeURIComponent(hash.slice(1))); } catch { t = null; }
+    if (!t) return;
+    for (let p = t; p; p = p.parentElement) if (p instanceof HTMLDetailsElement && !p.open) p.open = true;
+    requestAnimationFrame(() => t.scrollIntoView({ block: 'start', behavior: smooth && !reduced ? 'smooth' : 'auto' }));
+  };
+  reveal(location.hash, false);
+  addEventListener('hashchange', () => reveal(location.hash, true));
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (a && a.getAttribute('href').length > 1) { e.preventDefault(); history.replaceState(null, '', a.getAttribute('href')); reveal(a.getAttribute('href'), true); }
+  });
+}
