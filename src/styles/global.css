@@ -186,10 +186,17 @@ input[type=search] { flex: 1 1 10rem; }
 table.simple { width: 100%; border-collapse: collapse; font-size: .9rem; }
 table.simple th { text-align: left; font-size: .78rem; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--line); padding: 4px 8px; }
 table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertical-align: top; }
-.prefs .row { display: grid; grid-template-columns: 3.2rem 1fr 1.6rem; gap: 8px; align-items: center; font-size: .85rem; margin-bottom: 4px; }
+.prefs .row { display: grid; grid-template-columns: 3.2rem 1fr 2.2rem; gap: 8px; align-items: center; font-size: .85rem; margin-bottom: 4px; }
 .prefs .row span:last-child { color: var(--muted); }
 .prefs .bar2 { height: 14px; border-radius: 4px; background: var(--muted); opacity: .45; width: calc(var(--w, 0) * 1%); }
-.prefs .row.ky .bar2 { background: var(--brand); opacity: 1; }
+.prefs .pref-d.ky .bar2 { background: var(--brand); opacity: 1; }
+/* 出身地：バーを押すとその出身の選手名を出す */
+.prefs .pref-d > summary { list-style: none; cursor: pointer; border-radius: 6px; padding: 2px 4px; margin: 0 -4px 4px; }
+.prefs .pref-d > summary::-webkit-details-marker { display: none; }
+.prefs .pref-d > summary:hover { background: var(--soft); }
+.prefs .pref-d > summary i { font-style: normal; font-size: .7em; margin-left: 3px; color: var(--ink); display: inline-block; transition: transform .2s; }
+.prefs .pref-d[open] > summary i { transform: rotate(180deg); }
+.prefs .pref-names { margin: 0 0 8px 3.6rem; padding: 6px 10px; border-radius: 8px; background: var(--soft); color: var(--fg); font-size: .85rem; font-weight: 700; }
 
 /* birthdays */
 .hbd { border-radius: var(--radius); padding: 18px; color: #fff; text-align: center; background: linear-gradient(120deg, #F16682, #F2A93B, #F5C84A, #F16682); background-size: 300% 100%;

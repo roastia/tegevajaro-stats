@@ -119,8 +119,12 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
   </Acc>
   <Acc id="prefs" title="出身地" icon="pin" count={d.prefs.length + '都道府県'}>
     <section class="card prefs">
-      <p class="note">都道府県ごとの人数（ピンクは九州）</p>
-      {d.prefs.map(p => <div class={`row ${kyushu.includes(p.pref) ? 'ky' : ''}`}><span>{p.pref}</span><span class={`bar2 w${Math.round(p.n / pmax * 100)}`}></span><span>{p.n}</span></div>)}
+      <p class="note">都道府県ごとの人数（ピンクは九州）。バーを押すと、その出身の選手が出ます。</p>
+      {d.prefs.map(p => (
+        <details class={`pref-d ${kyushu.includes(p.pref) ? 'ky' : ''}`}>
+          <summary class="row"><span>{p.pref}</span><span class={`bar2 w${Math.round(p.n / pmax * 100)}`}></span><span>{p.n}<i aria-hidden="true">▾</i></span></summary>
+          <p class="pref-names">{d.profiles.filter(x => x.birthplace === p.pref).map(x => x.name).join('・')}</p>
+        </details>))}
     </section>
   </Acc>
 </Base>
