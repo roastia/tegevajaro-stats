@@ -246,6 +246,7 @@ document.addEventListener('click', e => {
       if (boardBox) boardBox.hidden = !nx.count;
       set('when', `${nx.tag}・${nx.when.replace(' キックオフ', '')}`);
       set('ha', nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ');
+      const haEl = q('ha'); if (haEl) haEl.className = 'sn-ha ' + (nx.fx.ha === 'H' ? 'h' : 'a');
       set('vs', 'vs ' + nx.vs.replace(/戦$/, ''));
       set('big', nx.count ? (nx.mode === 'today' ? '今日！キックオフまで' : 'キックオフまで') : nx.big);
     };

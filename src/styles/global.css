@@ -804,7 +804,10 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .season-next { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
 .sn-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; }
 .sn-vs { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; color: var(--fg); }
-.sn-ha { padding: 0 8px; border-radius: 999px; font-size: .72rem; font-weight: 700; background: #fff; color: var(--ink); }
+.sn-ha { padding: 1px 9px; border-radius: 999px; font-size: .72rem; font-weight: 700; background: #fff; color: var(--ink); }
+/* ホーム＝ピンク、アウェイ＝濃いグレー（ひと目で見分けられるように） */
+.sn-ha.h { background: var(--brand); color: #fff; }
+.sn-ha.a { background: var(--fg); color: #fff; }
 .sn-count { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .sn-big { font-weight: 700; color: var(--ink); font-size: 1.05rem; white-space: nowrap; }
 .season-next.is-count .sn-big { font-size: .78rem; color: var(--muted); }

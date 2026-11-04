@@ -84,7 +84,7 @@ const nav = [
             <script type="application/json" id="next-data" is:inline set:html={JSON.stringify({ fixtures, matches: lite }).replace(/</g, '\\u003c')}></script>
             <div class="season-h"><span class="season-k">次の試合</span><span class="season-when" data-sn="when">{nxWhen}</span></div>
             <div class="sn-row">
-              <span class="sn-vs"><span class="sn-ha" data-sn="ha">{nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ'}</span><span data-sn="vs">vs {nx.vs.replace(/戦$/, '')}</span></span>
+              <span class="sn-vs"><span class={`sn-ha ${nx.fx.ha === 'H' ? 'h' : 'a'}`} data-sn="ha">{nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ'}</span><span data-sn="vs">vs {nx.vs.replace(/戦$/, '')}</span></span>
               <span class="sn-count">
                 <span class="sn-big" data-sn="big">{nx.big}</span>
                 <span class="sn-board" data-sn="board" hidden></span>
