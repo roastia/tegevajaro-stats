@@ -13,7 +13,7 @@ const counts = {};
 d.goals.forEach(g => { counts[g.scorer] = (counts[g.scorer] || 0) + 1; });
 const scorers = Object.entries(counts).sort((a, b) => b[1] - a[1]);
 const matches = [...d.matches].sort((a, b) => Number(b.round) - Number(a.round));
-// 大項目（アコーディオン）：月ごと。いちばん新しい月だけ開いておく
+// 大項目（アコーディオン）：月ごと
 const months = [...new Set(matches.map(m => m.date.slice(0, 7)))].map(k => [k, matches.filter(m => m.date.slice(0, 7) === k)]);
 const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
 const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}`; };
@@ -35,7 +35,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
   </section>
   <div class="hl-months" id="matchList">
     {months.map(([mk, list], gi) => (
-    <Acc id={`m-${mk}`} title={`${Number(mk.slice(5))}月の試合`} icon="calendar" count={`${list.length}試合`} open={gi === 0}>
+    <Acc id={`m-${mk}`} title={`${Number(mk.slice(5))}月の試合`} icon="calendar" count={`${list.length}試合`}>
     <ul class="grid hl-games" data-month={mk}>
     {list.map(m => { const gs = d.goals.filter(g => String(g.round) === String(m.round)).sort((a, b) => Number(a.minute) - Number(b.minute)); const v = safeUrl(m.video_url), p = safeUrl(m.match_url); const g = xiOf.get(String(m.round)); return (
       <li class="card hl-game" data-res={m.result} data-round={m.round} data-scorers={[...new Set(gs.map(x => x.scorer))].join('|')}>

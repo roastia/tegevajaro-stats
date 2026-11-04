@@ -9,7 +9,7 @@ const d = getData();
 // ランキングの先頭：テゲスタ！ランキングの首位浮上（前の節から1位が入れかわったとき）
 const climb = getShareables().find(s => s.kind === 't' && s.id === 'climb');
 const share = new Map(getShareables().filter(s => s.kind === 'r').map(s => [s.id, s]));
-// 大項目（アコーディオン）：ランキングの種類ごと。はじめはすべて閉じておく（見出しがメニューになる）
+// 大項目（アコーディオン）：ランキングの種類ごと
 const CAT_ICON = { goal: 'ball', time: 'stopwatch', team: 'flag', play: 'network', trivia: 'star' };
 const cats = [['goal', 'ゴール'], ['time', '出場'], ['team', '貢献'], ['play', 'プレー'], ['trivia', 'トリビア']]
   .filter(([c]) => c && d.rankings.some(r => r.meta.cat === c && r.rows.length));
