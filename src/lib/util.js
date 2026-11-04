@@ -61,6 +61,8 @@ export function splitDisp(s) {
 /** X のアカウント名（英数字と _ の15文字まで）なら https://x.com/〇〇、それ以外は空 */
 export const xUrl = h => /^[A-Za-z0-9_]{1,15}$/.test(String(h || '')) ? `https://x.com/${h}` : '';
 /** 緯度経度から Google マップのリンク */
+/** おすすめスポットの公式サイト（https だけ。確かめて spots.csv の url に入れたもの） */
+export const siteUrl = u => /^https:\/\/[^\s<>"']+$/.test(u || '') ? u : '';
 export const mapsUrl = (lat, lng) => Number.isFinite(+lat) && Number.isFinite(+lng) && lat !== '' && lng !== '' ? `https://www.google.com/maps/search/?api=1&query=${+lat},${+lng}` : '';
 
 /** ホームスタジアム（Google マップの施設の位置。いちご宮崎新富サッカー場の公式サイトの地図リンクから） */

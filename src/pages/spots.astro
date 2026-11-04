@@ -2,12 +2,12 @@
 import Base from '../layouts/Base.astro';
 import Acc from '../components/Acc.astro';
 import { readCsv } from '../lib/data.js';
-import { icon, href, xUrl, mapsUrl, STADIUM, distanceKm, distanceLabel } from '../lib/util.js';
+import { icon, href, xUrl, mapsUrl, siteUrl, STADIUM, distanceKm, distanceLabel } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 // 載せるのは、こちらで確認して src/data/spots.csv に入れたものだけ（投稿はそのままは出さない）
-// スタジアムから近い順に並べ、直線距離を出す。タップすると Google マップが開く
+// スタジアムから近い順に並べ、直線距離を出す。公式サイトと Google マップは別のボタン
 const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '')
-  .map(s => { const km = distanceKm(STADIUM.lat, STADIUM.lng, +s.lat, +s.lng); return { ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng), km, dist: distanceLabel(km) }; })
+  .map(s => { const km = distanceKm(STADIUM.lat, STADIUM.lng, +s.lat, +s.lng); return { ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng), site: siteUrl(s.url), km, dist: distanceLabel(km) }; })
   .sort((a, b) => a.km - b.km);
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 ---
@@ -25,17 +25,21 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
   <section class="card">
 
     {spots.length > 0
-      ? <p class="note">{STADIUM.name}から近い順。距離は直線距離です。場所を押すと Google マップが開きます。</p>
+      ? <p class="note">{STADIUM.name}から近い順。距離は直線距離です。「公式サイト」でお店・施設のページ、「Googleマップ」で場所が開きます。</p>
       : <div class="spot-empty"><p>まだありません。最初のおすすめを教えてください！</p><a class="btn-main" href="#post">おすすめを教える</a></div>}
     {spots.length > 0 && (
       <ul class="spot-list">
         {spots.map(s => (
           <li id={`spot-${s.id}`}>
-            <a class="spot-go" href={s.maps} target="_blank" rel="noopener noreferrer">
+            <div class="spot-go">
               <span class="spot-head"><Fragment set:html={icon('pin')} /><b>{s.name}</b>{s.area && <small>{s.area}</small>}</span>
               <span class="spot-dist">スタジアムから{s.dist}</span>
               <span class="spot-info">{s.info}</span>
-            </a>
+            </div>
+            <div class="spot-links">
+              {s.site && <a class="spot-btn" href={s.site} target="_blank" rel="noopener noreferrer">公式サイト<span aria-hidden="true">↗</span></a>}
+              <a class="spot-btn" href={s.maps} target="_blank" rel="noopener noreferrer">Googleマップ<span aria-hidden="true">↗</span></a>
+            </div>
             {s.x && <a class="spot-x" href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc">@{s.x_handle} さんのおすすめ</a>}
           </li>
         ))}

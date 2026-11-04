@@ -151,6 +151,7 @@ test('おすすめスポット：載せる場所のデータの形（緯度経�
     assert.ok(+r.lat > 24 && +r.lat < 46 && +r.lng > 122 && +r.lng < 154, `緯度経度が日本の範囲にない：${r.name}`);
     assert.ok(!r.x_handle || /^[A-Za-z0-9_]{1,15}$/.test(r.x_handle), `X アカウントの形：${r.name}`);
     assert.ok(![r.name, r.area, r.info].some(v => /https?:|<|>/.test(v || '')), `URL やタグは入れない：${r.name}`);
+    assert.ok(!r.url || /^https:\/\/[^\s<>"']+$/.test(r.url), `公式サイトは https の URL：${r.name}`);
   }
 });
 

@@ -27,7 +27,7 @@
 - 背番号の画像は 256色に減色した PNG（`tools/jersey_numbers.py`）。画像を足すときも軽くする。
 - GitHub Actions の外部 Action は公式のみ、コミット SHA で固定する。
 - 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。
-- 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：みやざき情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。
+- 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：みやざき情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。おすすめスポットの「公式サイト」ボタンは、確かめて `spots.csv` の `url` に入れた https の URL だけ（`siteUrl`）。
 
 ## くわしい手順（必要なときだけ読む）
 - 試合後の更新 → `docs/update-match.md`（**最初に読む**。ブラウザで1回 → `tools/apply_match.mjs` で一度に書き込む）
