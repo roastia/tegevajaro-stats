@@ -265,12 +265,22 @@ document.addEventListener('click', e => {
 
 /* ---------- アコーディオン：開け閉めを覚える（同じタブの間）・#id へのリンクで中を開く ---------- */
 {
+  // 開いているアコーディオンの見出しは、上のメニューのすぐ下に貼りつく（--stick にメニューの高さ）
+  const nav = document.querySelector('.site-nav');
+  const stickH = () => (nav ? nav.getBoundingClientRect().height : 0);
+  const setStick = () => document.documentElement.style.setProperty('--stick', `${Math.round(stickH())}px`);
+  setStick();
+  if (nav && 'ResizeObserver' in window) new ResizeObserver(setStick).observe(nav);
   const accs = [...document.querySelectorAll('details[data-acc][id]')];
   const key = (d) => `tg:acc:${location.pathname}:${d.id}`;
   for (const d of accs) {
     const v = ss.get(key(d));
     if (v !== null) d.open = v === '1';
-    d.addEventListener('toggle', () => ss.set(key(d), d.open ? '1' : '0'));
+    d.addEventListener('toggle', () => {
+      ss.set(key(d), d.open ? '1' : '0');
+      // 上に貼りついた見出しで閉じたら、閉じた見出しが画面の上に来るように戻す（中身の分だけ飛ばない）
+      if (!d.open && d.getBoundingClientRect().top < stickH()) d.scrollIntoView({ block: 'start' });
+    });
   }
   // リンク先（#rank-〇〇 など）がたたまれた中にあれば、まわりを開いてからそこへ
   const reveal = (hash, smooth) => {
