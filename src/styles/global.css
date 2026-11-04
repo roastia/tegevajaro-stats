@@ -876,3 +876,5 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .spot-list .spot-links { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
 @media (min-width: 761px) { .spot-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .spot-by { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0 0; font-size: .8rem; font-weight: 700; color: var(--muted); }
+/* ハイライト：ゴールを決めた選手の名前は Jリーグ公式の選手ページへのリンク */
+.glist a.gname { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
