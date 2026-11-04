@@ -1,0 +1,37 @@
+---
+// ランキングのページの先頭：テゲスタ！ランキングの首位交代を1件ずつ（記録・新しい首位・数字・前の節からの順位・前の首位）
+import PostBox from './PostBox.astro';
+import { icon, href } from '../lib/util.js';
+import { ICON_OF_RECORD } from '../lib/meta.js';
+import { SITE } from '../config/site.js';
+interface Props { climbs: any[]; prevRound: number; round: string; share: any }
+const { climbs, prevRound, round, share } = Astro.props;
+---
+<section class="card climbs reveal" id="t-climb">
+  <div class="climbs-h">
+    <span class="climbs-k"><Fragment set:html={icon('arrowup')} />テゲスタ！ランキングの首位交代</span>
+    <span class="climbs-when">第{prevRound}節 → {round}</span>
+  </div>
+  <p class="climbs-hl"><b>{climbs.length}</b>件のランキングで、1位が入れかわりました</p>
+  <ol class="climbs-list">
+    {climbs.map(c => (
+      <li>
+        <a class="cl-rec" href={`#rank-${c.id}`}><Fragment set:html={icon(ICON_OF_RECORD[c.id] || 'star')} />{c.title}<span aria-hidden="true">›</span></a>
+        {c.leaders.map(l => (
+          <div class="cl-who">
+            <span class="cl-name">{l.name}</span>
+            {l.value && <span class="cl-val">{l.value}</span>}
+          </div>
+        ))}
+        <div class="cl-move">
+          <span class="cl-from">{c.from ? `第${prevRound}節 ${c.from}位` : `第${prevRound}節 ランク外`}</span>
+          <span class="cl-arrow" aria-hidden="true">→</span>
+          <span class="cl-to">1位</span>
+        </div>
+        {c.was.length > 0 && <p class="cl-was">第{prevRound}節の1位：{c.was.join('・')}</p>}
+      </li>
+    ))}
+  </ol>
+  <p class="cheer">テゲスタ！の選手ランキングは毎節動く。次に上がるのは誰だ？</p>
+  <PostBox what="ランキング首位浮上" text={share.text} url={`${SITE.url}/t/climb/`} />
+</section>

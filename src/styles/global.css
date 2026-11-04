@@ -888,3 +888,24 @@ a.club-link, a.club-link:hover { color: inherit; text-decoration: none; }
 /* ?を重ねて出した吹き出しは、まわりを暗くしない・カーソルの邪魔をしない */
 [popover].pop.hov { pointer-events: none; }
 [popover].pop.hov::backdrop { background: transparent; }
+/* ランキングの先頭：首位交代ボード（1件ずつカードに分ける） */
+.climbs { margin: 14px 0 8px; display: grid; gap: 10px; }
+.climbs-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.climbs-k { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--ink); font-size: .9rem; }
+.climbs-k .ic { width: 1.1em; height: 1.1em; }
+.climbs-when { font-size: .8rem; color: var(--muted); }
+.climbs-hl { margin: 0; font-weight: 700; font-size: 1.05rem; }
+.climbs-hl b { font-size: 1.8rem; color: var(--ink); margin-right: 2px; }
+.climbs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+.climbs-list li { display: grid; gap: 6px; align-content: start; padding: 12px 14px; border: 1px solid var(--line); border-left: 4px solid var(--brand); border-radius: var(--radius); background: #fff; }
+.cl-rec { display: inline-flex; align-items: center; gap: 6px; justify-self: start; font-size: .85rem; font-weight: 700; color: var(--ink); text-decoration: none; }
+.cl-rec .ic { width: 1.1em; height: 1.1em; }
+.cl-rec:hover { text-decoration: underline; }
+.cl-who { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.cl-name { font-size: 1.25rem; font-weight: 800; }
+.cl-val { font-size: .85rem; font-weight: 700; color: var(--ink); padding: 1px 8px; border-radius: 999px; background: var(--soft); }
+.cl-move { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+.cl-to { font-weight: 800; color: #fff; background: var(--brand); padding: 0 8px; border-radius: 999px; }
+.cl-was { margin: 0; font-size: .78rem; color: var(--muted); }
+.climbs .cheer { margin: 0; }
+.rec { scroll-margin-top: calc(var(--stick, 56px) + 8px); }

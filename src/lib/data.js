@@ -6,6 +6,7 @@ import { RECORDS, rankRows, plainTitle as pTitle } from './meta.js';
 import { ranksOf, movesOf, newLeaders } from './history.js';
 import { milestones } from './milestones.js';
 import { SITE } from '../config/site.js';
+import { splitDisp as splitDispB } from './util.js';
 
 // ビルドはプロジェクトの直下で実行する前提（npm run build）
 const DATA_DIR = path.resolve(process.cwd(), 'src/data');
@@ -48,7 +49,14 @@ export function getData() {
   const shown = new Set(records.map(r => r.meta.id));
   const byRec = new Map();
   for (const l of newLeaders(now, prev).filter(l => shown.has(l.id))) { if (!byRec.has(l.id)) byRec.set(l.id, []); byRec.get(l.id).push(l); }
-  const climbs = [...byRec.entries()].map(([id, ls]) => ({ id, title: pTitle(RECORDS.find(r => r.id === id).title), names: ls.map(l => l.name), from: ls[0].from }));
+  // 1件ごとの詳しい中身（ランキングのページの「首位交代」ボードで使う）：新しい首位の記録・前の節の順位、前の節の首位
+  const climbs = [...byRec.entries()].map(([id, ls]) => {
+    const rec = records.find(r => r.meta.id === id);
+    const val = name => { const r = rec.rows.find(x => x.name === name); return r && !rec.meta.hideValue ? splitDispB(r.display)[0] : ''; };
+    const was = Object.entries(prev[id] || {}).filter(([, rk]) => rk === 1).map(([n]) => n).filter(n => !ls.some(l => l.name === n));
+    return { id, title: pTitle(rec.meta.title), names: ls.map(l => l.name), from: ls[0].from,
+      leaders: ls.map(l => ({ name: l.name, from: l.from, value: val(l.name) })), was };
+  });
   const topics = [...all.topics];
   if (climbs.length) {
     const c = climbs[0];
