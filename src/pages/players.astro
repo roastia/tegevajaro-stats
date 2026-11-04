@@ -30,7 +30,48 @@ d.rankings.forEach(({ meta, rows }, idx) => {
 const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
 ---
 <Base current="players" title="選手の背景・称号" description="テゲバジャーロ宮崎の選手の年齢・出身地・出身校・経歴と、今季の記録から決まる選手の称号の一覧（非公式）。">
-  <div class="sec-h"><h2>選手の背景</h2><a href="#titles">選手の称号へ ↓</a></div>
+  <div class="sec-h"><h2>選手の称号</h2><a href="#roots">選手の背景へ ↓</a></div>
+  <section class="card" id="titles">
+    <p class="note">ランキングで3位以内に入ると称号ゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>
+    <div class="controls">
+      <input id="pq" type="search" placeholder="名前・よみ・ローマ字で検索" aria-label="選手名で検索（漢字・ひらがな・ローマ字）" />
+      <div class="seg" id="posSeg" role="group" aria-label="ポジション">
+        {['', 'GK', 'DF', 'MF', 'FW'].map((p, i) => <button type="button" data-pos={p} aria-pressed={i === 0 ? 'true' : 'false'}>{p || '全員'}</button>)}
+      </div>
+      <select id="pOrder" aria-label="並び順"><option value="no">背番号順</option><option value="age">若い順</option><option value="kana">名前順</option></select>
+    </div>
+    <div class="legend legend-gap">
+      {['GK', 'DF', 'MF', 'FW'].map(p => <span class={`pos-${p}`}><i></i>{p}</span>)}
+      <span>大きな数字は背番号</span>
+    </div>
+  </section>
+  <div class="grid" id="pGrid">
+    {players.map(p => {
+      const ts = (titles.get(p.name) || []).sort((a, b) => a.order - b.order);
+      const u = playerUrl(urlOf.get(p.name));
+      const age = ageOf.get(p.name);
+      return (
+        <section class={`card pcard reveal pos-${['GK','DF','MF','FW'].includes(p.pos) ? p.pos : 'x'}`} data-name={p.name} data-kana={p.kana || undefined} data-roma={p.romaji || undefined} data-pos={p.pos} data-no={p.no} data-birth={p.birth || undefined} data-age-out={p.birth ? `age-${p.no}` : undefined}>
+          <div class="pband">
+            <img class="jersey jersey-lg on-color" src={href(`chars/numbers-s/${p.no}.png`)} alt={`背番号${p.no}`} width="72" height="72" loading="lazy" decoding="async" />
+            <div>
+              <div class="pname">{u ? <a href={u} target="_blank" rel="noopener noreferrer">{p.name}</a> : p.name}</div>
+              <div class="pmeta">{p.pos}{age !== '' && age != null && <>・<span id={`age-${p.no}`}>{age}</span>歳</>}{p.birthplace && `・${p.birthplace}出身`}</div>
+            </div>
+            <span data-bslot="bchip"></span>
+          </div>
+          <div class="pbody">
+            {p.birth && <div class="chips"><button class="chip prof bdbtn" type="button" data-bday-open={p.birth}><Fragment set:html={icon('cake')} />{Number(p.birth.slice(5, 7))}月{Number(p.birth.slice(8))}日生まれ</button></div>}
+            {(p.hs_or_youth || p.university) && <div class="chips">{[p.hs_or_youth, p.university].filter(Boolean).map(s => <span class="chip prof"><Fragment set:html={icon('cap')} />{s}</span>)}</div>}
+            {ts.length > 0 && <div class="chips">{ts.map(t => t.anchor
+              ? <a class={`chip ${t.cls}`} href={href(t.anchor)}><Fragment set:html={icon(ICON_OF_RECORD[t.id] || 'star')} />{t.text}</a>
+              : <span class={`chip ${t.cls}`}><Fragment set:html={icon(ICON_OF_RECORD[t.id] || 'star')} />{t.text}</span>)}</div>}
+          </div>
+        </section>
+      );
+    })}
+  </div>
+  <div class="sec-h" id="roots"><h2>選手の背景</h2><a href="#titles">選手の称号へ ↑</a></div>
   <div class="grid">
     {facts.map(f => (
       <article class={`card fact reveal vt-b-${f.id}`} id={`b-${f.id}`}>
@@ -78,51 +119,11 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
       {d.prefs.map(p => <div class={`row ${kyushu.includes(p.pref) ? 'ky' : ''}`}><span>{p.pref}</span><span class={`bar2 w${Math.round(p.n / pmax * 100)}`}></span><span>{p.n}</span></div>)}
     </section>
   </div>
-
-  <section class="card" id="titles">
-    <h2>選手の称号</h2>
-    <p class="note">ランキングで3位以内に入ると称号ゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>
-    <div class="controls">
-      <input id="pq" type="search" placeholder="名前・よみ・ローマ字で検索" aria-label="選手名で検索（漢字・ひらがな・ローマ字）" />
-      <div class="seg" id="posSeg" role="group" aria-label="ポジション">
-        {['', 'GK', 'DF', 'MF', 'FW'].map((p, i) => <button type="button" data-pos={p} aria-pressed={i === 0 ? 'true' : 'false'}>{p || '全員'}</button>)}
-      </div>
-      <select id="pOrder" aria-label="並び順"><option value="no">背番号順</option><option value="age">若い順</option><option value="kana">名前順</option></select>
-    </div>
-    <div class="legend legend-gap">
-      {['GK', 'DF', 'MF', 'FW'].map(p => <span class={`pos-${p}`}><i></i>{p}</span>)}
-      <span>大きな数字は背番号</span>
-    </div>
-  </section>
-  <div class="grid" id="pGrid">
-    {players.map(p => {
-      const ts = (titles.get(p.name) || []).sort((a, b) => a.order - b.order);
-      const u = playerUrl(urlOf.get(p.name));
-      const age = ageOf.get(p.name);
-      return (
-        <section class={`card pcard reveal pos-${['GK','DF','MF','FW'].includes(p.pos) ? p.pos : 'x'}`} data-name={p.name} data-kana={p.kana || undefined} data-roma={p.romaji || undefined} data-pos={p.pos} data-no={p.no} data-birth={p.birth || undefined} data-age-out={p.birth ? `age-${p.no}` : undefined}>
-          <div class="pband">
-            <img class="jersey jersey-lg on-color" src={href(`chars/numbers-s/${p.no}.png`)} alt={`背番号${p.no}`} width="72" height="72" loading="lazy" decoding="async" />
-            <div>
-              <div class="pname">{u ? <a href={u} target="_blank" rel="noopener noreferrer">{p.name}</a> : p.name}</div>
-              <div class="pmeta">{p.pos}{age !== '' && age != null && <>・<span id={`age-${p.no}`}>{age}</span>歳</>}{p.birthplace && `・${p.birthplace}出身`}</div>
-            </div>
-            <span data-bslot="bchip"></span>
-          </div>
-          <div class="pbody">
-            {p.birth && <div class="chips"><button class="chip prof bdbtn" type="button" data-bday-open={p.birth}><Fragment set:html={icon('cake')} />{Number(p.birth.slice(5, 7))}月{Number(p.birth.slice(8))}日生まれ</button></div>}
-            {(p.hs_or_youth || p.university) && <div class="chips">{[p.hs_or_youth, p.university].filter(Boolean).map(s => <span class="chip prof"><Fragment set:html={icon('cap')} />{s}</span>)}</div>}
-            {ts.length > 0 && <div class="chips">{ts.map(t => t.anchor
-              ? <a class={`chip ${t.cls}`} href={href(t.anchor)}><Fragment set:html={icon(ICON_OF_RECORD[t.id] || 'star')} />{t.text}</a>
-              : <span class={`chip ${t.cls}`}><Fragment set:html={icon(ICON_OF_RECORD[t.id] || 'star')} />{t.text}</span>)}</div>}
-          </div>
-        </section>
-      );
-    })}
-  </div>
 </Base>
 <style>
   .sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 4px; }
+  #roots { margin-top: 28px; scroll-margin-top: 70px; }
+  #titles { scroll-margin-top: 70px; }
   .sec-h h2 { margin: 0; font-size: 1.15rem; }
   .sec-h a { font-size: .85rem; white-space: nowrap; }
   .two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
