@@ -32,7 +32,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
 ---
 <Base current="players" title="選手の背景・称号" description="テゲバジャーロ宮崎の選手の年齢・出身地・出身校・経歴と、今季の記録から決まる選手の称号の一覧（非公式）。">
   <section class="bday" data-bday hidden></section>
-  <Acc id="titles" title="選手の称号" icon="medal" count={players.length + '人'}>
+  <Acc id="titles" title="選手の称号" icon="medal" count={players.length}>
   <section class="card">
     <p class="note">ランキングで3位以内に入ると称号ゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>
     <div class="controls">
@@ -88,7 +88,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
     ))}
   </div>
   </Acc>
-  <Acc id="ages" title="年齢一覧" icon="cake" count={rows.length + '人'}>
+  <Acc id="ages" title="年齢一覧" icon="cake" count={rows.length}>
   <section class="card">
     <p class="note">今日時点の満年齢。左の数字が並び順で、上から順に読みます（2段のときは左の段の下から右の段へ続きます）。ピンクの枠は1か月以内に誕生日を迎える選手です。</p>
     <div class="controls gap">
@@ -117,7 +117,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
         <tbody>{d.school_links.map(r => <tr><td>{r.school}</td><td>{r.members}</td></tr>)}</tbody></table>
     </section>
   </Acc>
-  <Acc id="prefs" title="出身地" icon="pin" count={d.prefs.length + '都道府県'}>
+  <Acc id="prefs" title="出身地" icon="pin" count={d.prefs.length}>
     <section class="card prefs">
       <p class="note">都道府県ごとの人数（ピンクは九州）。バーにカーソルを重ねる（スマホはタップ）と、その出身の選手が出ます。</p>
       {d.prefs.map(p => (

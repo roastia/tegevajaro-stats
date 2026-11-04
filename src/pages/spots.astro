@@ -21,7 +21,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     </div>
   </section>
 
-  <Acc id="spotList" title="おすすめスポット" icon="pin" count={spots.length ? spots.length + '件' : ''}>
+  <Acc id="spotList" title="おすすめスポット" icon="pin" count={spots.length || ''}>
   <section class="card">
 
     {spots.length > 0
