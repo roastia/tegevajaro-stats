@@ -301,3 +301,28 @@ document.addEventListener('click', e => {
     if (a && a.getAttribute('href').length > 1) { e.preventDefault(); history.replaceState(null, '', a.getAttribute('href')); reveal(a.getAttribute('href'), true); }
   });
 }
+
+
+/* ---------- ランキングの「?」：PC（マウス）はカーソルを重ねると説明が吹き出しで出る。押すと出たままになる ---------- */
+if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  const place = (b, p) => {
+    const r = b.getBoundingClientRect(), w = p.offsetWidth, h = p.offsetHeight;
+    const left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8);
+    const top = r.bottom + 8 + h > innerHeight - 8 ? Math.max(8, r.top - 8 - h) : r.bottom + 8;
+    Object.assign(p.style, { position: 'fixed', inset: 'auto', margin: '0', left: `${left}px`, top: `${top}px` });
+  };
+  for (const b of document.querySelectorAll('button.info[popovertarget]')) {
+    const p = document.getElementById(b.getAttribute('popovertarget'));
+    if (!p || !p.showPopover) continue;
+    let t = 0;
+    b.addEventListener('mouseenter', () => {
+      clearTimeout(t);
+      if (p.matches(':popover-open')) return;
+      p.classList.add('hov'); p.showPopover(); place(b, p);
+    });
+    b.addEventListener('mouseleave', () => { if (p.classList.contains('hov')) t = setTimeout(() => { if (p.classList.contains('hov')) p.hidePopover(); }, 100); });
+    // 重ねて出ているときに押したら、閉じずに出したままにする
+    b.addEventListener('click', e => { if (p.classList.contains('hov')) { e.preventDefault(); p.classList.remove('hov'); } });
+    p.addEventListener('toggle', e => { if (e.newState === 'closed') { p.classList.remove('hov'); p.removeAttribute('style'); } });
+  }
+}

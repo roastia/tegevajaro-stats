@@ -885,3 +885,6 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 a.rank-link { color: inherit; text-decoration: none; }
 /* 相手チーム名は相手クラブの公式サイトへのリンク（目立たせない） */
 a.club-link, a.club-link:hover { color: inherit; text-decoration: none; }
+/* ?を重ねて出した吹き出しは、まわりを暗くしない・カーソルの邪魔をしない */
+[popover].pop.hov { pointer-events: none; }
+[popover].pop.hov::backdrop { background: transparent; }
