@@ -323,6 +323,6 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
     b.addEventListener('mouseleave', () => { if (p.classList.contains('hov')) t = setTimeout(() => { if (p.classList.contains('hov')) p.hidePopover(); }, 100); });
     // 重ねて出ているときに押したら、閉じずに出したままにする
     b.addEventListener('click', e => { if (p.classList.contains('hov')) { e.preventDefault(); p.classList.remove('hov'); } });
-    p.addEventListener('toggle', e => { if (e.newState === 'closed') { p.classList.remove('hov'); p.removeAttribute('style'); } });
+    p.addEventListener('toggle', e => { if (e.newState === 'closed') { p.classList.remove('hov'); p.removeAttribute('style'); } else place(b, p); });
   }
 }
