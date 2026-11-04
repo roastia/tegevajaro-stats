@@ -39,8 +39,8 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
             <div class="spot-links">
               {s.site && <a class="spot-btn" href={s.site} target="_blank" rel="noopener noreferrer">公式サイト<span aria-hidden="true">↗</span></a>}
               <a class="spot-btn" href={s.maps} target="_blank" rel="noopener noreferrer">Googleマップ<span aria-hidden="true">↗</span></a>
-              {s.x && <a class="spot-btn" href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc">@{s.x_handle} さんのおすすめ<span aria-hidden="true">↗</span></a>}
             </div>
+            {s.x && <p class="spot-by">教えてくれた人<a class="spot-btn" href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`教えてくれた人 @${s.x_handle} さんの X アカウントを開く`}>@{s.x_handle} の X へ<span aria-hidden="true">↗</span></a></p>}
           </li>
         ))}
       </ul>
@@ -60,7 +60,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
         <label>ひとこと<span class="req">必須</span><textarea name="info" required maxlength="300" rows="3" aria-describedby="infoHint" placeholder="例：新富町の国道沿い。試合前に寄りたい、チキン南蛮がおいしいお店"></textarea></label>
         <p class="note field-hint" id="infoHint">同じ名前の場所がほかにあるかもしれないので、場所がわかる特徴（町名・近くの目印・どんな場所か など）も書いてください。</p>
         <label>あなたの X アカウント<input name="x_handle" maxlength="16" autocomplete="off" inputmode="latin" aria-describedby="xHint" placeholder="例：@tegesapo" /></label>
-        <p class="note field-hint" id="xHint">X アカウントを書くと、おすすめしてくれた人として「@〇〇 さんのおすすめ」と、入力どおりに載せます（書かなくても送れます）。</p>
+        <p class="note field-hint" id="xHint">X アカウントを書くと、おすすめしてくれた人として「教えてくれた人 @〇〇」と、入力どおりに載せます（書かなくても送れます）。</p>
         <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
         <div class="ts" id="spotTs"></div>
         <button class="spot-send" type="submit">送る</button>
