@@ -26,7 +26,7 @@
 - 部品の更新は Dependabot（`.github/dependabot.yml`、月1回・出て14日以上の版だけ）がプルリクエストで知らせる。取り込む前に `npm test` と `npm run build` が通ることを確かめる。Node.js は LTS（`.nvmrc`）。
 - 背番号の画像は 256色に減色した PNG（`tools/jersey_numbers.py`）。画像を足すときも軽くする。
 - GitHub Actions の外部 Action は公式のみ、コミット SHA で固定する。
-- 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。
+- 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する（見出し・短い表示）。説明の段落（`p`・スポットのひとこと・吹き出しなど）は文ごとに改行せず続けて流し、文節の途中でだけ切らない。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。
 - 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：みやざき情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。相手チーム名は相手クラブの公式サイト（`src/config/clubs.js` に確かめて入れた https の URL だけ）、ヘッダーの「J2 〇位」は Jリーグ公式の J2 順位表へ。おすすめスポットの「公式サイト」ボタンは、確かめて `spots.csv` の `url` に入れた https の URL だけ（`siteUrl`）。
 
 ## くわしい手順（必要なときだけ読む）

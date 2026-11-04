@@ -931,3 +931,5 @@ a.pl-link:hover { text-decoration: underline; text-underline-offset: 2px; }
 .spot-list .spot-head { display: block; }
 .spot-list .spot-head .ic { vertical-align: -0.12em; margin-right: 6px; }
 .spot-list .spot-head small { margin-left: 6px; }
+/* 説明の文（段落など）は文ごとに改行せず、続けて流す（文節の途中では切れない：<wbr> と keep-all はそのまま）。見出し・短い表示は今までどおり */
+p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss { display: inline; }
