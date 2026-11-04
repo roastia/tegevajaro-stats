@@ -3,7 +3,7 @@ import '../styles/global.css';
 import { clubUrl } from '../config/clubs.js';
 import { SITE } from '../config/site.js';
 import { getData } from '../lib/data.js';
-import { icon, href } from '../lib/util.js';
+import { icon, href, playerUrl } from '../lib/util.js';
 import { seasonRecord } from '../lib/form.js';
 import { readCsv } from '../lib/data.js';
 import { nextMatch } from '../lib/nextmatch.js';
@@ -69,6 +69,7 @@ const nav = [
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" />
 </head>
 <body>
+  <script type="application/json" id="pl-urls" is:inline set:html={JSON.stringify(Object.fromEntries(d.players.map(p => [p.name, playerUrl(p.jl_url)]).filter(([, u]) => u))).replace(/</g, '\\u003c')}></script>
   <header class="site-head">
     <div class="wrap">
       <h1><a href={href('')} class="logo-link"><img class="logo" src={href('logo-tegesta.svg')} alt={SITE.name} width="1731" height="388" /></a><span class="head-sub"><span class="tagline">{SITE.tagline}</span><span class="unofficial">非公式サポーターサイト</span></span></h1>

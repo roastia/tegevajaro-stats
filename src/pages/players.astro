@@ -109,7 +109,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
   <Acc id="links" title="同じ母校・ユース出身" icon="link" count={d.school_links.length}>
     <section class="card">
       <p class="note">高校・ユース・大学が同じ選手。宮崎でまた同じピッチに。</p>
-      <table class="simple"><thead><tr><th>学校・ユース</th><th>選手</th></tr></thead>
+      <table class="simple school-links"><thead><tr><th>学校・ユース</th><th>選手</th></tr></thead>
         <tbody>{d.school_links.map(r => <tr><td>{r.school}</td><td>{r.members}</td></tr>)}</tbody></table>
     </section>
   </Acc>
@@ -206,7 +206,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
     const rows = [...document.querySelectorAll<HTMLElement>('.pref-row')];
     const close = (except?: HTMLElement) => rows.forEach(r => { if (r !== except) r.classList.remove('is-open'); });
     rows.forEach(r => {
-      r.addEventListener('click', e => { if (matchMedia('(hover: hover)').matches) return; e.stopPropagation(); const on = !r.classList.contains('is-open'); close(r); r.classList.toggle('is-open', on); });
+      r.addEventListener('click', e => { if ((e.target as HTMLElement).closest('a')) return; if (matchMedia('(hover: hover)').matches) return; e.stopPropagation(); const on = !r.classList.contains('is-open'); close(r); r.classList.toggle('is-open', on); });
       r.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const on = !r.classList.contains('is-open'); close(r); r.classList.toggle('is-open', on); } if (e.key === 'Escape') close(); });
     });
     document.addEventListener('click', () => close());

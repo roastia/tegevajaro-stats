@@ -5,6 +5,7 @@ import { SITE } from '../config/site.js';
 import { nextMatch, splitLeft } from '../lib/nextmatch.js';
 import { makeFlipBoard } from '../lib/flipboard.js';
 import { clubUrl } from '../config/clubs.js';
+import { linkPlayers } from '../lib/playerlinks.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -332,4 +333,12 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
     b.addEventListener('click', e => { if (p.classList.contains('hov')) { e.preventDefault(); p.classList.remove('hov'); } });
     p.addEventListener('toggle', e => { if (e.newState === 'closed') { p.classList.remove('hov'); p.removeAttribute('style'); } else place(b, p); });
   }
+}
+
+
+/* ---------- 選手名 → Jリーグ公式の選手ページ（ランキング・チャンピオン・首位交代・年齢一覧・出身地・同じ母校・記録まであと少し・スタメン図） ---------- */
+{
+  let urls = {};
+  try { urls = JSON.parse(document.getElementById('pl-urls')?.textContent || '{}'); } catch { urls = {}; }
+  linkPlayers(document, urls, '.rank .nm, .champ .nm, .cl-name, .ages .nm, .pref-tip .nm, .school-links td:nth-child(2), .ms-list .who', ['.pitch .pl[data-name]', '.pl-n']);
 }

@@ -33,6 +33,7 @@ const cats = [['goal', 'ゴール'], ['time', '出場'], ['team', '貢献'], ['p
     det.hidden = !det.hidden; li.setAttribute('aria-expanded', String(!det.hidden));
   };
   document.getElementById('recGrid')?.addEventListener('click', e => {
+    if ((e.target as HTMLElement).closest('a')) return;
     const li = (e.target as HTMLElement).closest<HTMLElement>('li.has-det'); if (li) toggleRow(li);
   });
   document.getElementById('recGrid')?.addEventListener('keydown', e => {

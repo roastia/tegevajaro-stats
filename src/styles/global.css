@@ -914,3 +914,6 @@ a.club-link, a.club-link:hover { color: inherit; text-decoration: none; }
 .site-nav::after { content: ''; position: absolute; left: 50%; bottom: 0; width: calc(min(100%, 1120px) - 32px - 2 * var(--radius)); height: 1px; background: var(--line); transform: translateX(-50%); pointer-events: none; }
 /* 上に貼りついている間の見出しは、角のない平らな帯にする（下を流れる中身が角のすき間から見えないように） */
 .acc[open] > .acc-h.stuck { border-radius: 0; border-color: transparent transparent var(--line); box-shadow: 0 -14px 0 0 #fff, 0 8px 10px -8px rgba(58, 50, 54, .3); }
+/* 選手名 → Jリーグ公式の選手ページ（色はそのまま。カーソルを重ねると下線） */
+a.pl-link { color: inherit; text-decoration: none; }
+a.pl-link:hover { text-decoration: underline; text-underline-offset: 2px; }
