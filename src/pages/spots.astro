@@ -10,6 +10,9 @@ const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '
   .map(s => { const km = distanceKm(STADIUM.lat, STADIUM.lng, +s.lat, +s.lng); return { ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng), site: siteUrl(s.url), km, dist: distanceLabel(km) }; })
   .sort((a, b) => a.km - b.km);
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
+// ハート（ログインなしで押せる。数は出さず、多い順に並べかえるだけ）。受付（Cloudflare Workers）があるときだけみんなの分で並ぶ
+const heartsApi = SITE.spots.api ? new URL('/api/hearts', SITE.spots.api).href : '';
+const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.5 8 3.6 4.5 7.1 4.5c2 0 3.6 1.1 4.9 2.8 1.3-1.7 2.9-2.8 4.9-2.8 3.5 0 5.6 3.5 4.4 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
 ---
 <Base current="spots" title="みやざき情報・アウェイ観戦ガイド" description="テゲバジャーロ宮崎のホーム、いちご宮崎新富サッカー場へのアクセス・スタグル・観戦ルールの案内（公式ページへのリンク）と、テゲサポおすすめの宮崎のスポット（非公式）。">
   <section class="miya-hero">
@@ -25,12 +28,13 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
   <section class="card">
 
     {spots.length > 0
-      ? <p class="note">{STADIUM.name}から近い順。距離は直線距離です。「公式サイト」でお店・施設のページ、「Googleマップ」で場所が開きます。</p>
+      ? <p class="note">ハートが多い順（同じなら{STADIUM.name}から近い順）。気に入った場所には、ハートを押してください（ログインなしで押せます）。距離は直線距離です。「公式サイト」でお店・施設のページ、「Googleマップ」で場所が開きます。</p>
       : <div class="spot-empty"><p>まだありません。最初のおすすめを教えてください！</p><a class="btn-main" href="#post">おすすめを教える</a></div>}
     {spots.length > 0 && (
-      <ul class="spot-list">
+      <ul class="spot-list" id="spotUl" data-hearts={heartsApi || undefined}>
         {spots.map(s => (
-          <li id={`spot-${s.id}`}>
+          <li id={`spot-${s.id}`} data-id={s.id}>
+            <button class="spot-heart" type="button" data-heart={s.id} aria-pressed="false" aria-label={`${s.name}にハート`}><Fragment set:html={HEART} /></button>
             <div class="spot-go">
               <span class="spot-head"><Fragment set:html={icon('pin')} /><b>{s.name}</b>{s.area && <small>{s.area}</small>}</span>
               <span class="spot-dist">スタジアムから{s.dist}</span>
@@ -124,6 +128,35 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 </Base>
 
 <script>
+  // ---- ハート：押すと塗りつぶし（この端末に覚える）。受付があれば送って、みんなのハートが多い順に並べかえる ----
+  {
+    const ul = document.getElementById('spotUl');
+    if (ul) {
+      const api = ul.dataset.hearts || '';
+      const KEY = (id: string) => `tg:heart:${id}`;
+      const get = (id: string) => { try { return localStorage.getItem(KEY(id)) === '1'; } catch { return false; } };
+      const put = (id: string, on: boolean) => { try { on ? localStorage.setItem(KEY(id), '1') : localStorage.removeItem(KEY(id)); } catch { /* 覚えられなくても押せる */ } };
+      const btns = [...ul.querySelectorAll<HTMLButtonElement>('[data-heart]')];
+      for (const b of btns) b.setAttribute('aria-pressed', String(get(b.dataset.heart!)));
+      ul.addEventListener('click', e => {
+        const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-heart]'); if (!b) return;
+        const id = b.dataset.heart!, on = b.getAttribute('aria-pressed') !== 'true';
+        b.setAttribute('aria-pressed', String(on)); put(id, on);
+        b.classList.remove('pop'); void b.offsetWidth; if (on) b.classList.add('pop');
+        if (api) fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, on }), keepalive: true }).catch(() => {});
+      });
+      // 並べかえ（ハートが多い順。返ってこなかった場所は、いまの順＝スタジアムから近い順のまま後ろに）
+      if (api) fetch(api).then(r => r.ok ? r.json() : null).then(d => {
+        const order: string[] = Array.isArray(d?.order) ? d.order : [];
+        if (!order.length) return;
+        const rank = new Map(order.map((id, i) => [id, i]));
+        const items = [...ul.children] as HTMLElement[];
+        items.map((li, i) => ({ li, i, r: rank.has(li.dataset.id!) ? rank.get(li.dataset.id!)! : Infinity }))
+          .sort((a, b) => a.r - b.r || a.i - b.i).forEach(x => ul.appendChild(x.li));
+      }).catch(() => {});
+    }
+  }
+
   // ---- 投稿フォーム ----
   const form = document.getElementById('spotForm') as HTMLFormElement | null;
   if (form) {

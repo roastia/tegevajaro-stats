@@ -917,3 +917,17 @@ a.club-link, a.club-link:hover { color: inherit; text-decoration: none; }
 /* 選手名 → Jリーグ公式の選手ページ（色はそのまま。カーソルを重ねると下線） */
 a.pl-link { color: inherit; text-decoration: none; }
 a.pl-link:hover { text-decoration: underline; text-underline-offset: 2px; }
+/* おすすめスポットのハート（数は出さない）。右上に置き、押すと塗りつぶし */
+.spot-list li { position: relative; }
+.spot-list .spot-head { padding-right: 48px; }
+.spot-heart { all: unset; position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; cursor: pointer; color: var(--brand); }
+.spot-heart svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.spot-heart[aria-pressed='true'] svg { fill: currentColor; }
+.spot-heart:hover { background: var(--soft); }
+.spot-heart:focus-visible { outline: 3px solid var(--brand); outline-offset: 1px; }
+.spot-heart.pop svg { animation: heart-pop .35s ease-out; }
+@keyframes heart-pop { 0% { transform: scale(1); } 40% { transform: scale(1.3); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .spot-heart.pop svg { animation: none; } }
+.spot-list .spot-head { display: block; }
+.spot-list .spot-head .ic { vertical-align: -0.12em; margin-right: 6px; }
+.spot-list .spot-head small { margin-left: 6px; }

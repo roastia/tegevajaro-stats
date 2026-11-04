@@ -19,7 +19,7 @@
 - 事実は出典で確かめてから書く（例：期限付き移籍→完全移籍を「帰ってきた」と書かない）。
 
 ## セキュリティ
-- サーバー側のプログラム・データベース・フォームは置かない（静的ファイルのみ）。**例外はおすすめスポットの投稿受付だけ**で、GitHub Pages とは別の Cloudflare Workers（`worker/`）に置く。投稿の中身を返す API は作らない（取り出しは `npm run spots:pull`）。連投対策は Turnstile 毎回必須・同じ回線から1日10件まで（`worker/wrangler.toml` の `IP_DAILY_LIMIT`）・同じ日の同じ内容は受けない。
+- サーバー側のプログラム・データベース・フォームは置かない（静的ファイルのみ）。**例外はおすすめスポットの投稿受付だけ**で、GitHub Pages とは別の Cloudflare Workers（`worker/`）に置く。投稿の中身を返す API は作らない（取り出しは `npm run spots:pull`）。連投対策は Turnstile 毎回必須・同じ回線から1日10件まで（`worker/wrangler.toml` の `IP_DAILY_LIMIT`）・同じ日の同じ内容は受けない。同じ Worker でおすすめスポットのハート（`/api/hearts`。ログインなし・同じ回線から同じスポットへは1日1回まで数える）も受ける。ハートの数は返さず、多い順の並びだけを返す。
 - CSP は `astro.config.mjs` の `security.csp`。HTML に `style="..."` 属性やインラインのイベント属性を書かない（CSP で止まる）。幅や色はクラス（`w0`〜`w100`、`pos-GK` など）で指定する。
 - 外部から読み込むのは Google Fonts だけ。スクリプトの CDN は使わない（npm で入れてバンドルする）。例外：おすすめスポットのボット対策の Cloudflare Turnstile（スクリプトと iframe）だけ。地図は埋め込まず、各スポットから Google マップを開く。
 - 部品の追加は最小限に。`npm install --save-exact` で版を固定し、出て2週間以内の版は避ける。

@@ -17,3 +17,11 @@
 5. `npm test` → `npm run build` → `npm run preview` で一覧と距離を確認 → コミット（push は人）。載せた／見送った id を人に伝え、必要なら `worker/README.md` の status 更新コマンドを案内する
 6. 消してほしいと連絡があった場所は、`spots.csv` から行を消してコミットする
 7. ダッシュボード版（Claude のダッシュボード）にも同じ `spots.csv` を入れる（データセット `spots`）。ダッシュボード版もメニューの「みやざき情報」で一覧を見られるが、投稿フォームは見た目だけで送れない
+
+## ハート（noteのスキのように、ログインなしで押せる）
+- 各スポットの右上のハート。押すと塗りつぶし、この端末に覚える（localStorage の `tg:heart:<id>`）。数は表示しない。
+- 受付（`SITE.spots.api`）があるときは Worker の `/api/hearts` に送り、ページを開くたびに「ハートが多い順」の並び（id だけ）を受け取って並べかえる。同じ数・ハートなしは、スタジアムから近い順。
+- 数え方：同じ回線（IP のハッシュ）から同じスポットへは1日1回まで。その日に押したものを外すと1減る。前の日に押した分は数えたまま。
+- Worker を作るとき：`worker/schema.sql`（`hearts`・`heart_marks` の表）を `npx wrangler d1 execute tegesta-spots --remote --file=worker/schema.sql` で入れる。ハートの数を見たいときは `npx wrangler d1 execute tegesta-spots --remote --command "SELECT * FROM hearts ORDER BY n DESC"`。
+- スポットの id（s1・s2 …）は変えない（ハートが id にひもづくため）。
+- ダッシュボード版（確認用）はみんなのハートを集めず、押したハートをその端末にだけ覚えて、押したものを上に並べる。

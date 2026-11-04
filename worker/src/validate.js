@@ -54,3 +54,11 @@ export async function ipHash(ip, secret, day) {
   const sig = await crypto.subtle.sign('HMAC', key, enc.encode(String(ip)));
   return [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
+
+// ハート：おすすめスポットの id（spots.csv の s1・s2 …）と、押した（true）か外した（false）か
+export function validateHeart(input) {
+  if (!input || typeof input !== 'object') return { ok: false };
+  const id = typeof input.id === 'string' ? input.id : '';
+  if (!/^s\d{1,4}$/.test(id) || typeof input.on !== 'boolean') return { ok: false };
+  return { ok: true, value: { id, on: input.on } };
+}

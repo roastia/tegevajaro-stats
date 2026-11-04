@@ -38,3 +38,11 @@ test('同じ内容の判定：空白・記号・大文字小文字・全角半�
   assert.notEqual(contentKey('テゲバ食堂', 'チキン南蛮'), contentKey('テゲバ食堂', 'からあげ'));
   assert.match(await sha256('x'), /^[0-9a-f]{64}$/);
 });
+import { validateHeart } from '../src/validate.js';
+test('ハート：スポットの id と押した・外したの形', () => {
+  assert.deepEqual(validateHeart({ id: 's1', on: true }), { ok: true, value: { id: 's1', on: true } });
+  assert.equal(validateHeart({ id: 's12345', on: true }).ok, false);
+  assert.equal(validateHeart({ id: 'x1', on: true }).ok, false);
+  assert.equal(validateHeart({ id: 's1', on: 'yes' }).ok, false);
+  assert.equal(validateHeart(null).ok, false);
+});
