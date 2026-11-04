@@ -880,7 +880,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .glist a.gname { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
 .spot-by .spot-btn { padding-top: 2px; padding-bottom: 2px; }
 /* 開いているアコーディオンの見出しは、スクロール中も上のメニューの下に貼りつく（次の見出しが来たら入れ替わる） */
-.acc[open] > .acc-h { position: sticky; top: var(--stick, 0px); z-index: 5; box-shadow: 0 6px 10px -8px rgba(58, 50, 54, .35); }
+.acc[open] > .acc-h { position: sticky; top: var(--stick, 0px); z-index: 5; box-shadow: 0 -14px 0 0 #fff, 0 10px 0 0 #fff, 0 16px 10px -8px rgba(58, 50, 54, .3); }
 /* ヘッダーの「J2 〇位」は Jリーグ公式のJ2順位表へのリンク */
 a.rank-link { color: inherit; text-decoration: none; }
 /* 相手チーム名は相手クラブの公式サイトへのリンク（目立たせない） */
