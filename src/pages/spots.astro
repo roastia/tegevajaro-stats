@@ -21,7 +21,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     </div>
   </section>
 
-  <Acc id="spotList" title="テゲサポおすすめスポット" icon="pin" count={spots.length ? spots.length + '件' : ''}>
+  <Acc id="spotList" title="おすすめスポット" icon="pin" count={spots.length ? spots.length + '件' : ''}>
   <section class="card">
 
     {spots.length > 0
@@ -39,8 +39,8 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
             <div class="spot-links">
               {s.site && <a class="spot-btn" href={s.site} target="_blank" rel="noopener noreferrer">公式サイト<span aria-hidden="true">↗</span></a>}
               <a class="spot-btn" href={s.maps} target="_blank" rel="noopener noreferrer">Googleマップ<span aria-hidden="true">↗</span></a>
+              {s.x && <a class="spot-btn" href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc">@{s.x_handle} さんのおすすめ<span aria-hidden="true">↗</span></a>}
             </div>
-            {s.x && <a class="spot-x" href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc">@{s.x_handle} さんのおすすめ</a>}
           </li>
         ))}
       </ul>

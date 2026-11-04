@@ -850,7 +850,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .acc-h:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
 .acc-t { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; color: var(--fg); min-width: 0; }
 .acc-t .ic { width: 1.2em; height: 1.2em; flex: none; color: var(--ink); }
-.acc-n { padding: 0 8px; border-radius: 999px; background: var(--soft2); color: var(--ink); font-size: .75rem; font-weight: 700; }
+.acc-n { flex: none; white-space: nowrap; padding: 0 8px; border-radius: 999px; background: var(--soft2); color: var(--ink); font-size: .75rem; font-weight: 700; }
 .acc-note { margin-left: auto; font-size: .78rem; color: var(--muted); white-space: nowrap; }
 .acc-x { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 10px; border-radius: 999px; border: 1px solid var(--brand); background: #fff; color: var(--ink); font-size: .78rem; font-weight: 700; white-space: nowrap; }
 .acc-note + .acc-x { margin-left: 8px; }
