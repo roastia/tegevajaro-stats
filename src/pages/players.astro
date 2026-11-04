@@ -119,12 +119,12 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
   </Acc>
   <Acc id="prefs" title="出身地" icon="pin" count={d.prefs.length + '都道府県'}>
     <section class="card prefs">
-      <p class="note">都道府県ごとの人数（ピンクは九州）。バーを押すと、その出身の選手が出ます。</p>
+      <p class="note">都道府県ごとの人数（ピンクは九州）。バーにカーソルを重ねる（スマホはタップ）と、その出身の選手が出ます。</p>
       {d.prefs.map(p => (
-        <details class={`pref-d ${kyushu.includes(p.pref) ? 'ky' : ''}`}>
-          <summary class="row"><span>{p.pref}</span><span class={`bar2 w${Math.round(p.n / pmax * 100)}`}></span><span>{p.n}<i aria-hidden="true">▾</i></span></summary>
-          <p class="pref-names">{d.profiles.filter(x => x.birthplace === p.pref).map(x => x.name).join('・')}</p>
-        </details>))}
+        <div class={`row pref-row ${kyushu.includes(p.pref) ? 'ky' : ''}`} tabindex="0" role="button" aria-label={`${p.pref}出身 ${p.n}人：${d.profiles.filter(x => x.birthplace === p.pref).map(x => x.name).join('・')}`}>
+          <span>{p.pref}</span><span class={`bar2 w${Math.round(p.n / pmax * 100)}`}></span><span>{p.n}</span>
+          <span class="pref-tip" aria-hidden="true"><b>{p.pref}出身</b>{d.profiles.filter(x => x.birthplace === p.pref).map(x => x.name).join('・')}</span>
+        </div>))}
     </section>
   </Acc>
 </Base>
@@ -200,5 +200,15 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
     seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     drawCards();
   });
+  }
+  // 出身地：スマホ（カーソルのない端末）はタップで吹き出しを開く。ほかを押すと閉じる（PC はカーソルを重ねると CSS で出る）
+  {
+    const rows = [...document.querySelectorAll<HTMLElement>('.pref-row')];
+    const close = (except?: HTMLElement) => rows.forEach(r => { if (r !== except) r.classList.remove('is-open'); });
+    rows.forEach(r => {
+      r.addEventListener('click', e => { if (matchMedia('(hover: hover)').matches) return; e.stopPropagation(); const on = !r.classList.contains('is-open'); close(r); r.classList.toggle('is-open', on); });
+      r.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const on = !r.classList.contains('is-open'); close(r); r.classList.toggle('is-open', on); } if (e.key === 'Escape') close(); });
+    });
+    document.addEventListener('click', () => close());
   }
 </script>
