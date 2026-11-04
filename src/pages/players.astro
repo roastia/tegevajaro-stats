@@ -6,7 +6,7 @@ import { getData, getShareables } from '../lib/data.js';
 import { icon, playerUrl, href } from '../lib/util.js';
 import { ICON_OF_RECORD, plainTitle } from '../lib/meta.js';
 import { SITE } from '../config/site.js';
-// 上段：選手の背景（経歴・出身・年齢）／下段：選手の称号
+// 上段：選手名鑑（背番号・プロフィール・称号）／下段：チームの顔ぶれ（経歴・出身・年齢から作るトピック）
 const d = getData();
 const facts = getShareables().filter(s => s.kind === 'b');
 const ageOf = new Map(d.ages.map(a => [a.name, a.age]));
@@ -30,11 +30,11 @@ d.rankings.forEach(({ meta, rows }, idx) => {
 });
 const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
 ---
-<Base current="players" title="選手の背景・称号" description="テゲバジャーロ宮崎の選手の年齢・出身地・出身校・経歴と、今季の記録から決まる選手の称号の一覧（非公式）。">
+<Base current="players" title="選手名鑑・チームの顔ぶれ" description="テゲバジャーロ宮崎の選手名鑑（背番号・年齢・出身地・出身校と今季の称号）と、大学経由・アカデミー育ち・平均年齢などチームの顔ぶれ（非公式）。">
   <section class="bday" data-bday hidden></section>
-  <Acc id="titles" title="選手の称号" icon="medal" count={players.length}>
+  <Acc id="titles" title="選手名鑑" icon="medal" count={players.length}>
   <section class="card">
-    <p class="note">ランキングで3位以内に入ると称号ゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>
+    <p class="note">背番号・年齢・出身地・出身校と、今季の称号がひと目でわかる選手カード。称号はランキングで3位以内に入るとゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>
     <div class="controls">
       <input id="pq" type="search" placeholder="名前・よみ・ローマ字で検索" aria-label="選手名で検索（漢字・ひらがな・ローマ字）" />
       <div class="seg" id="posSeg" role="group" aria-label="ポジション">
@@ -74,7 +74,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
     })}
   </div>
   </Acc>
-  <Acc id="roots" title="選手の背景" icon="suitcase" count={facts.length}>
+  <Acc id="roots" title="チームの顔ぶれ" icon="suitcase" count={facts.length}>
   <div class="grid">
     {facts.map(f => (
       <article class={`card fact reveal vt-b-${f.id}`} id={`b-${f.id}`}>

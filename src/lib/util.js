@@ -29,7 +29,7 @@ export const flatPost = (text, asOf = '') => {
     return p + '。';
   }).join('');
 };
-// asOf：本文の最後に付ける「（第〇節時点）」。選手の背景・誕生日のポストは '' で付けない
+// asOf：本文の最後に付ける「（第〇節時点）」。チームの顔ぶれ・誕生日のポストは '' で付けない
 export function xIntent(text, url, asOf = SITE.roundLabel) {
   const q = new URLSearchParams({ text: flatPost(text, asOf) });
   if (url) q.set('url', url);

@@ -3,7 +3,7 @@
 import { xIntent, X_MARK } from '../lib/util.js';
 interface Props { what: string; text: string; url?: string }
 const { what, text, url } = Astro.props;
-// 選手の背景（/b/）のポストには「（第〇節時点）」を付けない
+// チームの顔ぶれ（/b/）のポストには「（第〇節時点）」を付けない
 const asOf = /\/b\//.test(url || '') ? '' : undefined;
 ---
 <div class="post">

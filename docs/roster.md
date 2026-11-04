@@ -17,7 +17,7 @@
    - 値にカンマを使わない
 3. `src/data/players.csv` に1行追加する（出場がまだなら数字は 0）。`jl_url` に公式の選手ページURL
 4. `python3 tools/jersey_numbers.py` で背番号イラストを作る
-5. `npm run roster` で名簿を点検 → `npm test` → `npm run build` → `npm run preview` で「選手」ページの年齢一覧・選手の称号に出ることを確認
+5. `npm run roster` で名簿を点検 → `npm test` → `npm run build` → `npm run preview` で「選手」ページの年齢一覧・選手名鑑に出ることを確認
 6. コミット（push は人が行う）。例：「〇〇選手（MF・背番号△）の加入を反映」
 
 ### 退団（移籍・期限付き移籍・契約満了）
