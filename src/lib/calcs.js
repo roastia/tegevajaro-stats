@@ -56,7 +56,7 @@ function miyazakiPath(career) {
 const teamCount = career => new Set(String(career || '').split('→').map(s => s.trim()).filter(Boolean)).size;
 dash.calc('roots_facts', {
   inputs: ['profiles', 'ages'],
-  title: 'チームの顔ぶれトピック',
+  title: 'チームデータトピック',
   description: '選手プロフィール（生年月日・身長・出身地・高校/ユース・大学・経歴）から、ポストしたくなる背景トピックを作る。年齢は2026年10月27日時点。',
   fn: (profiles, ages) => {
     const F = [];
