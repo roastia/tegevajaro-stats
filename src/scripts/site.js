@@ -274,6 +274,12 @@ document.addEventListener('click', e => {
   const setStick = () => document.documentElement.style.setProperty('--stick', `${Math.round(stickH())}px`);
   setStick();
   if (nav && 'ResizeObserver' in window) new ResizeObserver(setStick).observe(nav);
+  // 貼りついている見出しに .stuck（見た目を平らな帯に変える）
+  const heads = [...document.querySelectorAll('details.acc > .acc-h')];
+  let rq = 0;
+  const markStuck = () => { rq = 0; const top = stickH() + 1; for (const h of heads) { const d = h.parentElement; h.classList.toggle('stuck', d.open && d.getBoundingClientRect().top < top - 1 && h.getBoundingClientRect().top <= top); } };
+  addEventListener('scroll', () => { if (!rq) rq = requestAnimationFrame(markStuck); }, { passive: true });
+  addEventListener('resize', markStuck); document.addEventListener('toggle', markStuck, true); markStuck();
   const accs = [...document.querySelectorAll('details[data-acc][id]')];
   const key = (d) => `tg:acc:${location.pathname}:${d.id}`;
   for (const d of accs) {
