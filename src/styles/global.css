@@ -909,3 +909,6 @@ a.club-link, a.club-link:hover { color: inherit; text-decoration: none; }
 .cl-was { margin: 0; font-size: .78rem; color: var(--muted); }
 .climbs .cheer { margin: 0; }
 .rec { scroll-margin-top: calc(var(--stick, 56px) + 8px); }
+/* メニューの下の線は、下に貼りつくアコーディオンの見出し（角の丸み）より内側だけに引く（はしから線がはみ出して見えないように） */
+.site-nav { border-bottom: 0; }
+.site-nav::after { content: ''; position: absolute; left: 50%; bottom: 0; width: calc(min(100%, 1120px) - 32px - 2 * var(--radius)); height: 1px; background: var(--line); transform: translateX(-50%); pointer-events: none; }
