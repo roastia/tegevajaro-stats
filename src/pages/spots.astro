@@ -20,42 +20,6 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     </div>
   </section>
 
-  <section class="card away-guide" aria-label="アウェイからお越しのみなさんへ">
-    <h2><Fragment set:html={icon('plane')} />アウェイからお越しのみなさんへ</h2>
-    <ul class="ag-tiles">
-      <li>
-        <span class="ag-ic"><Fragment set:html={icon('pin')} /></span>
-        <b>スタジアム</b>
-        <p>いちご宮崎新富サッカー場（宮崎県児湯郡新富町）</p>
-        <a class="ag-btn" href="https://www.google.com/maps/search/?api=1&amp;query=32.0737818,131.4909384" target="_blank" rel="noopener noreferrer">地図を開く</a>
-      </li>
-      <li>
-        <span class="ag-ic"><Fragment set:html={icon('plane')} /></span>
-        <b>アクセス</b>
-        <p>飛行機・電車・車でのお越しかたと駐車場の案内は、クラブ公式のアクセスページにまとまっています。</p>
-        <a class="ag-btn" href="https://www.tegevajaro.com/club/stadium/access" target="_blank" rel="noopener noreferrer">アクセス・駐車場</a>
-      </li>
-      <li>
-        <span class="ag-ic"><Fragment set:html={icon('food')} /></span>
-        <b>スタグル</b>
-        <p>スタジアムグルメ（スタグル）の出店情報は、クラブ公式サイトのお知らせで確認できます。</p>
-        <a class="ag-btn" href="https://www.tegevajaro.com/" target="_blank" rel="noopener noreferrer">クラブ公式サイト</a>
-      </li>
-      <li>
-        <span class="ag-ic"><Fragment set:html={icon('flag')} /></span>
-        <b>観戦ルール</b>
-        <p>入場や応援のルールは、クラブ公式の観戦ガイドで確認できます。</p>
-        <a class="ag-btn" href="https://www.tegevajaro.com/news/850" target="_blank" rel="noopener noreferrer">観戦ガイド</a>
-      </li>
-      <li>
-        <span class="ag-ic"><Fragment set:html={icon('calendar')} /></span>
-        <b>来場案内</b>
-        <p>試合ごとの来場案内（マッチデーガイド）は、クラブ公式サイトのお知らせに出ます。</p>
-        <a class="ag-btn" href="https://www.tegevajaro.com/" target="_blank" rel="noopener noreferrer">クラブ公式サイト</a>
-      </li>
-    </ul>
-  </section>
-
   <section class="card reveal" id="spotList">
     <h2><Fragment set:html={icon('pin')} />テゲサポおすすめスポット</h2>
     {spots.length > 0
@@ -109,6 +73,42 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     </details>
   </section>
 
+
+  <section class="card away-guide" aria-label="アウェイからお越しのみなさんへ">
+    <h2><Fragment set:html={icon('plane')} />アウェイからお越しのみなさんへ</h2>
+    <ul class="ag-tiles">
+      <li>
+        <span class="ag-ic"><Fragment set:html={icon('pin')} /></span>
+        <b>スタジアム</b>
+        <p>いちご宮崎新富サッカー場（宮崎県児湯郡新富町）</p>
+        <a class="ag-btn" href="https://www.google.com/maps/search/?api=1&amp;query=32.0737818,131.4909384" target="_blank" rel="noopener noreferrer">地図を開く</a>
+      </li>
+      <li>
+        <span class="ag-ic"><Fragment set:html={icon('plane')} /></span>
+        <b>アクセス</b>
+        <p>飛行機・電車・車でのお越しかたと駐車場の案内は、クラブ公式のアクセスページにまとまっています。</p>
+        <a class="ag-btn" href="https://www.tegevajaro.com/club/stadium/access" target="_blank" rel="noopener noreferrer">アクセス・駐車場</a>
+      </li>
+      <li>
+        <span class="ag-ic"><Fragment set:html={icon('food')} /></span>
+        <b>スタグル</b>
+        <p>スタジアムグルメ（スタグル）の出店情報は、クラブ公式サイトのお知らせで確認できます。</p>
+        <a class="ag-btn" href="https://www.tegevajaro.com/" target="_blank" rel="noopener noreferrer">クラブ公式サイト</a>
+      </li>
+      <li>
+        <span class="ag-ic"><Fragment set:html={icon('flag')} /></span>
+        <b>観戦ルール</b>
+        <p>入場や応援のルールは、クラブ公式の観戦ガイドで確認できます。</p>
+        <a class="ag-btn" href="https://www.tegevajaro.com/news/850" target="_blank" rel="noopener noreferrer">観戦ガイド</a>
+      </li>
+      <li>
+        <span class="ag-ic"><Fragment set:html={icon('calendar')} /></span>
+        <b>来場案内</b>
+        <p>試合ごとの来場案内（マッチデーガイド）は、クラブ公式サイトのお知らせに出ます。</p>
+        <a class="ag-btn" href="https://www.tegevajaro.com/" target="_blank" rel="noopener noreferrer">クラブ公式サイト</a>
+      </li>
+    </ul>
+  </section>
 </Base>
 
 <script>
