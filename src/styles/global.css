@@ -194,8 +194,11 @@ table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertic
 .prefs .pref-row { position: relative; cursor: pointer; border-radius: 6px; padding: 2px 4px; margin: 0 -4px 4px; }
 .prefs .pref-row:hover, .prefs .pref-row.is-open { background: var(--soft); }
 .prefs .pref-row:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
-.prefs .pref-tip { display: none; position: absolute; z-index: 5; left: 3.4rem; right: 0; bottom: calc(100% + 6px); padding: 8px 12px; border-radius: 10px; background: #fff; border: 1px solid var(--brand); box-shadow: 0 4px 14px rgba(58, 50, 54, .14); color: var(--fg); font-size: .85rem; font-weight: 700; line-height: 1.5; }
+.prefs .pref-tip { display: none; position: absolute; z-index: 5; left: 3.4rem; width: max-content; max-width: calc(100% - 3.4rem); bottom: calc(100% + 6px); padding: 8px 12px; border-radius: 10px; background: #fff; border: 1px solid var(--brand); box-shadow: 0 4px 14px rgba(58, 50, 54, .14); color: var(--fg); font-size: .85rem; font-weight: 700; line-height: 1.5; }
 .prefs .pref-tip b { display: block; font-size: .72rem; color: var(--ink); }
+.prefs .pref-tip .nm + .nm::before { content: '・'; }
+/* スマホ：名前を1行ずつにして、吹き出しを名前の長さに合わせる */
+@media (hover: none) { .prefs .pref-tip .nm { display: block; } .prefs .pref-tip .nm + .nm::before { content: none; } }
 .prefs .pref-tip::after { content: ''; position: absolute; left: 18px; top: 100%; border: 7px solid transparent; border-top-color: var(--brand); }
 .prefs .pref-row.is-open .pref-tip { display: block; }
 @media (hover: hover) { .prefs .pref-row:hover .pref-tip, .prefs .pref-row:focus-visible .pref-tip { display: block; } }

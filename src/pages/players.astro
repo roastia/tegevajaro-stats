@@ -123,7 +123,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
       {d.prefs.map(p => (
         <div class={`row pref-row ${kyushu.includes(p.pref) ? 'ky' : ''}`} tabindex="0" role="button" aria-label={`${p.pref}出身 ${p.n}人：${d.profiles.filter(x => x.birthplace === p.pref).map(x => x.name).join('・')}`}>
           <span>{p.pref}</span><span class={`bar2 w${Math.round(p.n / pmax * 100)}`}></span><span>{p.n}</span>
-          <span class="pref-tip" aria-hidden="true"><b>{p.pref}出身</b>{d.profiles.filter(x => x.birthplace === p.pref).map(x => x.name).join('・')}</span>
+          <span class="pref-tip" aria-hidden="true"><b>{p.pref}出身</b>{d.profiles.filter(x => x.birthplace === p.pref).map(x => <span class="nm">{x.name}</span>)}</span>
         </div>))}
     </section>
   </Acc>
