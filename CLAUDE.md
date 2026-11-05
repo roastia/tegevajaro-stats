@@ -29,6 +29,11 @@
 - 日本語の改行は「文（。！？／）→ 節（、：）→ 文節（BudouX）」の順に優先する（見出し・短い表示）。説明の段落（`p`・スポットのひとこと・吹き出しなど）は文ごとに改行せず続けて流し、文節の途中でだけ切らない。ページはビルド後に文・節を `<span class="ss">`（inline-block）で包み、文節の切れ目に `<wbr>` を入れる（`integrations/phrase-break.mjs`、CSS は `word-break: keep-all`）。
 - 外部リンクには `rel="noopener noreferrer"`。リンク先 URL は `safeUrl` / `playerUrl` で Jリーグ・YouTube に限定する。例外：みやざき情報の案内だけ、クラブ公式サイト（tegevajaro.com）と Google マップ（スタジアム・おすすめスポット）へ固定のリンクを置く。相手チーム名は相手クラブの公式サイト（`src/config/clubs.js` に確かめて入れた https の URL だけ）、ヘッダーの「J2 〇位」は Jリーグ公式の J2 順位表へ。おすすめスポットの「公式サイト」ボタンは、確かめて `spots.csv` の `url` に入れた https の URL だけ（`siteUrl`）。
 
+## 更新のしかた（SLP のサイトと同じ）
+- 作業場所は Mac の `~/Documents/tegevajaro-stats`（Claude デスクトップアプリからこのフォルダを直接編集する）。リポジトリは `roastia/tegevajaro-stats`、`main` に push すると GitHub Actions が組み立てて https://tegestats.com に公開する。
+- 1. 始める前に `git pull`（ほかの PC や GitHub 上の変更を取りこむ）。2. ファイルを直接直す。3. 直すたびに `npm test` と `npm run build` を通してからコミット（1つの修正＝1コミット）。4. **push は本人がターミナルで行う**（`git push`）。Claude は push しない。
+- ダッシュボード版（Claude のダッシュボード）は頼まれたときだけ更新する。
+
 ## くわしい手順（必要なときだけ読む）
 - 試合後の更新 → `docs/update-match.md`（**最初に読む**。ブラウザで1回 → `tools/apply_match.mjs` で一度に書き込む）
 - 選手の加入・退団・背番号変更 → `docs/roster.md`
