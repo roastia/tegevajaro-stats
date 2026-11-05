@@ -3,6 +3,10 @@ name = "tegesta-spots"
 main = "src/index.js"
 compatibility_date = "2026-10-01"
 
+# 公開の入口は https://tegesta-spots.tegestats.workers.dev の1つだけ（版ごとのプレビューURLは作らない）
+workers_dev = true
+preview_urls = false
+
 # 受け付けるサイト（カンマ区切り）。手元で試すときは http://localhost:4321 を足す
 [vars]
 ALLOWED_ORIGIN = "https://tegestats.com"
