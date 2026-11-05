@@ -15,5 +15,6 @@
 - 公開したら Google Search Console にサイトを登録し、`sitemap.xml` を送信する。「HTML タグ」で確認するときは `site.js` の `googleSiteVerification` に content の値を入れる（独自ドメインなら DNS の TXT レコードでも確認できる）。
 
 ## Football LAB の切り替え
+- 掲載の許可は得ている（2026年11月に確認）。`footballLab: true` のまま公開してよい。
 - `src/config/site.js` の `footballLab` を `false` にすると、Football LAB 出典のランキングとフッターの表記が消える。
 - 問い合わせの結果「掲載不可」なら、`false` にしたうえで Football LAB 由来の CSV・列も**リポジトリから削除**する（公開リポジトリに置くこと自体が転載になるため）。
