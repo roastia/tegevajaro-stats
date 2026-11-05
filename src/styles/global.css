@@ -239,6 +239,8 @@ table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertic
 /* 細かな調整 */
 .xm { width: 1em; height: 1em; flex: none; }
 .bpost .xm { width: .95em; height: .95em; }
+/* 文の中の X のロゴ（「〇〇を X でポスト」） */
+.xm.xin { display: inline-block; vertical-align: -.12em; margin: 0 .12em; }
 /* 日本語の見出しを文節で折り返す（対応ブラウザのみ）・行の長さをそろえる */
 /* 日本語は文節（<wbr> の位置）でだけ改行する。長すぎる語だけは折り返す */
 body { word-break: keep-all; overflow-wrap: anywhere; line-break: strict; }

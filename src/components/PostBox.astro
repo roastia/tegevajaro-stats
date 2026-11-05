@@ -1,6 +1,6 @@
 ---
 // どのデータのポストかがわかるボタン。押すと X の投稿画面が開く（画像の添付や共有メニューは使わない）
-import { xIntent, X_MARK } from '../lib/util.js';
+import { xIntent, xLabel } from '../lib/util.js';
 interface Props { what: string; text: string; url?: string }
 const { what, text, url } = Astro.props;
 // チームデータ（/players/#b-〇〇）のポストには「（第〇節時点）」を付けない
@@ -8,6 +8,6 @@ const asOf = /#b-/.test(url || '') ? '' : undefined;
 ---
 <div class="post">
   <a class="postbtn" href={xIntent(text, url, asOf)} target="_blank" rel="noopener noreferrer">
-    <Fragment set:html={X_MARK} /><span><b class="nw">「{what}」</b><span class="nw">をXでポスト</span></span>
+    <span><b class="nw">「{what}」</b><span class="nw" set:html={xLabel('をXでポスト')} /></span>
   </a>
 </div>

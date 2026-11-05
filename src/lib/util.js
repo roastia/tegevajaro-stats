@@ -8,6 +8,8 @@ export function icon(name, cls = 'ic') {
   return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 }
 
+/** 文の中の「X」をロゴにしたもの（「〇〇を X でポスト」の X。読み上げでは「X」と読む） */
+export const xLabel = label => label.split('X').join(X_MARK.replace('class="xm"', 'class="xm xin"').replace('aria-hidden="true"', 'role="img" aria-label="X"'));
 export const X_MARK = '<svg class="xm" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
 
 /** サイト内のパス（GitHub Pages のサブパスを付ける） */
