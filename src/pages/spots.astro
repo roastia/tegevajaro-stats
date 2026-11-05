@@ -12,7 +12,7 @@ const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 // ハート（ログインなしで押せる。数は出さず、多い順に並べかえるだけ）。受付（Cloudflare Workers）があるときだけみんなの分で並ぶ
 const heartsApi = SITE.spots.api ? new URL('/api/hearts', SITE.spots.api).href : '';
-const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.5 8 3.6 4.5 7.1 4.5c2 0 3.6 1.1 4.9 2.8 1.3-1.7 2.9-2.8 4.9-2.8 3.5 0 5.6 3.5 4.4 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
+const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 12.3A4.88 4.88 0 0 1 11.2 5.4L12 6.2l.8-.8a4.88 4.88 0 0 1 6.9 6.9z"/></svg>';
 ---
 <Base current="spots" title="みやざき情報・アウェイ観戦ガイド" description="テゲバジャーロ宮崎のホーム、いちご宮崎新富サッカー場へのアクセス・スタグル・観戦ルールの案内（公式ページへのリンク）と、テゲサポおすすめの宮崎のスポット（非公式）。">
   <section class="miya-hero">

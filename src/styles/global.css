@@ -917,7 +917,7 @@ a.pl-link:hover { text-decoration: underline; text-underline-offset: 2px; }
 .spot-list li { position: relative; }
 .spot-list .spot-head { padding-right: 48px; }
 .spot-heart { all: unset; position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; cursor: pointer; color: var(--brand); }
-.spot-heart svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.spot-heart svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
 .spot-heart[aria-pressed='true'] svg { fill: currentColor; }
 .spot-heart:hover { background: var(--soft); }
 .spot-heart:focus-visible { outline: 3px solid var(--brand); outline-offset: 1px; }
