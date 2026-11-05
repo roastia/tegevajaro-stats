@@ -937,3 +937,6 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss { dis
 #spotList .note, #spotList .note .ss, .spot-info, .spot-info .ss { display: inline; word-break: normal; overflow-wrap: anywhere; line-break: auto; }
 #spotList .note { display: block; }
 .spot-info { display: block; }
+/* もうすぐ誕生日の選手名：ハイライトのゴールの名前と同じ（ピンク文字・下線のリンク。ポストボタンの見た目にしない） */
+.bcard a.pl-link { all: unset; color: var(--ink); font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.bcard a.pl-link:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }

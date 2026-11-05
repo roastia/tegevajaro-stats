@@ -340,5 +340,5 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
 {
   let urls = {};
   try { urls = JSON.parse(document.getElementById('pl-urls')?.textContent || '{}'); } catch { urls = {}; }
-  linkPlayers(document, urls, '.rank .nm, .champ .nm, .cl-name, .ages .nm, .pref-tip .nm, .school-links td:nth-child(2), .ms-list .who', ['.pitch .pl[data-name]', '.pl-n']);
+  linkPlayers(document, urls, '.rank .nm, .bcard .nm, .champ .nm, .cl-name, .ages .nm, .pref-tip .nm, .school-links td:nth-child(2), .ms-list .who', ['.pitch .pl[data-name]', '.pl-n']);
 }
