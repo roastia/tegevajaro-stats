@@ -177,7 +177,7 @@ input[type=search] { flex: 1 1 10rem; }
 .ages { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: 4px 14px; }
 .ages li { position: relative; isolation: isolate; display: grid; grid-template-columns: 2rem 1fr auto; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 8px; }
 .ages li .bar { position: absolute; inset: 0 auto 0 0; width: calc(var(--w, 0) * 1%); z-index: -1; border-radius: 8px; background: color-mix(in srgb, var(--pc) 16%, transparent); transform-origin: left; }
-.ages li.bd { box-shadow: 0 0 0 1px rgba(232,131,58,.7) inset; background: rgba(240,138,93,.1); }
+.ages li.bd { outline: 1px solid rgba(232,131,58,.7); outline-offset: -1px; background: rgba(240,138,93,.1); }
 .ages .no { width: 1.8rem; height: 1.8rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: .7rem; font-weight: 700; background: var(--pc); }
 .ages .nm small { display: block; font-size: .68rem; color: var(--muted); }
 .ages .ag { font-weight: 700; font-size: 1.1rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -613,7 +613,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .bchip { background: #fff; color: var(--ink); border: 1px solid var(--line); }
 .ages li .bar { background: var(--pc-soft); }
 .ages .no { background: var(--pc); color: var(--pc-on); }
-.ages li.bd { box-shadow: 0 0 0 1px var(--brand) inset; background: var(--soft); }
+.ages li.bd { outline: 1px solid var(--brand); outline-offset: -1px; background: var(--soft); }
 .soon { background: var(--brand); }
 /* 誕生日 */
 .hbd { background: var(--gold-soft); color: var(--fg); animation: none; }
