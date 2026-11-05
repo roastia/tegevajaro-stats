@@ -9,6 +9,7 @@
     "test": "node --test tests/*.test.js worker/test/*.test.js",
     "roster": "node tools/check_roster.mjs",
     "spots:pull": "sh tools/pull_spots.sh",
+    "spots:names": "node tools/spot_names.mjs",
     "snapshot": "node tools/rank_snapshot.mjs"
   },
   "dependencies": {

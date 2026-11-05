@@ -54,6 +54,12 @@ npx wrangler@4.150.0 d1 execute tegesta-spots --remote --command "UPDATE submiss
 npx wrangler@4.150.0 d1 execute tegesta-spots --remote --command "UPDATE submissions SET status='rejected' WHERE id IN (3)"
 ```
 
+## 7. ハートを名前つきで見る
+```sh
+npm run spots:names    # spots.csv の id・名前を D1 の spot_names に入れ直す（スポットを足した・消したときに）
+```
+Cloudflare のダッシュボードの D1 → `tegesta-spots` → 「Explore Data」で `hearts_named` を開くと、スポットの名前とハートの数が多い順に並びます（ハートなしは 0）。見るだけにして、ここで書き換えないでください。
+
 ## 守りのしくみ
 - 受け付けるのは `POST /api/spots` だけです。送り元は `ALLOWED_ORIGIN`（サイトのドメイン）に限ります。
 - Turnstile の確認に通らない送信は受けません。確認サービスにつながらないときも受けません。

@@ -36,3 +36,8 @@ CREATE TABLE IF NOT EXISTS heart_marks (
   spot    TEXT NOT NULL,
   PRIMARY KEY (day, ip_hash, spot)
 );
+
+-- Cloudflare の Studio でハートを名前つきで見るための対応表とビュー（Worker は読まない）
+-- 中身は spots.csv から `npm run spots:names` で入れ直す（サイトに公開している名前だけ）
+CREATE TABLE IF NOT EXISTS spot_names (id TEXT PRIMARY KEY, name TEXT NOT NULL, area TEXT NOT NULL DEFAULT '');
+CREATE VIEW IF NOT EXISTS hearts_named AS SELECT s.id AS spot, s.name, s.area, COALESCE(h.n, 0) AS n FROM spot_names s LEFT JOIN hearts h ON h.spot = s.id ORDER BY n DESC, s.id;
