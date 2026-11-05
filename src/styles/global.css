@@ -17,7 +17,8 @@
   --ok: light-dark(#1F7A4A, #6BD69A);
   --bad: light-dark(#B3261E, #FF8A80);
   --radius: 14px;
-  --font: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic', YuGothic, Meiryo, system-ui, sans-serif;
+  /* 端末の標準フォント（ダウンロードなし）。Mac・iPhone はヒラギノ、Windows は游ゴシック、Android は system-ui（Noto Sans CJK） */
+  --font: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic', YuGothic, Meiryo, system-ui, sans-serif;
   --ease: cubic-bezier(.2, .8, .2, 1);
 }
 

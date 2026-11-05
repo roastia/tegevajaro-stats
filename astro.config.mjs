@@ -21,7 +21,7 @@ export default defineConfig({
       directives: [
         "default-src 'self'",
         "img-src 'self' data:",
-        "font-src https://fonts.gstatic.com",
+        "font-src 'self'",
         `connect-src 'self'${spotsApiOrigin ? ' ' + spotsApiOrigin : ''}`,
         `frame-src ${TURNSTILE}`,
         "object-src 'none'",
@@ -29,7 +29,7 @@ export default defineConfig({
         "form-action 'none'",
         'upgrade-insecure-requests',
       ],
-      styleDirective: { resources: ["'self'", 'https://fonts.googleapis.com'] },
+      styleDirective: { resources: ["'self'"] },
       scriptDirective: { resources: ["'self'", TURNSTILE] },
     },
   },
