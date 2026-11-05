@@ -28,7 +28,7 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.
   <section class="card">
 
     {spots.length > 0
-      ? <p class="note">ハートが多い順（同じなら{STADIUM.name}から近い順）。気に入った場所には、ハートを押してください（ログインなしで押せます）。距離は直線距離です。「公式サイト」でお店・施設のページ、「Googleマップ」で場所が開きます。</p>
+      ? <p class="note">気に入った場所は、ハートで応援！</p>
       : <div class="spot-empty"><p>まだありません。最初のおすすめを教えてください！</p><a class="btn-main" href="#post">おすすめを教える</a></div>}
     {spots.length > 0 && (
       <ul class="spot-list" id="spotUl" data-hearts={heartsApi || undefined}>
