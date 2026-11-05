@@ -21,7 +21,7 @@ export const SITE = {
   // おすすめスポットの投稿受付（Cloudflare Workers。worker/README.md の手順で用意してから入れる）
   // 空のあいだは投稿フォームが「準備中」になる
   spots: {
-    api: '',               // 例：'https://tegesta-spots.〇〇.workers.dev/api/spots'
-    turnstileSiteKey: '',  // Cloudflare Turnstile のサイトキー（公開してよい値）
+    api: 'https://tegesta-spots.tegestats.workers.dev/api/spots',
+    turnstileSiteKey: '0x4AAAAAAF01OOzpZSjTEVm4',  // Cloudflare Turnstile のサイトキー（公開してよい値）
   },
 };
