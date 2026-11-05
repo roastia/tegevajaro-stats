@@ -1,5 +1,4 @@
-// すべてのページで動く小さなスクリプト：スクロール位置・誕生日・紙吹雪・数字のカウントアップ
-import confetti from 'canvas-confetti';
+// すべてのページで動く小さなスクリプト：スクロール位置・誕生日・紙吹雪（当日だけ読み込む）・数字のカウントアップ
 import { icon, xIntent, X_MARK, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 import { nextMatch, splitLeft } from '../lib/nextmatch.js';
@@ -129,11 +128,15 @@ if (hbd && today.length) {
     postLink(`今日は${names}の誕生日！${today.length === 1 ? `${today[0].b.turning}歳、` : ''}おめでとうございます🎂🎉 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`, 'お祝いをXでポスト'));
   hbd.hidden = false;
   if (!reduced && !sessionStorageGet('confetti')) {
-    const colors = ['#F16682', '#F5C84A', '#FFFFFF', '#C8375F', '#F2A93B'];
-    confetti({ particleCount: 120, spread: 80, origin: { y: 0.25 }, colors, disableForReducedMotion: true });
-    setTimeout(() => confetti({ particleCount: 80, angle: 60, spread: 60, origin: { x: 0, y: 0.5 }, colors, disableForReducedMotion: true }), 400);
-    setTimeout(() => confetti({ particleCount: 80, angle: 120, spread: 60, origin: { x: 1, y: 0.5 }, colors, disableForReducedMotion: true }), 700);
-    sessionStorageSet('confetti', '1');
+    // 紙吹雪の部品は、誕生日の当日だけ読み込む（ふだんのページを軽くするため）
+    import('canvas-confetti').then(({ default: lib }) => {
+      const confetti = lib.create(null, { resize: true, useWorker: false });   // Worker は CSP で止まるので使わない
+      const colors = ['#F16682', '#F5C84A', '#FFFFFF', '#C8375F', '#F2A93B'];
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.25 }, colors, disableForReducedMotion: true });
+      setTimeout(() => confetti({ particleCount: 80, angle: 60, spread: 60, origin: { x: 0, y: 0.5 }, colors, disableForReducedMotion: true }), 400);
+      setTimeout(() => confetti({ particleCount: 80, angle: 120, spread: 60, origin: { x: 1, y: 0.5 }, colors, disableForReducedMotion: true }), 700);
+      sessionStorageSet('confetti', '1');
+    }).catch(() => { /* 読み込めなくてもお祝いの表示はそのまま */ });
   }
 }
 function sessionStorageGet(k) { try { return sessionStorage.getItem(k); } catch { return null; } }
