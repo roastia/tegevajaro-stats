@@ -96,7 +96,7 @@ const nav = [
   <span class="navtop" aria-hidden="true"></span>
   <nav class="site-nav" aria-label="ページ">
     <ul>
-      {nav.map(([p, id, label]) => <li><a class={id === 'spots' ? 'nw nav-miya' : 'nw'} href={href(p)} aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
+      {nav.map(([p, id, label]) => <li><a class={id === 'spots' ? 'nw nav-miya' : 'nw'} href={href(p)} data-astro-prefetch="viewport" aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
     </ul>
   </nav>
   <div class="wrap">
