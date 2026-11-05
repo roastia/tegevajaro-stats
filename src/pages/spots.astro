@@ -63,8 +63,8 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
         <label>場所の名前<span class="req">必須</span><input name="name" required maxlength="60" autocomplete="off" placeholder="例：〇〇食堂・〇〇神社・〇〇海岸" /></label>
         <label>ひとこと<span class="req">必須</span><textarea name="info" required maxlength="300" rows="3" aria-describedby="infoHint" placeholder="例：新富町の国道沿い。試合前に寄りたい、チキン南蛮がおいしいお店"></textarea></label>
         <p class="note field-hint" id="infoHint">同じ名前の場所がほかにあるかもしれないので、場所がわかる特徴（町名・近くの目印・どんな場所か など）も書いてください。ひとことはこちらで書き換えたりします。よろしくお願いします。</p>
-        <label>あなたの X アカウント<input name="x_handle" maxlength="16" autocomplete="off" inputmode="latin" aria-describedby="xHint" placeholder="例：@tegesapo" /></label>
-        <p class="note field-hint" id="xHint">X アカウントを書くと、おすすめしてくれた人として「教えてくれた人 @〇〇」と、入力どおりに載せます（書かなくても送れます）。</p>
+        <label>あなたの X のユーザー名<span class="opt">任意</span><span class="xin"><span class="at" aria-hidden="true">@</span><input name="x_handle" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="latin" aria-describedby="xHint" placeholder="tegesapo" /></span></label>
+        <p class="note field-hint" id="xHint">X のプロフィールで「@」のあとに出ている英数字です（@tegesapo なら tegesapo）。入れると「教えてくれた人 <span class="nw">@〇〇</span>」として載ります。空のままでも送れます。</p>
         <p class="note field-hint">※あとで X のユーザー名を変えても、掲載済みの表示は変更できません。ごめんなさい。</p>
         <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
         <div class="ts" id="spotTs"></div>
@@ -77,7 +77,7 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
     <details class="spot-privacy">
       <summary>送った内容の扱い</summary>
       <ul>
-        <li>送ってもらうのは「場所の名前・ひとこと・X アカウント（任意）」だけです。</li>
+        <li>送ってもらうのは「場所の名前・ひとこと・X のユーザー名（任意）」だけです。</li>
         <li>同じ回線から1日10件までの確認のため、IP アドレスを、元に戻せない形（日ごとに変わる鍵でハッシュ化した値）にして2日間だけ使い、そのあと消します。IP アドレスそのものは保存しません。</li>
         <li>同じ内容の投稿かどうかの確認のため、場所の名前とひとことから作った値を2日間だけ使い、そのあと消します。</li>
         <li>ボット対策に Cloudflare Turnstile を使っています。</li>
@@ -188,6 +188,8 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
       const f = new FormData(form);
       const body = Object.fromEntries(['name', 'info', 'x_handle', 'website'].map(k => [k, String(f.get(k) || '')]));
       if (!body.name.trim() || !body.info.trim()) { say('「場所の名前」と「ひとこと」を入れてください'); return; }
+      body.x_handle = body.x_handle.trim().replace(/^[@＠]/, '');
+      if (body.x_handle && !/^[A-Za-z0-9_]{1,15}$/.test(body.x_handle)) { say('X のユーザー名は「@」のあとの英数字（と _）を15文字まで入れてください'); return; }
       if (!token) { say('確認中です。少し待ってから、もう一度「送る」を押してください'); return; }
       send.disabled = true; say('送っています…');
       try {

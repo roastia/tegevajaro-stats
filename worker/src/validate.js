@@ -29,7 +29,7 @@ export function validateSubmission(input) {
   if (!info) return { ok: false, error: 'ひとこと情報を入れてください' };
   if (info.length > LIMITS.info) return { ok: false, error: `ひとこと情報は${LIMITS.info}文字までです` };
   if ([name, area, info].some(s => URL_RE.test(s))) return { ok: false, error: 'URL は入れられません（場所の名前で探して載せます）' };
-  if (x && !/^[A-Za-z0-9_]{1,15}$/.test(x)) return { ok: false, error: 'X アカウントは英数字と _ の15文字までで入れてください（@はなくてもOK）' };
+  if (x && !/^[A-Za-z0-9_]{1,15}$/.test(x)) return { ok: false, error: 'X のユーザー名は「@」のあとの英数字（と _）を15文字まで入れてください' };
   return { ok: true, value: { name, area, info, x_handle: x } };
 }
 

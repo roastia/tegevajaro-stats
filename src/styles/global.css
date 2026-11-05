@@ -485,8 +485,13 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .spot-form { display: grid; gap: 10px; margin-top: 8px; }
 .spot-form label { display: grid; gap: 4px; font-size: .88rem; font-weight: 700; }
 .spot-form .req { margin-left: 6px; font-size: .7rem; color: #fff; background: var(--brand-deep); border-radius: 999px; padding: 0 6px; font-weight: 500; justify-self: start; display: inline-block; }
-.spot-form label:has(.req) { grid-template-columns: auto 1fr; align-items: center; }
-.spot-form label:has(.req) > input, .spot-form label:has(.req) > textarea { grid-column: 1 / -1; }
+.spot-form label:has(.req, .opt) { grid-template-columns: auto 1fr; align-items: center; }
+.spot-form label:has(.req, .opt) > input, .spot-form label:has(.req, .opt) > textarea, .spot-form label > .xin { grid-column: 1 / -1; }
+.spot-form .opt { margin-left: 6px; font-size: .7rem; color: var(--muted); background: var(--soft); border-radius: 999px; padding: 0 6px; font-weight: 500; justify-self: start; display: inline-block; }
+/* X のユーザー名：頭に「@」を固定で出し、そのあとを入れてもらう */
+.spot-form .xin { display: flex; }
+.spot-form .xin .at { display: grid; place-items: center; padding: 0 10px; border: 1px solid var(--line); border-right: 0; border-radius: 10px 0 0 10px; background: var(--soft); color: var(--muted); font-weight: 700; }
+.spot-form .xin input { flex: 1; min-width: 0; border-radius: 0 10px 10px 0; }
 .spot-form input, .spot-form textarea { font: inherit; font-weight: 400; font-size: 16px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--fg); width: 100%; }
 .spot-form textarea { resize: vertical; }
 .spot-form .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
@@ -533,6 +538,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-6.2-6-6.2-11.2a6.2 6.2 0 0112.4 0C18.2 15 12 21 12 21z'/%3E%3Ccircle cx='12' cy='9.8' r='2.2'/%3E%3C/svg%3E") center / contain no-repeat; }
 }
 .spot-form .field-hint { margin: -6px 0 0; font-size: .78rem; }
+.spot-form .field-hint .nw { white-space: nowrap; }
 @media (max-width: 345px) { .site-nav ul { gap: 4px; padding-inline: 12px; } .site-nav a { font-size: 11px; letter-spacing: -.04em; } }
 
 /* 非公式の表記：ロゴの横に小さく（必須ルール1。消さない） */
