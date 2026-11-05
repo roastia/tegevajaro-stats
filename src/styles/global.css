@@ -504,6 +504,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .spot-privacy { margin-top: 12px; font-size: .82rem; color: var(--muted); }
 .spot-privacy summary { cursor: pointer; color: var(--ink); }
 .spot-privacy ul { margin: 6px 0 0; padding-left: 1.2em; }
+.spot-rules { margin: 6px 0 4px; }
 .spot-go { display: grid; gap: 2px; color: inherit; text-decoration: none; padding: 8px 10px; margin: 0 -10px; border-radius: 10px; }
 .spot-head { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .spot-head .ic { width: 1em; height: 1em; color: var(--ink); align-self: center; }
@@ -935,7 +936,7 @@ a.pl-link:hover { text-decoration: underline; text-underline-offset: 2px; }
 .spot-list .spot-head .ic { vertical-align: -0.12em; margin-right: 6px; }
 .spot-list .spot-head small { margin-left: 6px; }
 /* 説明の文（段落など）は文ごとに改行せず、続けて流す（文節の途中では切れない：<wbr> と keep-all はそのまま）。見出し・短い表示は今までどおり */
-p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss { display: inline; }
+p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spot-privacy li .ss { display: inline; }
 /* おすすめスポットの説明・ひとことは、言葉の途中でも折り返して、すき間なく続けて流す */
 #spotList .note, #spotList .note .ss, .spot-info, .spot-info .ss { display: inline; word-break: normal; overflow-wrap: anywhere; line-break: auto; }
 #spotList .note { display: block; }
