@@ -13,7 +13,7 @@ IP_DAILY_LIMIT = "10"
 [[d1_databases]]
 binding = "DB"
 database_name = "tegesta-spots"
-database_id = "ここに database_id"
+database_id = "bff5c145-bc90-473e-9d54-f088e0be0149"
 
 # 毎日 4:10（UTC）に古い制限記録を消す
 [triggers]
