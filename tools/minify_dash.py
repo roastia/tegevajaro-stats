@@ -7,7 +7,11 @@ s = open(src, encoding='utf-8').read()
 def css_min(css):
     css = re.sub(r'/\*[\s\S]*?\*/', '', css)
     lines = [l.strip() for l in css.split('\n')]
-    return '\n'.join(l for l in lines if l)
+    css = '\n'.join(l for l in lines if l)
+    # まわりの空白をとる（{ } ; : , > の前後と改行）。calc の + - の前後は残る
+    css = re.sub(r'\s*([{};,>])\s*', r'\1', css)
+    css = re.sub(r'(?<=[{;])\s*([a-z-]+)\s*:\s*', r'\1:', css)
+    return css.replace(';}', '}')
 
 def js_min(js):
     # 複数行のテンプレート文字列の中は触らない：バッククォートの数が奇数の行をまたぐ範囲は残す
