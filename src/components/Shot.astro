@@ -14,7 +14,7 @@ const headline = item.kind === 'r' ? `${item.label} 1位` : item.headline;
   <span class="char" aria-hidden="true">{ch && ch.img ? <img src={href(ch.img)} alt="" width="56" height="56" /> : <Fragment set:html={icon(item.icon)} />}</span>
   <div class="lb"><Fragment set:html={icon(item.icon)} />{kicker}</div>
   <div class="hl">{headline}</div>
-  <div class="bg" data-count>{item.big}</div>
+  <div class="bg">{item.big}</div>
   {item.sub && <div class="sb">{item.sub}</div>}
   {item.top && item.top.length > 1 && <div class="sb">{item.top.slice(1).map(t => `${t.rank}位 ${t.name}`).join('　')}</div>}
   {item.cheer && <div class="ch">{item.cheer}</div>}
