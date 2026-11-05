@@ -12,13 +12,13 @@
     "snapshot": "node tools/rank_snapshot.mjs"
   },
   "dependencies": {
-    "astro": "7.3.8",
-    "budoux": "0.9.3",
+    "astro": "7.4.2",
+    "budoux": "0.10.0",
     "canvas-confetti": "1.9.4"
   },
   "devDependencies": {
     "@resvg/resvg-js": "2.6.2",
-    "satori": "0.56.1"
+    "satori": "0.63.2"
   },
   "overrides": {
     "fflate": "0.8.3"
