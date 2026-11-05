@@ -13,7 +13,7 @@ https://dash.cloudflare.com/sign-up でアカウントを作ります（無料�
 
 ## 2. Turnstile のキーを作る
 1. Cloudflare のダッシュボードで「Turnstile」→「ウィジェットを追加」を開く
-2. ドメインに `roastia.github.io` を入れる（手元で試すなら `localhost` も）
+2. ドメインに `tegestats.com` を入れる（手元で試すなら `localhost` も）
 3. ウィジェットのモードは「マネージド」
 4. 表示された **サイトキー**（公開してよい）と **シークレットキー**（秘密）を控える
 

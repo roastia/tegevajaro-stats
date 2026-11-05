@@ -8,8 +8,8 @@ const spotsApiOrigin = SITE.spots.api ? new URL(SITE.spots.api).origin : '';
 const TURNSTILE = 'https://challenges.cloudflare.com';
 
 export default defineConfig({
-  site: 'https://roastia.github.io',
-  base: '/tegevajaro-stats',
+  site: 'https://tegestats.com',
+  base: '/',
   trailingSlash: 'always',
   build: { format: 'directory' },
   markdown: { syntaxHighlight: false },

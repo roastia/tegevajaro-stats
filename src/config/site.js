@@ -5,7 +5,7 @@ export const SITE = {
   short: 'テゲスタ！',
   // テゲスタ！のURL（まだ仮）。ポストに付くリンクとポスト用画像のページに使う。
   // 決まったら、ここと astro.config.mjs の site・base、ダッシュボード版の SITE_URL をそろえて変える（CLAUDE.md「公開URLが決まったら」）
-  url: 'https://roastia.github.io/tegevajaro-stats',
+  url: 'https://tegestats.com',
   // データの時点
   asOf: '2026-11-04',          // 年齢を数える基準日（最新の更新日）
   roundLabel: '第15節',        // 「第13節時点」の表記
