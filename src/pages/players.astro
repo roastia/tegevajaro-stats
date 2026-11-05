@@ -116,13 +116,13 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
   <Acc id="roots" title="チームデータ" icon="suitcase" count={facts.length}>
   <div class="grid">
     {facts.map(f => (
-      <article class={`card fact reveal vt-b-${f.id}`} id={`b-${f.id}`}>
+      <article class="card fact reveal" id={`b-${f.id}`}>
         <div class="label"><Fragment set:html={icon(f.icon)} />{f.label}</div>
-        <a class="big factlink" href={href(`b/${f.id}/`)} data-count>{f.big}</a>
+        <div class="big" data-count>{f.big}</div>
         <div class="hl">{f.headline}</div>
         <div class="sub">{f.sub}</div>
         <p class="cheer">{f.cheer}</p>
-        <PostBox what={f.label} text={f.text} url={`${SITE.url}/b/${f.id}/`} />
+        <PostBox what={f.label} text={f.text} url={`${SITE.url}/players/#b-${f.id}`} />
       </article>
     ))}
   </div>
@@ -134,7 +134,6 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
   .sec-h a { font-size: .85rem; white-space: nowrap; }
   .two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
   .gap { margin-bottom: 10px; }
-  .factlink { text-decoration: none; }
 
   .legend-gap { margin-top: 10px; }
   a.chip { color: inherit; text-decoration: none; }

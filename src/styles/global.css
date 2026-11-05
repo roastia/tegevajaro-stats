@@ -137,8 +137,6 @@ input[type=search] { flex: 1 1 10rem; }
 @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: no-preference) {
   .shot::before { animation: spin 9s linear infinite; }
-  .share { transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
-  .share:hover { transform: translateY(-3px) rotate(-.3deg); box-shadow: 0 14px 30px color-mix(in srgb, var(--brand) 25%, transparent); }
 }
 @keyframes spin { to { --spin: 360deg; } }
 
@@ -226,8 +224,6 @@ table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertic
 [hidden] { display: none !important; }
 
 /* share page */
-.share-page { max-width: 34rem; margin: 0 auto; width: 100%; }
-.backlink { font-size: .9rem; }
 
 /* footer */
 .site-foot { border-top: 1px solid var(--line); padding: 18px 0 40px; font-size: .8rem; color: var(--muted); }

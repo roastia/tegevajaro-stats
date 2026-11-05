@@ -1,7 +1,7 @@
 // 数字の検算。1つでも失敗したら公開しない（GitHub Actions で実行）
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readCsv, getData, getShareables } from '../src/lib/data.js';
+import { readCsv, getData, getShareables, sharePath } from '../src/lib/data.js';
 import { RECORDS } from '../src/lib/meta.js';
 import { xLength } from '../src/lib/util.js';
 import { SITE } from '../src/config/site.js';
@@ -61,7 +61,7 @@ test('ランキングの定義：id が重複せず、応援のひとことと�
 
 test('ポスト文がXの文字数（280）に収まる', () => {
   for (const s of getShareables()) {
-    const url = `${SITE.url}/${s.kind}/${s.id}/`;
+    const url = `${SITE.url}/${sharePath(s)}`;
     assert.ok(xLength(s.text, url) <= 280, `${s.kind}/${s.id}: ${xLength(s.text, url)}`);
   }
 });

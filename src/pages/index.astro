@@ -41,7 +41,6 @@ const msNear = ms.near.slice(0, 6);
   </section>
   <section class="bday" data-bday hidden></section>
   <Acc id="topics" title="今季の話題" icon="sparkle" count={items.length}>
-    <p class="page-lead">カードを押すと、ポスト用の画像つきページが開きます。</p>
     <div class="grid">
       {items.map(item => <ShareCard item={item} />)}
     </div>

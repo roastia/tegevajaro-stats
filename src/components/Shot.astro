@@ -10,7 +10,7 @@ const Tag = tag;
 const kicker = item.kind === 'r' ? `ランキング｜${item.label}` : item.label;
 const headline = item.kind === 'r' ? `${item.label} 1位` : item.headline;
 ---
-<Tag class={`shot vt-${item.kind}-${item.id}`}>
+<Tag class="shot">
   <span class="char" aria-hidden="true">{ch && ch.img ? <img src={href(ch.img)} alt="" width="56" height="56" /> : <Fragment set:html={icon(item.icon)} />}</span>
   <div class="lb"><Fragment set:html={icon(item.icon)} />{kicker}</div>
   <div class="hl">{headline}</div>

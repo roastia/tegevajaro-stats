@@ -79,6 +79,13 @@ export function getData() {
 import { ICON_OF_TOPIC, ICON_OF_RECORD, plainTitle } from './meta.js';
 import { postText, splitDisp } from './util.js';
 
+/** ポストに付けるリンク先（各ページの該当カード。サイトの URL のあとに付ける） */
+export function sharePath(item) {
+  if (item.kind === 'r') return `ranking/#rank-${item.id}`;
+  if (item.kind === 'b') return `players/#b-${item.id}`;
+  return item.id === 'climb' ? 'ranking/#t-climb' : `#t-${item.id}`;
+}
+
 export function getShareables() {
   const d = getData();
   const out = [];

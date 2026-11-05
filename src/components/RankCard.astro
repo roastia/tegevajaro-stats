@@ -24,7 +24,7 @@ const rest = rows.slice(top.length).map(row);
 const pid = `info-${meta.id}`;
 const title = plainTitle(meta.title);
 ---
-<section class={`card rec reveal vt-r-${meta.id}`} id={`rank-${meta.id}`} data-cat={meta.cat}>
+<section class="card rec reveal" id={`rank-${meta.id}`} data-cat={meta.cat}>
   <h2>
     <Fragment set:html={icon(ICON_OF_RECORD[meta.id] || 'star')} />
     <span class="ttl">{title.slice(0, -2)}<span class="nw">{title.slice(-2)}<button class="info" type="button" popovertarget={pid} aria-label={`${title}の数え方`}>?</button></span></span>
@@ -56,5 +56,5 @@ const title = plainTitle(meta.title);
       </ol>
     </details>
   )}
-  {share && <PostBox what={share.label} text={share.text} url={`${SITE.url}/r/${meta.id}/`} />}
+  {share && <PostBox what={share.label} text={share.text} url={`${SITE.url}/ranking/#rank-${meta.id}`} />}
 </section>

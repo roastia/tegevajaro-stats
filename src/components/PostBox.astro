@@ -3,8 +3,8 @@
 import { xIntent, X_MARK } from '../lib/util.js';
 interface Props { what: string; text: string; url?: string }
 const { what, text, url } = Astro.props;
-// チームデータ（/b/）のポストには「（第〇節時点）」を付けない
-const asOf = /\/b\//.test(url || '') ? '' : undefined;
+// チームデータ（/players/#b-〇〇）のポストには「（第〇節時点）」を付けない
+const asOf = /#b-/.test(url || '') ? '' : undefined;
 ---
 <div class="post">
   <a class="postbtn" href={xIntent(text, url, asOf)} target="_blank" rel="noopener noreferrer">
