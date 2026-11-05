@@ -108,6 +108,17 @@ dash.calc('roots_facts', {
     for (const p of profiles) for (const sc of [p.hs_or_youth, p.university]) { if (!sc) continue; if (!g.has(sc)) g.set(sc, []); g.get(sc).push(p.name); }
     const links = [...g.entries()].filter(([, l]) => l.length >= 2);
     if (links.length) add('schoolmates', 'link', '同じ学校の仲間', `同じ学校・ユース出身の仲間が${links.length}組！`, `${links.length}組`, links.slice(0, 2).map(([sc, l]) => `${sc}（${l.join('・')}）`).join('、') + (links.length > 2 ? 'など' : ''), '同窓会、ピッチで開催中');
+
+    // ---- もっとチームデータ（プロフィールから） ----
+    const hh = profiles.filter(p => Number(p.height)).sort((a, b) => Number(b.height) - Number(a.height));
+    if (hh.length >= 2) { const t1 = hh[0], t2 = hh[hh.length - 1]; add('heightgap', 'tower', '身長差', `いちばん高い選手と小柄な選手の差は${Number(t1.height) - Number(t2.height)}cm！`, `${Number(t1.height) - Number(t2.height)}cm`, `いちばん高いのは${t1.name}（${t1.height}cm）、いちばん小柄なのは${t2.name}（${t2.height}cm）。チームの平均は${avg(hh.map(p => Number(p.height))).toFixed(1)}cm`, '高さも小回りもそろってる'); }
+    const cnt = key => { const o = {}; profiles.forEach(p => { const k = key(p); if (k) o[k] = (o[k] || 0) + 1; }); const mx = Math.max(0, ...Object.values(o)); return { mx, keys: Object.keys(o).filter(k => o[k] === mx).sort((a, b) => Number(a) - Number(b)) }; };
+    const bm = cnt(p => p.birth ? String(Number(p.birth.slice(5, 7))) : '');
+    if (bm.mx >= 2) add('birthmonth', 'cake', '誕生月', `いちばん多い誕生月は${bm.keys.join('・')}月！`, `${bm.mx}人${bm.keys.length > 1 ? 'ずつ' : ''}`, bm.keys.length === 1 ? `${bm.keys[0]}月生まれ：${profiles.filter(p => p.birth && Number(p.birth.slice(5, 7)) === Number(bm.keys[0])).map(p => p.name).join('・')}` : `${bm.keys.join('月・')}月に${bm.mx}人ずつ。在籍${N}人の誕生月をかぞえると、この${bm.keys.length}か月が同点で最多`, 'お祝いポストの準備を');
+    const by = cnt(p => p.birth ? p.birth.slice(0, 4) : '');
+    if (by.mx >= 3) add('birthyear', 'balloon', '同い年', `${by.keys.join('年・')}年生まれが${by.mx}人${by.keys.length > 1 ? 'ずつ' : ''}！`, `${by.mx}人`, by.keys.length <= 2 ? by.keys.map(k => `${k}年生まれ：${profiles.filter(p => p.birth && p.birth.startsWith(k)).map(p => p.name).join('・')}`).join('／') : `在籍${N}人の生まれ年をかぞえると、${by.keys.join('年・')}年が同点で最多`, '同学年トーク、聞いてみたい');
+    const PO = ['GK', 'DF', 'MF', 'FW'], pc = PO.map(p => profiles.filter(x => x.pos === p).length);
+    if (N) { const mi = pc.indexOf(Math.max(...pc)); add('posmix', 'network', 'ポジションの顔ぶれ', `いちばん層が厚いのは${PO[mi]}の${pc[mi]}人！`, `${pc[mi]}人`, PO.map((p, i) => `${p} ${pc[i]}人`).join('／') + `（在籍${N}人）`, 'ポジション争いも見どころ'); }
     return F.map((f, i) => ({ ...f, order: i + 1 }));
   }
 });
@@ -354,10 +365,10 @@ dash.calc('team_records', {
 });
 
 dash.calc('topics', {
-  inputs: ['matches', 'goals_all', 'records', 'team_records'],
+  inputs: ['matches', 'goals_all', 'records', 'team_records', 'players', 'appearances'],
   title: 'SNS用トピック',
   description: '試合結果・全ゴール・個人記録から、拡散しやすい見出しと数字を作る。デーゲーム＝18時より前のキックオフ。遠征距離＝ホームスタジアムからアウェイ会場までの直線距離の往復。',
-  fn: (matches, goals_all, records, team_records) => {
+  fn: (matches, goals_all, records, team_records, players, appearances) => {
     const n = v => Number(v) || 0;
     const ms = [...matches].sort((a, b) => n(a.round) - n(b.round));
     const rec = list => { const w = list.filter(m => m.result === '勝').length, d = list.filter(m => m.result === '分').length; return { w, d, l: list.length - w - d, c: list.length, ppg: list.length ? (w * 3 + d) / list.length : 0, s: `${w}勝${d}分${list.length - w - d}敗` }; };
@@ -422,6 +433,49 @@ dash.calc('topics', {
     if (pm) { add('plusminus', '➕', '影のMVP', `${pm.name}がいると点差が開く！`, `${pm.value > 0 ? '+' : ''}${pm.value}`, pm.display.replace(/^[+-]?\d+/, '').replace(/[（）]/g, ''), '数字が貢献を証明'); used.add(pm.name); }
     const gp = sorted('golden_pair').find(r => r.name.split('＆').every(nm => !used.has(nm))) || sorted('golden_pair').find(r => !lk || !r.name.split('＆').includes(lk.name));
     if (gp) add('pair', '💞', '黄金コンビ', /0敗/.test(gp.display.split('（')[0]) ? `${gp.name.replace('＆', '×')}、2人そろえば負けない！` : `${gp.name.replace('＆', '×')}、2人そろえば勝ち点が積み上がる！`, gp.display.split('（')[0], `${gp.display.split('（')[1].replace('）', '')}で${gp.display.split('（')[0]}`, 'この2人、セットで見たい');
+
+    // ---- もっと話題（試合・ゴール・出場の記録から） ----
+    const lastOf = (list, ok) => { let c = 0; for (let i = list.length - 1; i >= 0 && ok(list[i]); i--) c++; return c; };
+    // 完封
+    const cs = ms.filter(m => n(m.ga) === 0), csRun = lastOf(ms, m => n(m.ga) === 0);
+    if (cs.length) add('cleansheet', '🧤', '完封', csRun >= 2 ? `${csRun}試合連続で完封中！` : `今季${cs.length}試合で完封！`, `${cs.length}試合`, `失点ゼロの${cs.length}試合は${rec(cs).s}${csRun >= 2 ? `。第${ms[ms.length - csRun].round}節からゴールを割らせていない` : ''}`, '守備陣にも大きな拍手を');
+    // 連勝
+    const wRun = lastOf(ms, m => m.result === '勝');
+    let wBest = 0, wCur = 0; ms.forEach(m => { wCur = m.result === '勝' ? wCur + 1 : 0; wBest = Math.max(wBest, wCur); });
+    if (wRun >= 2) add('winstreak', '🚀', '連勝', `${wRun}連勝中！止まらないテゲバ`, `${wRun}連勝`, `第${ms[ms.length - wRun].round}節から勝ち続けている${wBest > wRun ? `。今季の最長は${wBest}連勝` : wRun >= 3 ? '。今季いちばんの連勝' : ''}`, '次も勝って記録を伸ばそう');
+    // 2点取れば
+    const two = rec(ms.filter(m => n(m.gf) >= 2));
+    if (two.c >= 2) add('twogoals', '✌️', '2点の法則', two.l === 0 ? '2点取れば、もう負けない！' : `2点取れば${two.w}勝！`, two.s, `2点以上取った${two.c}試合は${two.s}`, '2点目のチャントは大きめに');
+    // 1点差
+    const close = rec(ms.filter(m => Math.abs(n(m.gf) - n(m.ga)) === 1));
+    if (close.c >= 2) add('close', '🤏', '1点差ゲーム', close.ppg >= 2 ? '1点差の勝負に強い！' : '1点差ゲームの成績', close.s, `1点差で決着した${close.c}試合は${close.s}`, '最後の1点まで声を枯らそう');
+    // 先制されても
+    const conc = ms.filter(m => m.first_goal === '相手'), concR = rec(conc), concOk = concR.w + concR.d;
+    if (concOk) add('comeback', '💪', '粘り腰', `先制されても${concOk}試合で勝ち点をもぎ取った！`, `${concOk}試合`, `相手に先に決められた${concR.c}試合は${concR.s}`, '1点取られてからが本番');
+    // ゴールの時間割（前後半それぞれ15分ずつ）
+    const mine2 = goals_all.filter(g => g.team === '宮崎');
+    const SLOT = ['前半0〜15分', '前半16〜30分', '前半31分〜', '後半0〜15分', '後半16〜30分', '後半31分〜'];
+    const slotOf = g => { const h2 = /^後半/.test(String(g.time)) || (!/^前半/.test(String(g.time)) && n(g.minute) > 45); const t = h2 ? n(g.minute) - 45 : n(g.minute); return (h2 ? 3 : 0) + Math.min(2, Math.max(0, Math.floor((t - 1) / 15))); };
+    const sc = [0, 0, 0, 0, 0, 0]; mine2.forEach(g => sc[slotOf(g)]++);
+    if (mine2.length >= 5) { const bi = sc.indexOf(Math.max(...sc)); add('timezone', '🕒', 'ゴールの時間割', `いちばん決めるのは${SLOT[bi]}！`, `${sc[bi]}点`, SLOT.map((l, i) => `${l} ${sc[i]}点`).join('／'), `${SLOT[bi]}は目が離せない`); }
+    // 最速ゴール
+    const fast = [...mine2].sort((a, b) => n(a.minute) - n(b.minute))[0];
+    if (fast) { const fm = ms.find(m => String(m.round) === String(fast.round)); const q = mine2.filter(g => slotOf(g) === 0).length; add('fastest', '⚡', '最速ゴール', `今季の最速ゴールは${fast.time}！`, fast.time.replace(/^前半/, ''), `第${fast.round}節${fm ? `の${fm.opponent}戦` : ''}で${fast.scorer}が決めた。開始15分までのゴールは今季${q}点`, 'キックオフの瞬間から見逃せない'); }
+    // お天気
+    const sunny = rec(ms.filter(m => /晴/.test(m.weather))), rainy = rec(ms.filter(m => /雨/.test(m.weather)));
+    if (sunny.c >= 3 && rainy.c >= 2) { const s = sunny.ppg >= rainy.ppg; add('weather', s ? '🌤️' : '☔', 'お天気と勝敗', s ? '晴れたらテゲバ日和！' : '雨の日のテゲバは強い！', s ? sunny.s : rainy.s, `晴れの日は${sunny.s}、雨（にわか雨をふくむ）の日は${rainy.s}`, s ? '日焼け止めを持ってスタジアムへ' : 'カッパを持ってスタジアムへ'); }
+    // ホームの得点力
+    const hm = ms.filter(m => m.ha === 'H'), am = ms.filter(m => m.ha === 'A'), sum = (l, k) => l.reduce((s, m) => s + n(m[k]), 0);
+    if (hm.length && am.length && sum(hm, 'gf') / hm.length > sum(am, 'gf') / am.length) add('homegoals', '🏠', 'ホームの得点力', `いちごでは1試合平均${(sum(hm, 'gf') / hm.length).toFixed(1)}得点！`, `${(sum(hm, 'gf') / hm.length).toFixed(1)}点`, `ホーム${hm.length}試合で${sum(hm, 'gf')}得点・${sum(hm, 'ga')}失点、アウェイ${am.length}試合で${sum(am, 'gf')}得点・${sum(am, 'ga')}失点`, 'ゴールの瞬間はいちごで見よう');
+    // 総力戦
+    const usedP = new Set(appearances.map(a => a.name)), startP = new Set(appearances.filter(a => n(a.started) === 1).map(a => a.name));
+    if (usedP.size) add('squad', '👥', '総力戦', `${usedP.size}人が出場！全員で戦う総力戦`, `${usedP.size}人`, `今季の出場は${usedP.size}人、そのうち先発は${startP.size}人`, 'ベンチもスタンドも全員で');
+    // アシスト
+    const ast = players.filter(p => n(p.assists) > 0), astMax = Math.max(0, ...ast.map(p => n(p.assists)));
+    if (ast.length >= 2) { const kings = ast.filter(p => n(p.assists) === astMax).map(p => p.name); add('assists', '🎁', 'お膳立て', `${ast.length}人がアシスト！ラストパスの名手は${kings.join('・')}`, `${astMax}アシスト`, `今季のアシストは合わせて${ast.reduce((s, p) => s + n(p.assists), 0)}本。${ast.length}人がゴールをお膳立て`, 'ゴールの前のパスにも拍手を'); }
+    // シュート数
+    const sf = sum(ms, 'shots_for'), sa = sum(ms, 'shots_against');
+    if (sf > sa && ms.length) add('shots', '🎯', '打ち勝つ', `シュート数で相手を${sf - sa}本上回る！`, `${sf}本`, `1試合平均${(sf / ms.length).toFixed(1)}本（相手は${(sa / ms.length).toFixed(1)}本）`, '打てば入る、打たなきゃ入らない');
     return T.map((t, i) => ({ ...t, order: i + 1, post: `${t.headline}\n${t.sub}\n${t.cheer}\n#テゲバジャーロ宮崎 #テゲバ #テゲスタ` }));
   }
 });

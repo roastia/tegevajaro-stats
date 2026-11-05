@@ -96,13 +96,44 @@ export function milestones({ players, matches, appearances, goals }) {
   for (const s of [5, 10, 15, 20, 25]) if (prev.w < s && now.w >= s) done.push({ kind: 'team_wins', who, icon: 'trophy', text: `今季${s}勝到達！` });
   for (const s of every(10)) if (prev.pts < s && now.pts >= s) done.push({ kind: 'team_pts', who, icon: 'coin', text: `勝ち点${s}到達！` });
 
+
+  // ---- もっと記録（チーム：連勝・完封・ホーム勝利・連続得点・観客。個人：連続先発） ----
+  const runOf = (list, ok) => { let c = 0; for (let i = list.length - 1; i >= 0 && ok(list[i]); i--) c++; return c; };
+  const wr = runOf(ms, m => m.result === '勝');
+  if (wr >= 2) near.push({ kind: 'team_winrun', who, icon: 'rocket', score: 106, text: `次も勝てば${wr + 1}連勝` });
+  const cr = runOf(ms, m => n(m.ga) === 0);
+  if (cr >= 2) near.push({ kind: 'team_cleanrun', who, icon: 'shield', score: 102, text: `次も無失点なら${cr + 1}試合連続完封` });
+  const CS = [3, 5, 10, 15, 20], csN = ms.filter(m => n(m.ga) === 0).length, csP = ms.slice(0, -1).filter(m => n(m.ga) === 0).length;
+  const tcs = nextStep(csN, CS);
+  if (tcs && tcs - csN === 1 && cr < 2) near.push({ kind: 'team_cs', who, icon: 'shield', score: 101, text: `次も無失点なら今季${tcs}試合目の完封` });
+  for (const s of CS) if (csP < s && csN >= s) done.push({ kind: 'team_cs', who, icon: 'shield', text: `今季${s}試合目の完封！` });
+  const HW = [3, 5, 10, 15], hw = ms.filter(m => m.ha === 'H' && m.result === '勝').length, th = nextStep(hw, HW);
+  if (th && th - hw === 1) near.push({ kind: 'team_homewin', who, icon: 'stadium', score: 99, text: `次のホームで勝てば今季ホーム${th}勝` });
+  const sr = runOf(ms, m => n(m.gf) > 0);
+  if (sr >= 3) near.push({ kind: 'team_scorerun', who, icon: 'ball', score: 98, text: `次も決めれば${sr + 1}試合連続ゴール` });
+  const hms = ms.filter(m => m.ha === 'H' && n(m.attendance) > 0), att = hms.reduce((s, m) => s + n(m.attendance), 0);
+  if (hms.length) {
+    const step = (Math.floor(att / 10000) + 1) * 10000, per = att / hms.length;
+    if (step - att <= per) near.push({ kind: 'team_attend', who, icon: 'stadium', score: 97, text: `ホームの観客、あと${(step - att).toLocaleString()}人で今季累計${step / 10000}万人` });
+    const last = ms.at(-1);
+    if (last.ha === 'H' && Math.floor((att - n(last.attendance)) / 10000) < Math.floor(att / 10000)) done.push({ kind: 'team_attend', who, icon: 'stadium', text: `ホームの観客が今季累計${Math.floor(att / 10000)}万人を突破！` });
+  }
+  // 連続先発（最新の節からさかのぼって先発が続いている）
+  const ST = [5, 10, 15, 20, 25, 30];
+  for (const p of players) {
+    let k = 0;
+    for (let i = ms.length - 1; i >= 0; i--) { const a = appearances.find(x => n(x.round) === n(ms[i].round) && x.name === p.name); if (a && n(a.started) === 1) k++; else break; }
+    const t = nextStep(k, ST);
+    if (k >= 4 && t && t - k === 1) near.push({ kind: 'startrun', who: p.name, icon: 'shield', score: 44 + t, text: `次も先発なら${t}試合連続先発` });
+  }
+
   // 同じ区切りの人はまとめる（例：4人が「次も出れば開幕から14試合連続出場」）
   const group = arr => {
     const m = new Map();
     for (const x of arr) { const k = x.kind + '|' + x.text; if (m.has(k)) m.get(k).names.push(x.who); else m.set(k, { ...x, names: [x.who] }); }
     return [...m.values()].map(x => ({ ...x, who: x.names.join('・') }));
   };
-  const KIND_ORDER = ['team_wins', 'team_pts', 'team_goals', 'goals', 'apps', 'starts', 'minutes'];
+  const KIND_ORDER = ['team_wins', 'team_pts', 'team_goals', 'team_cs', 'team_attend', 'goals', 'apps', 'starts', 'minutes'];
   return {
     near: group(near).sort((a, b) => b.score - a.score),
     done: group(done).sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind)),
