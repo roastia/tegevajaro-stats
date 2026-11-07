@@ -77,7 +77,6 @@ const nav = [
           <span class="pts">勝ち点<b>{sr.pts}</b></span>
           <span class="gl">{sr.gf}得点・{sr.ga}失点（{sr.gd > 0 ? '+' : ''}{sr.gd}）</span>
         </div>
-        {SITE.rank && SITE.rankPending && <p class="rank-note">順位は暫定です。{SITE.roundLabel}の残り試合（{SITE.rankPending.until}）の結果で、{SITE.rank}〜{SITE.rankPending.worst}位のどこかに決まります。</p>}
         {nx && (
           <div class="season-next" id="seasonNext" data-mode={nx.mode}>
             <script type="application/json" id="next-data" is:inline set:html={JSON.stringify({ fixtures, matches: lite }).replace(/</g, '\\u003c')}></script>
