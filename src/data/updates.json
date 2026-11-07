@@ -7,7 +7,7 @@
         "path": "goals/"
       },
       {
-        "text": "「日程」ページを新しく作成",
+        "text": "「日程」ページを作成（スマホのカレンダーにも）",
         "path": "schedule/"
       },
       {
@@ -15,8 +15,8 @@
         "path": "spots/"
       },
       {
-        "text": "日程をスマホのカレンダーに入れられるように",
-        "path": "schedule/"
+        "text": "Football LAB のデータを更新",
+        "path": "ranking/"
       }
     ]
   }
