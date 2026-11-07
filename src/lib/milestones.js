@@ -20,8 +20,10 @@ const P_STEPS = {
  * @returns {{ near: Array<{kind,who,text,icon,score}>, done: Array<{kind,who,text,icon}>, round:number }}
  *   near：次の試合で届くかもしれない区切り（score が大きいほど上に出す）
  *   done：最新の節で届いた区切り
+ * nextHa：次の試合のホーム／アウェイ（'H'・'A'）。'A' のときは、ホームでしか届かない区切り（ホームの観客・ホーム勝利）を near に出さない
  */
-export function milestones({ players, matches, appearances, goals }) {
+export function milestones({ players, matches, appearances, goals, nextHa }) {
+  const homeNext = nextHa !== 'A';
   const ms = [...matches].sort((a, b) => n(a.round) - n(b.round));
   const R = ms.length ? n(ms.at(-1).round) : 0;
   const near = [], done = [];
@@ -108,13 +110,13 @@ export function milestones({ players, matches, appearances, goals }) {
   if (tcs && tcs - csN === 1 && cr < 2) near.push({ kind: 'team_cs', who, icon: 'shield', score: 101, text: `次も無失点なら今季${tcs}試合目の完封` });
   for (const s of CS) if (csP < s && csN >= s) done.push({ kind: 'team_cs', who, icon: 'shield', text: `今季${s}試合目の完封！` });
   const HW = [3, 5, 10, 15], hw = ms.filter(m => m.ha === 'H' && m.result === '勝').length, th = nextStep(hw, HW);
-  if (th && th - hw === 1) near.push({ kind: 'team_homewin', who, icon: 'stadium', score: 99, text: `次のホームで勝てば今季ホーム${th}勝` });
+  if (homeNext && th && th - hw === 1) near.push({ kind: 'team_homewin', who, icon: 'stadium', score: 99, text: `次のホームで勝てば今季ホーム${th}勝` });
   const sr = runOf(ms, m => n(m.gf) > 0);
   if (sr >= 3) near.push({ kind: 'team_scorerun', who, icon: 'ball', score: 98, text: `次も決めれば${sr + 1}試合連続ゴール` });
   const hms = ms.filter(m => m.ha === 'H' && n(m.attendance) > 0), att = hms.reduce((s, m) => s + n(m.attendance), 0);
   if (hms.length) {
     const step = (Math.floor(att / 10000) + 1) * 10000, per = att / hms.length;
-    if (step - att <= per) near.push({ kind: 'team_attend', who, icon: 'stadium', score: 97, text: `ホームの観客、あと${(step - att).toLocaleString()}人で今季累計${step / 10000}万人` });
+    if (homeNext && step - att <= per) near.push({ kind: 'team_attend', who, icon: 'stadium', score: 97, text: `ホームの観客、あと${(step - att).toLocaleString()}人で今季累計${step / 10000}万人` });
     const last = ms.at(-1);
     if (last.ha === 'H' && Math.floor((att - n(last.attendance)) / 10000) < Math.floor(att / 10000)) done.push({ kind: 'team_attend', who, icon: 'stadium', text: `ホームの観客が今季累計${Math.floor(att / 10000)}万人を突破！` });
   }

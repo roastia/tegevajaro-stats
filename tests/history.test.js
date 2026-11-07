@@ -44,3 +44,13 @@ test('記録まであと少し：区切りの手前・到達の判定', () => {
   assert.ok(m.done.some(x => x.who === 'A' && x.text === '今季3ゴール到達！'));
   assert.equal(m.round, 3);
 });
+
+test('記録まであと少し：次がアウェイなら、ホームでしか届かない区切り（観客・ホーム勝利）は出さない', () => {
+  const matches = [1, 2, 3, 4].map(r => ({ round: String(r), ha: 'H', gf: '1', ga: '0', result: '勝', attendance: '2400' }));
+  const base = { players: [], matches, appearances: [], goals: [] };
+  const kinds = ha => milestones({ ...base, nextHa: ha }).near.map(x => x.kind);
+  assert.ok(kinds('H').includes('team_attend'));
+  assert.ok(kinds('H').includes('team_homewin'));
+  assert.ok(!kinds('A').includes('team_attend'));
+  assert.ok(!kinds('A').includes('team_homewin'));
+});

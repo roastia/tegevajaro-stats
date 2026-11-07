@@ -72,7 +72,10 @@ export function getData() {
   }
 
   // 記録まであと少し
-  const ms = milestones(D);
+  // 次の試合（結果がまだ入っていない、いちばん前の節）がホームかアウェイか
+  const playedR = new Set(D.matches.map(m => String(m.round)));
+  const nextFx = readCsv('fixtures').filter(f => !playedR.has(String(f.round))).sort((a, b) => Number(a.round) - Number(b.round))[0];
+  const ms = milestones({ ...D, nextHa: nextFx?.ha });
   cache = { ...all, topics, rankings: records, prevRound, climbs, milestones: ms };
   return cache;
 }
