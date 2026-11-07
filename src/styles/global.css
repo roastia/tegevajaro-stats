@@ -227,7 +227,7 @@ table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertic
 /* share page */
 
 /* footer */
-.site-foot { border-top: 1px solid var(--line); padding: 18px 0 40px; font-size: .8rem; color: var(--muted); }
+.site-foot { padding: 18px 0 40px; font-size: .8rem; color: var(--muted); }
 .site-foot a { color: var(--ink); }
 .site-foot ul { margin: 4px 0; padding-left: 1.2em; }
 .site-foot p { margin: 4px 0; }
