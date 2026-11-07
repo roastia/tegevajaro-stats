@@ -33,6 +33,7 @@
 - 作業場所は Mac の `~/Documents/tegevajaro-stats`（Claude デスクトップアプリからこのフォルダを直接編集する）。リポジトリは `roastia/tegevajaro-stats`、`main` に push すると GitHub Actions が組み立てて https://tegestats.com に公開する。
 - 1. 始める前に `git pull`（ほかの PC や GitHub 上の変更を取りこむ）。2. ファイルを直接直す。3. 直すたびに `npm test` と `npm run build` を通してからコミット（1つの修正＝1コミット）。4. **push は本人がターミナルで行う**（`git push`）。Claude は push しない。
 - ダッシュボード版（Claude のダッシュボード）は頼まれたときだけ更新する。
+- 読者に見える変更（試合結果の反映・ページやスポットの追加など）をしたら、`src/data/updates.json`（更新履歴。フッターの「更新履歴」→ `/updates/`）にその日の分を足す。同じ日は1件にまとめ、項目は短く・関係するページへの `path` を付ける。見た目の小さな直しや裏側の変更は書かない。
 
 ## くわしい手順（必要なときだけ読む）
 - 試合後の更新 → `docs/update-match.md`（**最初に読む**。ブラウザで1回 → `tools/apply_match.mjs` で一度に書き込む）

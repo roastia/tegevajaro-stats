@@ -8,9 +8,10 @@
 3. **ハイライト動画**：YouTube の検索結果ページ（「宮崎×相手 ハイライト 明治安田J2リーグ第〇節 2026/27」）で、チャンネルが DAZN Japan の動画IDだけを取り出す（Jリーグ公式の試合ページの動画は別チャンネルなので使わない）。1回の検索で2試合分出ることもある。
 4. **書き込み**：`node tools/apply_match.mjs <節> --rank <順位> [--pending <日付>:<いちばん下の順位>] --video <URL>` → matches・appearances・goals・goals_all・lineups・players（出場・先発・分・得点・警告・退場は数え直し、アシストを足す）・suspension・site.js が一度に更新される。流し直しても二重にならない。累積警告が4枚に届いたら注意が出る（出場停止の数え直しは手で）。
 5. `npm run snapshot` → `npm test` → `npm run build`。表示はスクリーンショットではなく、`dist/index.html` から今季の成績・記録まであと少し・直近5試合の文字だけを取り出して確かめる。
-6. コミット（push は人）。メッセージは「第14節（10/31 大分戦）を反映」のように。
-7. **ダッシュボード版は、頼まれたときだけ**更新する（確認用なので毎節はしない。→ `docs/dashboard.md`）。
-8. Football LAB 由来の値（`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列）は、この手順では変えない（空のまま）。まとめて更新するよう頼まれたときだけ入れる。
+6. `src/data/updates.json` に「第〇節（〇/〇 〇〇戦）の結果を反映」（`path`: `goals/`）を足す（同じ日の分があればそこに足す）。
+7. コミット（push は人）。メッセージは「第14節（10/31 大分戦）を反映」のように。
+8. **ダッシュボード版は、頼まれたときだけ**更新する（確認用なので毎節はしない。→ `docs/dashboard.md`）。
+9. Football LAB 由来の値（`xg.csv`・`cbp.csv`・`pass_pairs.csv`、`players.csv` の shots / last_passes、`matches.csv` の xg 列）は、この手順では変えない（空のまま）。まとめて更新するよう頼まれたときだけ入れる。
 
 ## データの意味（くわしく）
 1. `src/data/` の CSV を更新する（カンマは値に使わない。改行は LF）。

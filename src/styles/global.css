@@ -978,3 +978,10 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
   .fx-rd, .fx-ko { width: auto; }
   .fx-prev { text-align: left; }
 }
+
+/* ---------- 更新履歴（updates.astro） ---------- */
+.upd + .upd { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.upd-h { margin: 12px 0 6px; font-size: 1rem; color: var(--ink); }
+.upd-list { margin: 0 0 10px; padding-left: 1.2em; }
+.upd-list li { margin: 3px 0; }
+.upd-list .ss { display: inline; }

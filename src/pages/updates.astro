@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import PostBox from '../components/PostBox.astro';
+import { SITE } from '../config/site.js';
+import { href } from '../lib/util.js';
+import { updatePost } from '../lib/updates.js';
+import updates from '../data/updates.json';
+// 更新履歴：src/data/updates.json（新しい順）。日付ごとに X でポストできる
+const WD = ['日', '月', '火', '水', '木', '金', '土'];
+const long = s => { const [y, m, d] = s.split('-').map(Number); return `${y}年${m}月${d}日（${WD[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}）`; };
+const list = [...updates].sort((a, b) => b.date.localeCompare(a.date));
+---
+<Base current="updates" title="更新履歴" description="テゲバジャーロ宮崎の非公式サポーターサイト「テゲスタ！」の更新履歴。試合結果の反映や新しいページ・おすすめスポットの追加など、いつ何を変えたかをまとめています。">
+  <section class="card upd-card">
+    <p class="page-lead">テゲスタ！の更新のお知らせです。</p>
+    {list.map(u => {
+      const p = updatePost(u);
+      return (
+        <section class="upd" id={`u-${u.date}`}>
+          <h2 class="upd-h">{long(u.date)}</h2>
+          <ul class="upd-list">
+            {u.items.map(i => <li>{i.path != null ? <a href={href(i.path)}>{i.text}</a> : i.text}</li>)}
+          </ul>
+          <PostBox what={p.what} text={p.text} url={`${SITE.url}/updates/#u-${u.date}`} asOf="" />
+        </section>
+      );
+    })}
+  </section>
+</Base>

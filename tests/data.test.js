@@ -5,6 +5,8 @@ import { readCsv, getData, getShareables, sharePath } from '../src/lib/data.js';
 import { RECORDS } from '../src/lib/meta.js';
 import { xLength } from '../src/lib/util.js';
 import { SITE } from '../src/config/site.js';
+import fs from 'node:fs';
+import { updatePost } from '../src/lib/updates.js';
 
 const n = v => Number(v) || 0;
 const players = readCsv('players'), apps = readCsv('appearances'), matches = readCsv('matches');
@@ -63,6 +65,18 @@ test('ポスト文がXの文字数（280）に収まる', () => {
   for (const s of getShareables()) {
     const url = `${SITE.url}/${sharePath(s)}`;
     assert.ok(xLength(s.text, url) <= 280, `${s.kind}/${s.id}: ${xLength(s.text, url)}`);
+  }
+});
+
+test('更新履歴：日付が正しく重ならず、ポスト文がXの文字数（280）に収まる', () => {
+  const ups = JSON.parse(fs.readFileSync(new URL('../src/data/updates.json', import.meta.url), 'utf8'));
+  const dates = ups.map(u => u.date);
+  assert.equal(new Set(dates).size, dates.length);
+  for (const u of ups) {
+    assert.match(u.date, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(u.items.length > 0, u.date);
+    const { text } = updatePost(u);
+    assert.ok(xLength(text, `${SITE.url}/updates/#u-${u.date}`) <= 280, `${u.date}: ${xLength(text, 'x')}`);
   }
 });
 

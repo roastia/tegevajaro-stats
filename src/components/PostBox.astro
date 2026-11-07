@@ -1,10 +1,10 @@
 ---
 // どのデータのポストかがわかるボタン。押すと X の投稿画面が開く（画像の添付や共有メニューは使わない）
 import { xIntent, xLabel } from '../lib/util.js';
-interface Props { what: string; text: string; url?: string }
+interface Props { what: string; text: string; url?: string; asOf?: string }
 const { what, text, url } = Astro.props;
-// チームデータ（/players/#b-〇〇）のポストには「（第〇節時点）」を付けない
-const asOf = /#b-/.test(url || '') ? '' : undefined;
+// チームデータ（/players/#b-〇〇）のポストには「（第〇節時点）」を付けない。asOf="" を渡したときも付けない（更新履歴など）
+const asOf = Astro.props.asOf ?? (/#b-/.test(url || '') ? '' : undefined);
 ---
 <div class="post">
   <a class="postbtn" href={xIntent(text, url, asOf)} target="_blank" rel="noopener noreferrer">
