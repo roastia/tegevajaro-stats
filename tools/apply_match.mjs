@@ -1,5 +1,6 @@
 // 試合1つ分の記録（tools/jleague_extract.js の結果を private/matches/<節>.json に保存したもの）を、CSV と site.js に書き込む
-// 使い方：node tools/apply_match.mjs <節> [--rank 6] [--video https://www.youtube.com/watch?v=…]
+// 使い方：node tools/apply_match.mjs <節> [--rank 6] [--pending 11/8:6] [--video https://www.youtube.com/watch?v=…]
+// --pending：順位が暫定のとき「残り試合の日付:下がりうるいちばん下の順位」。付けなければ確定（rankPending: null）
 // 書き込む：matches・appearances・goals・goals_all・lineups・players（出場・先発・分・得点・警告・退場を数え直し、アシストを足す）・suspension（警告を足す）・site.js
 // 同じ節をもう一度流すと、その節の行を入れかえる（二重にならない）
 import fs from 'node:fs';
@@ -10,7 +11,7 @@ const D = path.resolve('src/data');
 const args = process.argv.slice(2);
 const R = Number(args[0]);
 const opt = k => { const i = args.indexOf('--' + k); return i > 0 ? args[i + 1] : ''; };
-if (!R) { console.error('使い方：node tools/apply_match.mjs <節> [--rank 6] [--video URL]'); process.exit(1); }
+if (!R) { console.error('使い方：node tools/apply_match.mjs <節> [--rank 6] [--pending 11/8:6] [--video URL]'); process.exit(1); }
 const J = JSON.parse(fs.readFileSync(`private/matches/${R}.json`, 'utf8'));
 
 // ---- CSV の読み書き（カンマは値に使わないルール） ----
@@ -114,6 +115,8 @@ let site = fs.readFileSync(sitePath, 'utf8');
 site = site.replace(/asOf: '[^']*'/, `asOf: '${new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10)}'`)
   .replace(/roundLabel: '[^']*'/, `roundLabel: '第${R}節'`).replace(/lastMatch: '[^']*'/, `lastMatch: '${mo}/${d} ${fx.opponent}戦'`);
 if (opt('rank')) site = site.replace(/rank: \d+/, `rank: ${Number(opt('rank'))}`);
+{ const [until, worst] = (opt('pending') || '').split(':');
+  site = site.replace(/rankPending: [^\n]*?,(\s*\n)/, `rankPending: ${until && worst ? `{ until: '${until}', worst: ${Number(worst)} }` : 'null'},$1`); }
 fs.writeFileSync(sitePath, site);
 
 console.log(`第${R}節 ${fx.opponent}（${J.ha === 'H' ? 'ホーム' : 'アウェイ'}）${gf}-${ga} ${result}｜得点：${scorers}｜出場${apRows.length}人｜${mrow.video_url ? '' : 'ハイライト動画URLなし（--video で入れる）'}`);
