@@ -7,10 +7,10 @@ export const SITE = {
   // 決まったら、ここと astro.config.mjs の site・base、ダッシュボード版の SITE_URL をそろえて変える（CLAUDE.md「公開URLが決まったら」）
   url: 'https://tegestats.com',
   // データの時点
-  asOf: '2026-11-04',          // 年齢を数える基準日（最新の更新日）
-  roundLabel: '第15節',        // 「第13節時点」の表記
-  lastMatch: '11/3 栃木C戦',   // ページ冒頭の「〜までの記録」
-  rank: 6,                     // J2 の現在の順位（Jリーグ公式の順位表の値）
+  asOf: '2026-11-07',          // 年齢を数える基準日（最新の更新日）
+  roundLabel: '第16節',        // 「第13節時点」の表記
+  lastMatch: '11/7 徳島戦',   // ページ冒頭の「〜までの記録」
+  rank: 4,                     // J2 の現在の順位（Jリーグ公式の順位表の値）
   // 検索（SEO）：検索結果やリンクに出る説明。「テゲバジャーロ宮崎」を必ず入れる
   team: 'テゲバジャーロ宮崎',
   // Google Search Console の「HTML タグ」で確認するときの content の値（空なら出さない）
