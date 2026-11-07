@@ -63,6 +63,11 @@ const months = [...new Set(fixtures.map(f => f.date.slice(0, 7)))].map(k => [k, 
         ))}
       </>
     ) : <p class="note">発表されている日程は、すべて終わりました。次の日程が出たら載せます。</p>}
+    <div class="fx-cal">
+      <a class="fx-cal-btn" href={`webcal://${new URL(SITE.url).host}/schedule.ics`}><Fragment set:html={icon('calendar')} />カレンダーに追加</a>
+      <a class="fx-cal-file" href={href('schedule.ics')} download="tegesta-schedule.ics">ファイルで取り込む（.ics）</a>
+      <p class="note">「カレンダーに追加」は iPhone・Mac で使えます。一度入れると、日程が変わったり増えたりしたときも自動で新しくなります。Android などは「ファイルで取り込む」を使ってください。その時点の日程が入ります。</p>
+    </div>
     <p class="note fx-src">日程・会場はクラブ公式サイトの<a href="https://www.tegevajaro.com/matches?type=all&year=2026" target="_blank" rel="noopener noreferrer">試合日程</a>から。変更されることがあるので、お出かけ前に確かめてください。これまでの試合の結果は<a href={href('goals/')}>ハイライト</a>へ。</p>
   </section>
 </Base>

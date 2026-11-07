@@ -9,7 +9,7 @@
 - `dashboard/` … ダッシュボード版（Claude のダッシュボード）の中身の控え。公開版のビルドには使わない（`dashboard/README.md`）
 - `integrations/stable-names.mjs` … ビルド後に `_astro/` の CSS・JS のファイル名から記号（.AbCd1234）を外し、ページの中の参照も書きかえる。公開のたびに名前が変わると、ブラウザに残った古いページ（GitHub Pages は10分ほど覚える・先読み）が消えたファイルを探してデザインなしになるため
 - `src/pages/updates.astro` … 更新履歴（フッターの「更新履歴」から）。中身は `src/data/updates.json`（日付ごとの項目と関係するページ）、ポスト文は `src/lib/updates.js`
-- `src/pages/schedule.astro` … メニューの「日程」。「残り〇試合（ホーム〇・アウェイ〇）」は、シーズンの全日程が `fixtures.csv` に入って `site.js` の `fixturesAll` を true にしたときだけ出す。`fixtures.csv` のうち結果がまだ入っていない試合を月ごとに並べ、相手クラブの公式サイト・会場・今季の前回の対戦を添える。試合の日が誕生日の選手がいれば「この日は〇〇選手（〇歳）の誕生日！」（黄色の札）。日付が過ぎて結果が未反映の試合には「結果は更新待ち」（ブラウザで日本時間の今日とくらべる）
+- `src/pages/schedule.astro` … メニューの「日程」。「残り〇試合（ホーム〇・アウェイ〇）」は、シーズンの全日程が `fixtures.csv` に入って `site.js` の `fixturesAll` を true にしたときだけ出す。`fixtures.csv` のうち結果がまだ入っていない試合を月ごとに並べ、相手クラブの公式サイト・会場・今季の前回の対戦を添える。下に「カレンダーに追加」（webcal:// で `/schedule.ics` を購読。iPhone・Mac）と「ファイルで取り込む（.ics）」。カレンダーのファイルは `src/pages/schedule.ics.ts`・`src/lib/ics.js` が `fixtures.csv` から作る。試合の日が誕生日の選手がいれば「この日は〇〇選手（〇歳）の誕生日！」（黄色の札）。日付が過ぎて結果が未反映の試合には「結果は更新待ち」（ブラウザで日本時間の今日とくらべる）
 - `src/pages/` … 注目トピック（/）・ランキング・選手（`players.astro`：上から選手名鑑・年齢一覧・出身都道府県・同じ母校・ユース出身・チームデータ。前の `/roots/` は `/players/` へ移す）・ハイライト（`goals.astro`：試合ごとのハイライト・ゴール・スタメン図。スタメンの計算は `src/lib/lineups.js`。前の `/lineups/` は `/goals/` へ移す）、サムネイル画像 `/og/site.png`
 - `public/logo-tegesta.svg` … サイトのロゴ（テゲスタ！の手描き文字をなぞった SVG）。ヘッダーとポスト用画像（白にして）で使う。`favicon.svg`・`apple-touch-icon.png` はロゴの「テ」
 - `src/scripts/site.js` … スクロール位置・誕生日（日本時間の今日から計算）・紙吹雪・カウントアップ

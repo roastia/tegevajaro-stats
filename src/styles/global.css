@@ -993,3 +993,9 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .fx-bd .ss { display: inline; }
 /* 得点板：数字が入るまで（書き出したままの空の枠）は数字を見せない */
 .fb.fb-wait .fl > span { color: transparent; }
+.fx-cal { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.fx-cal-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 999px; background: var(--brand); color: #fff; font-weight: 700; text-decoration: none; box-shadow: 0 3px 0 #D9506F; }
+.fx-cal-btn .ic { width: 1.1em; height: 1.1em; }
+.fx-cal-btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #D9506F; }
+.fx-cal-file { font-size: .85rem; }
+.fx-cal .note { flex: 1 1 100%; margin: 0; }
