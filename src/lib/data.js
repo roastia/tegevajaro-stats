@@ -58,6 +58,8 @@ export function getData() {
       leaders: ls.map(l => ({ name: l.name, from: l.from, value: val(l.name) })), was };
   });
   const topics = [...all.topics];
+  // 同じ記録で首位が2つ以上並んだら、ポスト文が長くなりすぎないよう1つ＋「ほか〇組／〇人」にまとめる（ランキングのページのボードは全員出す）
+  const few = ns => ns.length <= 1 ? ns.join('・') : `${ns[0]} ほか${ns.length - 1}${ns[0].includes('＆') ? '組' : '人'}`;
   if (climbs.length) {
     const c = climbs[0];
     const one = climbs.length === 1;
@@ -65,7 +67,7 @@ export function getData() {
       headline: one ? `${c.names.join('・')}が、テゲスタ！ランキング「${c.title}」で首位に！` : `テゲスタ！ランキングで首位交代が${climbs.length}件！`,
       big: one ? c.names.join('・') : `${climbs.length}件`,
       sub: one ? (c.from ? `第${prevRound}節の${c.from}位から一気にトップへ` : `第${prevRound}節はランク外から、一気にトップへ`)
-        : climbs.slice(0, 3).map(x => `${x.title}：${x.names.join('・')}`).join('／') + (climbs.length > 3 ? ' ほか' : ''),
+        : climbs.slice(0, 3).map(x => `${x.title}：${few(x.names)}`).join('／') + (climbs.length > 3 ? ' ほか' : ''),
       cheer: 'テゲスタ！の選手ランキングは毎節動く。次に上がるのは誰だ？' });
   }
 
