@@ -239,8 +239,10 @@ document.addEventListener('click', e => {
     const q = k => box.querySelector(`[data-sn="${k}"]`);
     const set = (k, v) => { const e = q(k); if (e) e.textContent = v; };
     const boardBox = q('board');
-    const board = makeFlipBoard();
-    boardBox?.appendChild(board.el);
+    // ページに書き出してある空の得点板があればそれを使う（なければ作る）
+    const pre = boardBox?.querySelector('.fb');
+    const board = makeFlipBoard(document, pre);
+    if (!pre) boardBox?.appendChild(board.el);
     let nx = null;
     const tick = () => { if (nx?.count) board.set(splitLeft(nx.target - Date.now())); };
     const draw = () => {

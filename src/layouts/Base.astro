@@ -77,14 +77,15 @@ const nav = [
           <span class="gl">{sr.gf}得点・{sr.ga}失点（{sr.gd > 0 ? '+' : ''}{sr.gd}）</span>
         </div>
         {nx && (
-          <div class="season-next" id="seasonNext" data-mode={nx.mode}>
+          <div class={`season-next${nx.count ? ' is-count' : ''}`} id="seasonNext" data-mode={nx.mode}>
             <script type="application/json" id="next-data" is:inline set:html={JSON.stringify({ fixtures, matches: lite }).replace(/</g, '\\u003c')}></script>
             <div class="season-h"><span class="season-k">次の試合</span><span class="season-when" data-sn="when">{nxWhen}</span></div>
             <div class="sn-row">
               <span class="sn-vs"><span class={`sn-ha ${nx.fx.ha === 'H' ? 'h' : 'a'}`} data-sn="ha">{nx.fx.ha === 'H' ? 'ホーム' : 'アウェイ'}</span><span>vs <a class="club-link" data-sn="club" href={clubUrl(nx.fx.opponent_full) || clubUrl(nx.fx.opponent) || undefined} target="_blank" rel="noopener noreferrer">{nx.vs.replace(/戦$/, '')}</a></span></span>
               <span class="sn-count">
-                <span class="sn-big" data-sn="big">{nx.big}</span>
-                <span class="sn-board" data-sn="board" hidden></span>
+                {/* ブラウザで書きかえたあとと同じ形で書き出す（ページを移るたびに「あと〇日」や高さがチラつかないように）。得点板は空の枠だけ先に置き、数字は site.js が入れる */}
+                <span class="sn-big" data-sn="big">{nx.count ? (nx.mode === 'today' ? '今日！キックオフまで' : 'キックオフまで') : nx.big}</span>
+                <span class="sn-board" data-sn="board" hidden={!nx.count}>{nx.count && <div class="fb fb-wait" role="timer">{['日', '時間', '分', '秒'].map(u => <div class="fb-g"><div class="fb-ds">{[0, 1].map(() => <span class="fl" data-v="0"><span class="fl-t">0</span><span class="fl-b">0</span><span class="fl-ft">0</span><span class="fl-fb">0</span></span>)}</div><span class="fb-u">{u}</span></div>)}</div>}</span>
               </span>
             </div>
           </div>

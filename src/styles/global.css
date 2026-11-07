@@ -991,3 +991,5 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .fx-bd .ic { width: 1.05em; height: 1.05em; flex: none; }
 .fx-bd a { color: inherit; }
 .fx-bd .ss { display: inline; }
+/* 得点板：数字が入るまで（書き出したままの空の枠）は数字を見せない */
+.fb.fb-wait .fl > span { color: transparent; }
