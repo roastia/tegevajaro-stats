@@ -149,8 +149,8 @@ input[type=search] { flex: 1 1 10rem; }
 .pband { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #fff; position: relative; background: linear-gradient(120deg, var(--pc) 0%, color-mix(in srgb, var(--pc) 55%, #000) 100%); }
 .pnum { font-weight: 700; font-size: 3rem; line-height: 1; min-width: 3.2rem; text-align: center; color: transparent; -webkit-text-stroke: 1.2px #fff; font-variant-numeric: tabular-nums; }
 .pname { font-weight: 700; font-size: 1.15rem; line-height: 1.25; }
-.pname a { color: #fff; text-decoration: none; border-bottom: 1px dotted rgba(255,255,255,.7); }
-.pname a::after { content: ' ↗'; font-size: .7rem; opacity: .75; }
+.pname a { color: #fff; text-decoration: none; text-underline-offset: 2px; }
+.pname a:hover { text-decoration: underline; }
 .pmeta { font-size: .8rem; opacity: .9; }
 .pbody { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -616,7 +616,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .pband { background: var(--pc-soft); color: var(--fg); border-bottom: 3px solid var(--pc); }
 .pband .jersey.on-color { filter: none; opacity: .85; }
 .pnum { -webkit-text-stroke-color: var(--pc-ink); }
-.pname a { color: var(--fg); border-bottom-color: color-mix(in srgb, var(--pc-ink) 60%, transparent); }
+.pname a { color: var(--fg); }
 .pmeta { color: var(--muted); opacity: 1; }
 .bchip { background: #fff; color: var(--ink); border: 1px solid var(--line); }
 .ages li .bar { background: var(--pc-soft); }
