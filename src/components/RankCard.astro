@@ -28,7 +28,7 @@ const title = plainTitle(meta.title);
   <h2>
     <Fragment set:html={icon(ICON_OF_RECORD[meta.id] || 'star')} />
     <span class="ttl">{title.slice(0, -2)}<span class="nw">{title.slice(-2)}<button class="info" type="button" popovertarget={pid} aria-label={`${title}の数え方`}>?</button></span></span>
-    <span class="src">{meta.src}</span>
+    <span class="src">{meta.src}{meta.upto && `・第${meta.upto}節まで`}</span>
   </h2>
   <div class="pop" id={pid} popover><b>{title}</b><br />{meta.note}</div>
   {meta.cheer && <p class="cheer">{meta.cheer}</p>}
@@ -56,5 +56,5 @@ const title = plainTitle(meta.title);
       </ol>
     </details>
   )}
-  {share && <PostBox what={share.label} text={share.text} url={`${SITE.url}/ranking/#rank-${meta.id}`} />}
+  {share && <PostBox what={share.label} text={share.text} url={`${SITE.url}/ranking/#rank-${meta.id}`} asOf={meta.upto ? `第${meta.upto}節` : undefined} />}
 </section>

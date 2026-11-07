@@ -1,4 +1,5 @@
 // ランキングの定義・アイコン・キャラクター
+import { LAB_UPTO } from './calcs.js';
 
 export const RECORDS = [
   { id: 'streak', cat: 'goal', title: '🔥 ゴール連チャン', cheer: '決めるのが習慣です', note: '続けてゴールを決めた試合数の最長記録（2試合以上）', src: 'J STATS' },
@@ -31,20 +32,20 @@ export const RECORDS = [
   { id: 'young', cat: 'time', title: '🌱 ヤングパワー', cheer: '伸びしろしかない', note: '23歳以下（基準日時点）の出場時間（GKは「守護神」で別に比べます）', src: 'J STATS' },
   { id: 'veteran', cat: 'time', title: '🧔 ベテランの意地', cheer: '背中で語る頼れる先輩', note: '28歳以上（基準日時点）の出場時間（300分以上）（GKは「守護神」で別に比べます）', src: 'J STATS' },
   { id: 'clean', cat: 'time', title: '😇 クリーンファイター', cheer: 'フェアに、熱く', note: '警告・退場ゼロの選手の出場時間（300分以上）（GKは「守護神」で別に比べます）', src: 'J STATS' },
-  { id: 'shot90', cat: 'play', title: '🚀 シュート意欲', cheer: '前を向いたら、まず狙う', note: '90分あたりのシュート本数（出場300分以上）', src: 'Football LAB' },
-  { id: 'chance_q', cat: 'play', title: '🔍 決定機の質', cheer: '打つ場所がいちいち上手い', note: 'シュート1本あたりのゴール期待値。高いほどゴールに近い場所・形で打てている（シュート5本以上）', src: 'Football LAB', hideValue: true },
-  { id: 'hub', cat: 'play', title: '🕸️ パス回しの中心', cheer: 'ボールの乗り換え駅', note: 'よくつながるパス上位10組のうち、その選手が出し手・受け手として関わった本数', src: 'Football LAB' },
+  { id: 'shot90', cat: 'play', title: '🚀 シュート意欲', cheer: '前を向いたら、まず狙う', note: '90分あたりのシュート本数（シュートと同じ節までの出場300分以上）', src: 'Football LAB', upto: LAB_UPTO.players },
+  { id: 'chance_q', cat: 'play', title: '🔍 決定機の質', cheer: '打つ場所がいちいち上手い', note: 'シュート1本あたりのゴール期待値。高いほどゴールに近い場所・形で打てている（シュート5本以上）', src: 'Football LAB', upto: LAB_UPTO.xg, hideValue: true },
+  { id: 'hub', cat: 'play', title: '🕸️ パス回しの中心', cheer: 'ボールの乗り換え駅', note: 'よくつながるパス上位10組のうち、その選手が出し手・受け手として関わった本数', src: 'Football LAB', upto: LAB_UPTO.pass_pairs },
   { id: 'distance', cat: 'trivia', title: '🧭 はるばる宮崎へ', cheer: '遠くからようこそ宮崎へ', note: '出身地（都道府県庁所在地）から宮崎までの直線距離', src: '選手情報' },
   { id: 'chose', cat: 'trivia', title: '🤝 宮崎を選んだ男', cheer: '宮崎を選んでくれてありがとう', note: '期限付き移籍で宮崎でプレーしたあと、完全移籍で残った選手（期限付きだったシーズン数の多い順）', src: '選手情報' },
   { id: 'returnee', cat: 'trivia', title: '🔁 おかえり宮崎', cheer: 'おかえり、待ってました', note: '一度宮崎を離れ、ほかのクラブを経て戻ってきた選手（期限付き移籍の延長は含まない）', src: '選手情報' },
   { id: 'career_len', cat: 'trivia', title: '🧳 歩んできた道', cheer: 'いろんな道の先に宮崎', note: '少年団からプロまで、これまでに所属したチーム・学校の数', src: '選手情報' },
   { id: 'tall', cat: 'trivia', title: '🗼 空の支配者', cheer: '空中戦はおまかせ', note: '身長の高い順', src: '選手情報' },
-  { id: 'shooter', cat: 'play', title: '💥 シュートマシン', cheer: '打って打って打ちまくる', note: 'シュートを打った本数', src: 'Football LAB' },
-  { id: 'finisher', cat: 'play', title: '🥅 決定力', cheer: 'チャンスをきっちり決める', note: 'シュートがゴールになった割合（シュート10本以上）', src: 'Football LAB' },
-  { id: 'creator', cat: 'play', title: '🎁 チャンスメーカー', cheer: 'ゴールの一歩手前をつくる', note: 'シュートにつながったパス（ラストパス）の本数', src: 'Football LAB' },
-  { id: 'xg_over', cat: 'play', title: '✨ 期待以上の男', cheer: '予想を超えて決めてくる', note: '実際のゴール数が、シュート内容から見込まれる得点（xG）をどれだけ上回ったか', src: 'Football LAB' },
-  { id: 'ball', cat: 'play', title: '🛡️ ボール奪取王', cheer: '奪ってチャンスに変える', note: '相手からボールを奪ったプレーの評価（第12節時点）', src: 'Football LAB', hideValue: true },
-  { id: 'combo', cat: 'play', title: '🤝 名コンビ', cheer: 'パスの行き先はもう決まっている', note: 'パスがよくつながる出し手→受け手の組み合わせ', src: 'Football LAB', pair: true },
+  { id: 'shooter', cat: 'play', title: '💥 シュートマシン', cheer: '打って打って打ちまくる', note: 'シュートを打った本数', src: 'Football LAB', upto: LAB_UPTO.players },
+  { id: 'finisher', cat: 'play', title: '🥅 決定力', cheer: 'チャンスをきっちり決める', note: 'シュートがゴールになった割合（シュートと同じ節までのゴールで数える。シュート10本以上）', src: 'Football LAB', upto: LAB_UPTO.players },
+  { id: 'creator', cat: 'play', title: '🎁 チャンスメーカー', cheer: 'ゴールの一歩手前をつくる', note: 'シュートにつながったパス（ラストパス）の本数', src: 'Football LAB', upto: LAB_UPTO.players },
+  { id: 'xg_over', cat: 'play', title: '✨ 期待以上の男', cheer: '予想を超えて決めてくる', note: '実際のゴール数が、シュート内容から見込まれる得点（xG）をどれだけ上回ったか', src: 'Football LAB', upto: LAB_UPTO.xg },
+  { id: 'ball', cat: 'play', title: '🛡️ ボール奪取王', cheer: '奪ってチャンスに変える', note: '相手からボールを奪ったプレーの評価', src: 'Football LAB', upto: LAB_UPTO.cbp, hideValue: true },
+  { id: 'combo', cat: 'play', title: '🤝 名コンビ', cheer: 'パスの行き先はもう決まっている', note: 'パスがよくつながる出し手→受け手の組み合わせ', src: 'Football LAB', upto: LAB_UPTO.pass_pairs, pair: true },
   { id: 'reach', cat: 'time', title: '🟨 出場停止リーチ', cheer: 'クリーンにいこう！次も一緒に戦おう', note: 'J2は警告4回で次の1試合が出場停止。1試合で2枚の警告による退場分は数えない', src: 'J STATS', warn: true }
 ];
 

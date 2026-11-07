@@ -195,3 +195,32 @@ test('アウェイ遠征：最遠の会場は宮崎から2,000km以内（位置�
   const far = Number((t.sub.match(/最遠は.*?約([\d,]+)km/) || [])[1]?.replace(/,/g, '') || 0);
   assert.ok(far > 0 && far < 2000, t.sub);
 });
+
+test('Football LAB 由来のランキングは、何節までの値かを持つ（ほかのデータと節をそろえる）', () => {
+  for (const r of RECORDS.filter(r => r.src === 'Football LAB')) assert.ok(Number.isInteger(r.upto) && r.upto > 0, `${r.id} に upto がない`);
+  const d = getData();
+  const fin = d.rankings.find(x => x.meta.id === 'finisher');
+  const lab = RECORDS.find(r => r.id === 'finisher').upto;
+  for (const row of fin?.rows || []) {
+    const p = players.find(x => x.name === row.name);
+    const g = goals.filter(x => x.scorer === row.name && Number(x.round) <= lab).length;
+    assert.equal(row.display, `${(g / Number(p.shots) * 100).toFixed(1)}%`, row.name);
+  }
+});
+
+test('トピック：平日開催は祝日をのぞき、晴れは主な天気が晴れの試合だけ', () => {
+  const d = getData();
+  const wk = d.topics.find(t => t.id === 'weekday');
+  const n = matches.filter(m => '月火水木金'.includes(m.weekday) && !['2026-11-03', '2026-09-22', '2026-09-23', '2026-11-23'].includes(m.date)).length;
+  if (wk) assert.ok(wk.sub.includes(`${n}`) || wk.big.includes(`${n}`), wk.sub);
+  const w = d.topics.find(t => t.id === 'weather');
+  const sunny = matches.filter(m => /^晴/.test(m.weather) && !/雨/.test(m.weather)).length;
+  if (w) { const m = w.sub.match(/晴れの日は(\d+)勝(\d+)分(\d+)敗/); assert.equal(Number(m[1]) + Number(m[2]) + Number(m[3]), sunny, w.sub); }
+});
+
+test('Football LAB 由来のランキングは、↑↓・首位交代の対象にしない（毎節は中身が変わらないため）', () => {
+  const d = getData();
+  const lab = new Set(RECORDS.filter(r => r.upto).map(r => r.id));
+  assert.ok(!d.climbs.some(c => lab.has(c.id)), d.climbs.map(c => c.id).join(','));
+  for (const { meta, rows } of d.rankings) if (lab.has(meta.id)) for (const r of rows) assert.equal(r._move, undefined, `${meta.id} ${r.name}`);
+});

@@ -41,12 +41,15 @@ export function getData() {
   const prev = prevRound ? hist[prevRound] : null;
   const now = ranksOf(all);
   const moves = movesOf(now, prev);
+  // Football LAB 由来（upto のあるもの）は毎節は中身が変わらないので、↑↓・首位交代の対象にしない
+  const fixedIds = new Set(records.filter(r => r.meta.upto).map(r => r.meta.id));
   for (const { meta, rows } of records) {
+    if (fixedIds.has(meta.id)) continue;
     const mv = moves[meta.id];
     if (mv) rows.forEach(r => { const x = mv[r.name]; if (x) { r._move = x.move; r._new = x.isNew; } });
   }
   // 首位浮上（記録ごとにまとめる）→ 注目トピックの先頭に
-  const shown = new Set(records.map(r => r.meta.id));
+  const shown = new Set(records.filter(r => !fixedIds.has(r.meta.id)).map(r => r.meta.id));
   const byRec = new Map();
   for (const l of newLeaders(now, prev).filter(l => shown.has(l.id))) { if (!byRec.has(l.id)) byRec.set(l.id, []); byRec.get(l.id).push(l); }
   // 1件ごとの詳しい中身（ランキングのページの「首位交代」ボードで使う）：新しい首位の記録・前の節の順位、前の節の首位

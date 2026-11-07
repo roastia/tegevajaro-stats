@@ -1,6 +1,16 @@
 // ランキング計算（純粋関数）。ダッシュボード版で検算済みのロジックをそのまま移植。
 // 入力: CSVを読み込んだ行の配列（値はすべて文字列）。出力: 各計算結果の配列。
 // AS_OF: 年齢を数える基準日（YYYY-MM-DD）
+// Football LAB 由来のデータが何節までの値か（毎節は更新しない）。ランキングの札・ポスト文・計算の範囲に使う
+export const LAB_UPTO = { players: 13, xg: 13, pass_pairs: 13, cbp: 12 };
+// 国民の祝日・休日（内閣府「国民の祝日」の一覧。2026〜2027年）。平日開催の判定に使う
+export const HOLIDAYS = new Set([
+  '2026-01-01', '2026-01-12', '2026-02-11', '2026-02-23', '2026-03-20', '2026-04-29', '2026-05-03', '2026-05-04', '2026-05-05', '2026-05-06',
+  '2026-07-20', '2026-08-11', '2026-09-21', '2026-09-22', '2026-09-23', '2026-10-12', '2026-11-03', '2026-11-23',
+  '2027-01-01', '2027-01-11', '2027-02-11', '2027-02-23', '2027-03-21', '2027-03-22', '2027-04-29', '2027-05-03', '2027-05-04', '2027-05-05',
+  '2027-07-19', '2027-08-11', '2027-09-20', '2027-09-23', '2027-10-11', '2027-11-03', '2027-11-23',
+]);
+
 export function computeAll(D, AS_OF) {
   const C = {};
   const dash = { calc: (id, def) => { C[id] = def; } };
@@ -203,7 +213,9 @@ dash.calc('records', {
       if (n(p.subs) > 0) add('super_sub', p.name, n(p.subs) * 100 + g, `途中出場${n(p.subs)}回（${g}得点）`);
       if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) <= 23 && m > 0 && !isGK(p.name)) add('young', p.name, m, `${m.toLocaleString()}分（${ageOf[p.name]}歳）`);
       if (n(p.shots) > 0) add('shooter', p.name, n(p.shots), `${n(p.shots)}本`);
-      if (n(p.shots) >= 10) add('finisher', p.name, g / n(p.shots), `${(g / n(p.shots) * 100).toFixed(1)}%`);
+      // 決定力：シュート（Football LAB）が第 LAB_UPTO.players 節までなので、得点も同じ節までで割る
+      const gLab = gs.filter(x => x.scorer === p.name && n(x.round) <= LAB_UPTO.players).length;
+      if (n(p.shots) >= 10) add('finisher', p.name, gLab / n(p.shots), `${(gLab / n(p.shots) * 100).toFixed(1)}%`);
       if (n(p.last_passes) > 0) add('creator', p.name, n(p.last_passes), `${n(p.last_passes)}本`);
     });
     xg.forEach(x => { const d = n(x.goals) - n(x.xg); add('xg_over', x.name, d, `${d >= 0 ? '+' : ''}${d.toFixed(1)}点`); });
@@ -243,7 +255,9 @@ dash.calc('records', {
       if (m < 300) return;
       const ga = n(p.goals) + n(p.assists);
       if (ga > 0) add('ga90', p.name, ga / m * 90, `90分あたり${(ga / m * 90).toFixed(2)}`);
-      if (n(p.shots) > 0) add('shot90', p.name, n(p.shots) / m * 90, `90分あたり${(n(p.shots) / m * 90).toFixed(1)}本`);
+      // シュート意欲：シュート（Football LAB）が第 LAB_UPTO.players 節までなので、出場時間も同じ節までで割る
+      const mLab = appearances.filter(a => a.name === p.name && n(a.round) <= LAB_UPTO.players).reduce((s, a) => s + n(a.minutes), 0);
+      if (n(p.shots) > 0 && mLab >= 300) add('shot90', p.name, n(p.shots) / mLab * 90, `90分あたり${(n(p.shots) / mLab * 90).toFixed(1)}本`);
       if (n(p.yellow) === 0 && n(p.red) === 0 && !isGK(p.name)) add('clean', p.name, m, `${m.toLocaleString()}分（警告ゼロ）`);
       if (ageOf[p.name] !== '' && ageOf[p.name] != null && n(ageOf[p.name]) >= 28 && !isGK(p.name)) add('veteran', p.name, m, `${m.toLocaleString()}分（${ageOf[p.name]}歳）`);
     });
@@ -394,8 +408,9 @@ dash.calc('topics', {
     if (st) add('streak', '🔥', '連続ゴール', /・継続中/.test(st.display) ? `${st.name}、${st.value}試合連続ゴール継続中！` : /再び/.test(st.display) ? `${st.name}、${st.value}試合連続ゴール！そして再び連続ゴール中` : `${st.name}、${st.value}試合連続ゴールを記録！`, `${st.value}試合`, st.display, 'どこまで伸びるか楽しみ！');
     const day = rec(ms.filter(m => n(String(m.kickoff).slice(0, 2)) < 18)), night = rec(ms.filter(m => n(String(m.kickoff).slice(0, 2)) >= 18));
     if (day.c) add('daygame', '☀️', '昼の宮崎', day.l === 0 ? 'デーゲーム負けなし！太陽は味方' : 'デーゲームの成績', day.s, `18時より前のキックオフは${day.s}`, '明るいうちからスタジアムへ');
-    const wk = rec(ms.filter(m => ['月', '火', '水', '木', '金'].includes(m.weekday)));
-    if (wk.c) add('weekday', '🏢', '平日の宮崎', wk.l === 0 && wk.d === 0 ? `平日開催は${wk.c}戦全勝！` : '平日開催の成績', wk.s, `仕事終わりの声援が力に。平日開催は${wk.s}`, '定時で上がる理由ができた');
+    // 平日＝月〜金で、祝日・休日でない日
+    const wk = rec(ms.filter(m => ['月', '火', '水', '木', '金'].includes(m.weekday) && !HOLIDAYS.has(m.date)));
+    if (wk.c) add('weekday', '🏢', '平日の宮崎', wk.l === 0 && wk.d === 0 ? `平日開催は${wk.c}戦全勝！` : '平日開催の成績', wk.s, `平日（祝日をのぞく）の試合は${wk.s}`, '平日だって、声は届く');
     const byMonth = {};
     ms.forEach(m => { const k = n(String(m.date).slice(5, 7)); (byMonth[k] = byMonth[k] || []).push(m); });
     const mk = Object.keys(byMonth).map(Number).sort((a, b) => a - b);
@@ -463,7 +478,8 @@ dash.calc('topics', {
     const fast = [...mine2].sort((a, b) => n(a.minute) - n(b.minute))[0];
     if (fast) { const fm = ms.find(m => String(m.round) === String(fast.round)); const q = mine2.filter(g => slotOf(g) === 0).length; add('fastest', '⚡', '最速ゴール', `今季の最速ゴールは${fast.time}！`, fast.time.replace(/^前半/, ''), `第${fast.round}節${fm ? `の${fm.opponent}戦` : ''}で${fast.scorer}が決めた。開始15分までのゴールは今季${q}点`, 'キックオフの瞬間から見逃せない'); }
     // お天気
-    const sunny = rec(ms.filter(m => /晴/.test(m.weather))), rainy = rec(ms.filter(m => /雨/.test(m.weather)));
+    // 晴れ＝主な天気が晴れ（「晴」で始まり、雨がない）。「曇り時々晴」は晴れに入れない。雨＝雨が入る（にわか雨をふくむ）
+    const sunny = rec(ms.filter(m => /^晴/.test(m.weather) && !/雨/.test(m.weather))), rainy = rec(ms.filter(m => /雨/.test(m.weather)));
     if (sunny.c >= 3 && rainy.c >= 2) { const s = sunny.ppg >= rainy.ppg; add('weather', s ? '🌤️' : '☔', 'お天気と勝敗', s ? '晴れたらテゲバ日和！' : '雨の日のテゲバは強い！', s ? sunny.s : rainy.s, `晴れの日は${sunny.s}、雨（にわか雨をふくむ）の日は${rainy.s}`, s ? '日焼け止めを持ってスタジアムへ' : 'カッパを持ってスタジアムへ'); }
     // ホームの得点力
     const hm = ms.filter(m => m.ha === 'H'), am = ms.filter(m => m.ha === 'A'), sum = (l, k) => l.reduce((s, m) => s + n(m[k]), 0);
