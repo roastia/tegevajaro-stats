@@ -50,7 +50,7 @@ const months = [...new Set(fixtures.map(f => f.date.slice(0, 7)))].map(k => [k, 
                         <span class="fx-wait" hidden>結果は更新待ち</span>
                       </div>
                       <div class="fx-venue">{f.venue}</div>
-                      {bd.length > 0 && <div class="fx-bd"><Fragment set:html={icon('cake')} /><span>この日は{bd.map((b, i) => <>{i > 0 && '・'}{b.url ? <a href={b.url} target="_blank" rel="noopener noreferrer">{b.name}</a> : b.name}選手（{b.age}歳）</>)}の誕生日！</span></div>}
+                      {bd.length > 0 && <div class="fx-bd"><Fragment set:html={icon('cake')} /><span>この日は{bd.map((b, i) => <>{i > 0 && '・'}{b.url ? <a href={b.url} target="_blank" rel="noopener noreferrer">{b.name}</a> : b.name}選手の{b.age}歳</>)}の誕生日！</span></div>}
                     </div>
                     <div class="fx-prev">{p
                       ? <span>前回 第{p.round}節 <span class={`fx-res ${resCls[p.result]}`}>{p.gf}-{p.ga} {resWord[p.result]}</span></span>
