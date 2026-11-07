@@ -999,15 +999,36 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .fx-cal-btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #D9506F; }
 .fx-cal-file { font-size: .85rem; }
 .fx-cal .note { flex: 1 1 100%; margin: 0; }
-/* おすすめスポット：ふだんは名前の1行だけ（押すと開く）。PC は3列まで */
+/* おすすめスポット：ふだんは「名前・距離・開く印・ハート」の1行だけ（押すと開く）。PC は3列まで
+   summary は Safari で横並び（flex）が効かないことがあるので、中の .spot-row で並べる */
 .spot-list { align-items: start; gap: 8px; }
 @media (min-width: 761px) { .spot-list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); } }
 .spot-list li { padding: 0; }
-.spot-list .spot-heart { top: 4px; right: 4px; }
-.spot-sum { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 6px; min-height: 48px; padding: 4px 48px 4px 14px; }
+.spot-list .spot-heart { top: 6px; right: 4px; }
+.spot-sum { display: block; list-style: none; cursor: pointer; padding: 4px 48px 4px 12px; border-radius: var(--radius); -webkit-tap-highlight-color: transparent; }
 .spot-sum::-webkit-details-marker { display: none; }
-.spot-sum .spot-head::after { content: '▾'; margin-left: 6px; font-size: .7rem; color: var(--muted); }
-.spot-d[open] > .spot-sum .spot-head::after { content: '▴'; }
-.spot-sum:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; border-radius: var(--radius); }
-.spot-list .spot-sum .spot-head { padding-right: 0; flex: 0 1 auto; min-width: 0; }
-.spot-body { padding: 0 14px 14px; }
+.spot-sum::marker { content: ''; }
+.spot-sum:hover, .spot-sum:active { background: var(--soft); }
+.spot-d[open] > .spot-sum { border-radius: var(--radius) var(--radius) 0 0; }
+.spot-sum:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; }
+.spot-row { display: flex; align-items: center; gap: 6px; min-height: 44px; }
+.spot-row > .ic { flex: none; width: 1em; height: 1em; color: var(--ink); }
+.spot-name { flex: 1 1 auto; min-width: 0; font-size: 1rem; line-height: 1.35; }
+.spot-km { flex: none; display: inline-flex; align-items: center; gap: 3px; padding: 1px 8px; border-radius: 999px; background: var(--soft); color: var(--ink); font-size: .75rem; font-weight: 700; white-space: nowrap; }
+.spot-km .ic { width: 1.05em; height: 1.05em; }
+/* 開く印：丸の中の ∨。開くと ∧ に回る */
+.spot-more { flex: none; position: relative; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--brand); }
+.spot-more::before { content: ''; position: absolute; left: 50%; top: 45%; width: 6px; height: 6px; border-right: 2px solid var(--brand); border-bottom: 2px solid var(--brand); transform: translate(-50%, -50%) rotate(45deg); transition: transform .2s; }
+.spot-d[open] .spot-more::before { top: 58%; transform: translate(-50%, -50%) rotate(-135deg); }
+.spot-body { padding: 4px 14px 14px; }
+/* スポットの名前は空白（「〇〇直売所 ルーピン」の間など）で折り返す。1語が入りきらないときだけ語の中で折る */
+.spot-np { display: inline-block; max-width: 100%; word-break: keep-all; overflow-wrap: anywhere; }
+.spot-name { font-size: .95rem; }
+/* スマホ：名前の欄を広くとるため、📍と距離のアイコンを省いて字を少し小さく */
+@media (max-width: 760px) {
+  .spot-sum { padding-left: 12px; }
+  .spot-row { gap: 5px; }
+  .spot-row > .ic, .spot-km .ic { display: none; }
+  .spot-name { font-size: .9rem; }
+  .spot-km { padding: 1px 7px; }
+}

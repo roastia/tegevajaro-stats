@@ -35,12 +35,11 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
         {spots.map(s => (
           <li id={`spot-${s.id}`} data-id={s.id}>
             <button class="spot-heart" type="button" data-heart={s.id} aria-pressed="false" aria-label={`${s.name}にハート`}><Fragment set:html={HEART} /></button>
-            {/* ふだんは名前だけ。押すと距離・ひとこと・リンクが開く（1画面にたくさん並べるため） */}
+            {/* ふだんは「名前・スタジアムからの距離・開く印」の1行だけ。押すと、ひとこと・リンクが開く（1画面にたくさん並べるため） */}
             <details class="spot-d">
-              <summary class="spot-sum"><span class="spot-head"><Fragment set:html={icon('pin')} /><b>{s.name}</b>{s.area && <small>{s.area}</small>}</span></summary>
+              <summary class="spot-sum"><span class="spot-row"><Fragment set:html={icon('pin')} /><b class="spot-name">{s.name.split(/[ 　]+/).map((w, i) => <>{i > 0 && ' '}<span class="nw spot-np">{w}</span></>)}</b><span class="spot-km" aria-label={`スタジアムから${s.dist}`}><Fragment set:html={icon('stadium')} />{s.dist}</span><span class="spot-more" aria-hidden="true"></span></span></summary>
               <div class="spot-body">
                 <div class="spot-go">
-                  <span class="spot-dist">スタジアムから{s.dist}</span>
                   <span class="spot-info">{s.info}</span>
                 </div>
                 <div class="spot-links">
