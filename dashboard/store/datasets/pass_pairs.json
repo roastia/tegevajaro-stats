@@ -1,0 +1,13 @@
+{
+  "description": "Football LAB テゲバジャーロ宮崎ランキングのパス交換（10/27更新）。",
+  "source": {
+    "kind": "file",
+    "name": "pass_pairs.csv",
+    "url": "/_blob/1aed86c15d0443ebb43fa22e1c4f90ac"
+  },
+  "title": "パスコンビ上位10組",
+  "updated": {
+    "at": "2026-10-27T16:00:00+09:00",
+    "by": "Claude"
+  }
+}

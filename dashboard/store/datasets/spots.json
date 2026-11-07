@@ -1,0 +1,13 @@
+{
+  "description": "確認して載せた場所（名前・エリア・ひとこと・Xアカウント・緯度経度・公式サイト）。公開版の src/data/spots.csv と同じ。最初の2件（こゆ農畜産物直売所 ルーピン・宮交シティ）は @tegevajaro_fuk のおすすめ。位置はJAグループの直売所ページ・NAVITIMEのスポット情報で確認。",
+  "source": {
+    "kind": "file",
+    "name": "spots.csv",
+    "url": "/_blob/b8b5a08f1284df1dc9e489309e1f614e"
+  },
+  "title": "おすすめスポット（掲載分）",
+  "updated": {
+    "at": "2026-11-04T17:00:00+09:00",
+    "by": "Claude"
+  }
+}

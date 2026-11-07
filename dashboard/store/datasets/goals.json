@@ -1,0 +1,13 @@
+{
+  "description": "第1〜15節の宮崎の全得点（24点）の節・時間・得点者。minuteは並べ替え用の通しの分（後半は45＋）。",
+  "source": {
+    "kind": "file",
+    "name": "goals.csv",
+    "url": "/_blob/7c64e57ebc25ade903c943f5a4fd1643"
+  },
+  "title": "宮崎のゴール一覧",
+  "updated": {
+    "at": "2026-11-04T15:30:00+09:00",
+    "by": "Claude"
+  }
+}

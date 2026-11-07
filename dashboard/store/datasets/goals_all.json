@@ -1,0 +1,13 @@
+{
+  "description": "J2第1〜15節の宮崎の試合の全ゴール（宮崎・相手）の時間と得点者。各試合のスコアと一致することを確認。minuteは通しの分（後半は45＋）。",
+  "source": {
+    "kind": "file",
+    "name": "goals_all.csv",
+    "url": "/_blob/d022a08a2f28b2defa83e4c204c6e1dc"
+  },
+  "title": "両チームの全ゴール",
+  "updated": {
+    "at": "2026-11-04T15:30:00+09:00",
+    "by": "Claude"
+  }
+}

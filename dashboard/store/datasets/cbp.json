@@ -1,0 +1,14 @@
+{
+  "description": "Football LAB チャンスビルディングポイント。テゲバジャーロ宮崎シーズンサマリーの選手データ表（10/23更新・第12節まで）。",
+  "fixed": true,
+  "source": {
+    "kind": "file",
+    "name": "cbp_r12.csv",
+    "url": "/_blob/c5deabe91a905918c70a92f02aa46ce2"
+  },
+  "title": "プレー指標（CBP）",
+  "updated": {
+    "at": "2026-10-27T15:00:00+09:00",
+    "by": "Claude"
+  }
+}

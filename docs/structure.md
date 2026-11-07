@@ -6,6 +6,7 @@
 - `src/lib/meta.js` … ランキングの定義（タイトル・応援のひとこと・説明・出典）、アイコン、称号キャラ
 - `src/lib/data.js` … CSV 読み込み → 計算 → ページへ。`getShareables()` がポストできるもの（トピック・ランキング・背景）
 - `src/lib/og.js` … リンクのサムネイル画像（1200×630 PNG、テゲスタ！のロゴ。全ページ共通の `/og/site.png`）を Satori + resvg でビルド時に生成
+- `dashboard/` … ダッシュボード版（Claude のダッシュボード）の中身の控え。公開版のビルドには使わない（`dashboard/README.md`）
 - `integrations/stable-names.mjs` … ビルド後に `_astro/` の CSS・JS のファイル名から記号（.AbCd1234）を外し、ページの中の参照も書きかえる。公開のたびに名前が変わると、ブラウザに残った古いページ（GitHub Pages は10分ほど覚える・先読み）が消えたファイルを探してデザインなしになるため
 - `src/pages/updates.astro` … 更新履歴（フッターの「更新履歴」から）。中身は `src/data/updates.json`（日付ごとの項目と関係するページ）、ポスト文は `src/lib/updates.js`
 - `src/pages/schedule.astro` … メニューの「日程」。「残り〇試合（ホーム〇・アウェイ〇）」は、シーズンの全日程が `fixtures.csv` に入って `site.js` の `fixturesAll` を true にしたときだけ出す。`fixtures.csv` のうち結果がまだ入っていない試合を月ごとに並べ、相手クラブの公式サイト・会場・今季の前回の対戦を添える。試合の日が誕生日の選手がいれば「この日は〇〇選手（〇歳）の誕生日！」（黄色の札）。日付が過ぎて結果が未反映の試合には「結果は更新待ち」（ブラウザで日本時間の今日とくらべる）

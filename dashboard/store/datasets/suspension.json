@@ -1,0 +1,13 @@
+{
+  "description": "選手ごとの警告数（Football LAB）と、Jリーグ規律委員会の細則に沿って累積に数える警告数。J2は累積4回で1試合停止、同一試合の2枚の警告は算入しない。",
+  "source": {
+    "kind": "file",
+    "name": "suspension.csv",
+    "url": "/_blob/87b51faf07d221b1bba218c620596795"
+  },
+  "title": "警告の累積",
+  "updated": {
+    "at": "2026-10-27T17:00:00+09:00",
+    "by": "Claude"
+  }
+}

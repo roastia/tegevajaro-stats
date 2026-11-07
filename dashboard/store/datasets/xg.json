@@ -1,0 +1,13 @@
+{
+  "description": "Football LAB テゲバジャーロ宮崎シーズンサマリーのゴール期待値・選手ランキング上位10人（10/27取得）。",
+  "source": {
+    "kind": "file",
+    "name": "xg.csv",
+    "url": "/_blob/1ff77681caec225e8a9d02954712320c"
+  },
+  "title": "ゴール期待値（xG）",
+  "updated": {
+    "at": "2026-10-27T16:00:00+09:00",
+    "by": "Claude"
+  }
+}
