@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import { getData, readCsv } from '../lib/data.js';
+import { clubUrl } from '../config/clubs.js';
+import { href } from '../lib/util.js';
+// 日程：これからの試合（fixtures.csv のうち、結果がまだ入っていない節）を、前回の対戦といっしょに並べる
+const d = getData();
+const played = new Set(d.matches.map(m => String(m.round)));
+const fixtures = readCsv('fixtures').filter(f => !played.has(String(f.round))).sort((a, b) => Number(a.round) - Number(b.round));
+const WD = ['日', '月', '火', '水', '木', '金', '土'];
+const wd = s => { const [y, m, dd] = s.split('-').map(Number); return WD[new Date(Date.UTC(y, m - 1, dd)).getUTCDay()]; };
+const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}`; };
+const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
+const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
+// 前回の対戦（今季）
+const prevOf = f => d.matches.filter(m => m.opponent === f.opponent).sort((a, b) => Number(b.round) - Number(a.round))[0];
+const home = fixtures.filter(f => f.ha === 'H').length;
+const months = [...new Set(fixtures.map(f => f.date.slice(0, 7)))].map(k => [k, fixtures.filter(f => f.date.slice(0, 7) === k)]);
+---
+<Base current="schedule" title="試合日程" description={`テゲバジャーロ宮崎のこれからの試合日程（J2 2026/27）。節・日時・ホーム／アウェイ・会場と、今季の前回の対戦結果をまとめています。`}>
+  <section class="card fx-card">
+    {fixtures.length > 0 ? (
+      <>
+        <p class="fx-sum">残り<b>{fixtures.length}</b>試合<span class="fx-sum-ha">（ホーム{home}・アウェイ{fixtures.length - home}）</span></p>
+        {months.map(([k, list]) => (
+          <section class="fx-month">
+            <h2 class="fx-mh">{Number(k.slice(5))}月</h2>
+            <ul class="fx-list">
+              {list.map(f => {
+                const p = prevOf(f);
+                const url = clubUrl(f.opponent_full) || clubUrl(f.opponent);
+                return (
+                  <li class={`fx-row${f === fixtures[0] ? ' next' : ''}`} data-date={f.date}>
+                    <div class="fx-when">
+                      <span class="fx-rd">第{f.round}節</span>
+                      <span class="fx-day"><b>{md(f.date)}</b>（{wd(f.date)}）</span>
+                      <span class="fx-ko">{f.kickoff || '時間未定'}</span>
+                    </div>
+                    <div class="fx-main">
+                      <div class="fx-vs">
+                        <span class={`sn-ha ${f.ha === 'H' ? 'h' : 'a'}`}>{f.ha === 'H' ? 'ホーム' : 'アウェイ'}</span>
+                        <span>vs {url ? <a class="club-link" href={url} target="_blank" rel="noopener noreferrer">{f.opponent_full || f.opponent}</a> : (f.opponent_full || f.opponent)}</span>
+                        {f === fixtures[0] && <span class="fx-next">次の試合</span>}
+                        <span class="fx-wait" hidden>結果は更新待ち</span>
+                      </div>
+                      <div class="fx-venue">{f.venue}</div>
+                    </div>
+                    <div class="fx-prev">{p
+                      ? <span>前回 第{p.round}節 <span class={`fx-res ${resCls[p.result]}`}>{p.gf}-{p.ga} {resWord[p.result]}</span></span>
+                      : <span>今季初対戦</span>}</div>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
+      </>
+    ) : <p class="note">発表されている日程は、すべて終わりました。次の日程が出たら載せます。</p>}
+    <p class="note fx-src">日程・会場はクラブ公式サイトの<a href="https://www.tegevajaro.com/matches?type=all&year=2026" target="_blank" rel="noopener noreferrer">試合日程</a>から。変更されることがあるので、お出かけ前に確かめてください。これまでの試合の結果は<a href={href('goals/')}>ハイライト</a>へ。</p>
+  </section>
+</Base>
+<script>
+  // 日付が過ぎたのに結果がまだ入っていない試合（サイトの更新待ち）に印を付ける
+  const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+  for (const li of document.querySelectorAll<HTMLElement>('.fx-row[data-date]')) {
+    if (li.dataset.date! < today) { li.classList.add('done'); li.querySelector<HTMLElement>('.fx-wait')!.hidden = false; }
+  }
+</script>

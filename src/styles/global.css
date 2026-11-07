@@ -534,7 +534,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
   .site-nav a { display: flex; align-items: center; justify-content: center; gap: 2px; height: 34px; padding: 0 2px; font-size: 12.5px; letter-spacing: -.02em;
     border: 1px solid var(--line); border-bottom-width: 1px; border-radius: 9px; background: #fff; color: var(--fg); }
   .site-nav a[aria-current='page'] { background: var(--brand-deep); border-color: var(--brand-deep); color: #fff; font-weight: 700; }
-  .site-nav li:has(> a.nav-miya) { grid-column: span 4; }
+  .site-nav li:has(> a.nav-miya) { grid-column: span 3; }   /* 2段目：日程（1マス）＋みやざき情報（3マス） */
   .site-nav a.nav-miya { border-color: #E8A06A; color: #B8571A; background: #FFF6EE; font-weight: 700; }
   .site-nav a.nav-miya[aria-current='page'] { background: #E8833A; border-color: #E8833A; color: #fff; }
   .site-nav a.nav-miya::before { content: ''; width: 1em; height: 1em; background: currentColor; flex: none;
@@ -948,3 +948,33 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 /* もうすぐ誕生日の選手名：ハイライトのゴールの名前と同じ（ピンク文字・下線のリンク。ポストボタンの見た目にしない） */
 .bcard a.pl-link { all: unset; color: var(--ink); font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 .bcard a.pl-link:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+
+/* ---------- 日程（schedule.astro） ---------- */
+.fx-sum { margin: 0 0 4px; font-size: .95rem; }
+.fx-sum b { font-size: 1.6rem; color: var(--brand-deep); margin: 0 2px; }
+.fx-sum-ha { color: var(--muted); font-size: .85rem; }
+.fx-month + .fx-month { margin-top: 10px; }
+.fx-mh { margin: 10px 0 6px; font-size: .95rem; color: var(--ink); }
+.fx-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.fx-row { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr) auto; gap: 6px 14px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.fx-row.next { border-color: var(--brand); background: var(--soft); }
+.fx-row.done { opacity: .6; }
+.fx-when { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; }
+.fx-rd { font-size: .75rem; color: var(--muted); width: 100%; }
+.fx-day b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.fx-day { white-space: nowrap; }
+.fx-ko { width: 100%; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fx-vs { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-weight: 700; }
+.fx-next, .fx-wait { font-size: .68rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--brand); color: #fff; }
+.fx-wait { background: var(--muted); }
+.fx-venue { margin-top: 2px; font-size: .8rem; color: var(--muted); }
+.fx-prev { font-size: .78rem; color: var(--muted); white-space: nowrap; text-align: right; }
+.fx-res { font-weight: 700; color: var(--fg); }
+.fx-res.win { color: var(--brand-deep); }
+.fx-src { margin-top: 14px; }
+@media (max-width: 640px) {
+  .fx-row { grid-template-columns: 1fr; gap: 4px; }
+  .fx-when { gap: 0 8px; }
+  .fx-rd, .fx-ko { width: auto; }
+  .fx-prev { text-align: left; }
+}
