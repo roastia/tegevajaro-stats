@@ -224,3 +224,20 @@ test('Football LAB 由来のランキングは、↑↓・首位交代の対象�
   assert.ok(!d.climbs.some(c => lab.has(c.id)), d.climbs.map(c => c.id).join(','));
   for (const { meta, rows } of d.rankings) if (lab.has(meta.id)) for (const r of rows) assert.equal(r._move, undefined, `${meta.id} ${r.name}`);
 });
+
+test('新しいランキング：フル出場は「先発して交代なし」の数、プレー指標の項目別は GK を入れない', () => {
+  const d = getData();
+  const rows = id => (d.rankings.find(r => r.meta.id === id) || { rows: [] }).rows;
+  for (const r of rows('full90')) assert.equal(r.value, apps.filter(a => a.name === r.name && a.started === '1' && a.off === '99').length, r.name);
+  const gk = new Set(readCsv('cbp').filter(c => c.pos === 'GK').map(c => c.name));
+  for (const id of ['dribble', 'cross', 'defense']) assert.ok(!rows(id).some(r => gk.has(r.name)), id);
+});
+
+test('新しいトピック：前半リードは負けがないときだけ出し、ホームの観客数は合計と一致する', () => {
+  const d = getData();
+  const ht = d.topics.find(t => t.id === 'halftime');
+  if (ht) assert.match(ht.big, /0敗$/);
+  const hc = d.topics.find(t => t.id === 'homecrowd');
+  const total = matches.filter(m => m.ha === 'H').reduce((s, m) => s + n(m.attendance), 0);
+  if (hc) assert.ok(hc.big.includes(total.toLocaleString()), hc.big);
+});

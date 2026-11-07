@@ -209,6 +209,8 @@ dash.calc('records', {
       const m = n(p.minutes), g = n(p.goals), a = n(p.assists);
       if (g + a > 0) add('ga', p.name, g + a, `${g + a}（${g}得点・${a}アシスト）`);
       if (m > 0 && !isGK(p.name)) add('iron', p.name, m, `${m.toLocaleString()}分（出場率${Math.round(m / (R * 90) * 100)}%）`);
+      const full = appearances.filter(a => a.name === p.name && n(a.started) === 1 && String(a.off) === '99').length;
+      if (full > 0 && !isGK(p.name)) add('full90', p.name, full, `${full}試合（先発${n(p.starts)}試合のうち）`);
       if (n(p.apps) === R && R > 0 && !isGK(p.name)) add('allgames', p.name, n(p.starts), `先発${n(p.starts)}試合（全${R}試合に出場）`);
       if (g >= 2) add('per_goal', p.name, Math.round(m / g), `${Math.round(m / g)}分に1点`);
       if (n(p.subs) > 0) add('super_sub', p.name, n(p.subs) * 100 + g, `途中出場${n(p.subs)}回（${g}得点）`);
@@ -221,6 +223,12 @@ dash.calc('records', {
     });
     xg.forEach(x => { const d = n(x.goals) - n(x.xg); add('xg_over', x.name, d, `${d >= 0 ? '+' : ''}${d.toFixed(1)}点`); });
     cbp.forEach(c => { if (n(c.win) > 0) add('ball', c.name, n(c.win), '奪取ポイント'); });
+    // Football LAB のプレー指標（CBP）の項目別。GK は守備の値が大きくなりやすいので外す
+    cbp.filter(c => c.pos !== 'GK').forEach(c => {
+      if (n(c.dribble) > 0) add('dribble', c.name, n(c.dribble), 'ドリブルポイント');
+      if (n(c.cross) > 0) add('cross', c.name, n(c.cross), 'クロスポイント');
+      if (n(c.defense) > 0) add('defense', c.name, n(c.defense), '守備ポイント');
+    });
     pass_pairs.forEach(p => add('combo', `${p.from} → ${p.to}`, n(p.count), `${n(p.count)}本`));
     suspension.forEach(s => { if (n(s.yellow_counted) > 0) add('reach', s.name, n(s.yellow_counted), n(s.yellow_counted) >= 3 ? `累積${n(s.yellow_counted)}枚（次で出場停止）` : `累積${n(s.yellow_counted)}枚`); });
 
@@ -398,6 +406,10 @@ dash.calc('topics', {
     if (tr.unbeaten) add('unbeaten', '🛡️', '無敗街道', `リーグ戦${tr.unbeaten}試合、負け方を忘れ中！`, `${tr.unbeaten}試合`, `第${tr.unbeaten_from}節から一度も負けていない`, 'このまま突き進もう！');
     const lead = rec(ms.filter(m => m.first_goal === '宮崎'));
     if (lead.c) add('lead', '🥇', '先制の法則', lead.l === 0 ? '先に決めたら、もう負けない！' : '先制した試合の成績', lead.s, `先に点を取った${lead.c}試合は${lead.s}`, 'キックオフから声を出そう！');
+    // 前半を終えた時点のスコア（前半アディショナルタイムのゴールまで）
+    const htLead = ms.filter(m => { const g = goals_all.filter(x => n(x.round) === n(m.round) && String(x.time).startsWith('前半')); return g.filter(x => x.team === '宮崎').length > g.filter(x => x.team !== '宮崎').length; });
+    const ht = rec(htLead);
+    if (ht.c >= 3 && ht.l === 0) add('halftime', '🏁', '前半リードの法則', '前半リードで折り返せば、負けない！', ht.s, `前半をリードで終えた${ht.c}試合は${ht.s}`, '後半も声で押し切ろう！');
     if (n(tr.scoring) >= 2) add('scoring', '⚽', '連続得点', `${tr.scoring}試合連続ゴール中！`, `${tr.scoring}試合`, `第${ms[ms.length - n(tr.scoring)].round}節から、毎試合ゴールを奪い続けている`, 'ノドの準備をしてスタジアムへ');
     const homeRec = rec(ms.filter(m => m.ha === 'H'));
     if (n(tr.home_unbeaten) >= 2) add('home', '🏟️', 'ホーム無敗', `いちごで${tr.home_unbeaten}試合負けなし！`, `${tr.home_unbeaten}試合`, `いちごはテゲバの砦。今季のホームは${homeRec.s}`, '砦をスタンドの声で守ろう');
@@ -434,6 +446,10 @@ dash.calc('topics', {
     const ha = avg(ms.filter(m => m.ha === 'H')), aa = avg(ms.filter(m => m.ha === 'A'));
     const big = [...ms].sort((a, b) => n(b.attendance) - n(a.attendance))[0];
     if (big) add('crowd', '🏟️', '大観衆', `最多観客は${big.opponent}戦の${n(big.attendance).toLocaleString()}人！`, `${n(big.attendance).toLocaleString()}人`, `ホームの平均観客は${ha.toLocaleString()}人、アウェイは${aa.toLocaleString()}人`, 'この記録を塗り替えよう');
+    const hGames = ms.filter(m => m.ha === 'H' && n(m.attendance) > 0);
+    const hTotal = hGames.reduce((s, m) => s + n(m.attendance), 0);
+    const hBig = [...hGames].sort((a, b) => n(b.attendance) - n(a.attendance))[0];
+    if (hGames.length >= 2) add('homecrowd', '🎉', 'いちごに集まった人', `今季のホームゲームに、のべ${hTotal.toLocaleString()}人！`, `${hTotal.toLocaleString()}人`, `ホーム${hGames.length}試合の入場者数の合計。いちばん多かったのは${hBig.opponent}戦の${n(hBig.attendance).toLocaleString()}人`, '次のホームも、いちごで会おう！');
     // ラスト15分（後半30分以降）の宮崎のゴール
     const mine = goals_all.filter(g => g.team === '宮崎');
     const late = mine.filter(g => n(g.minute) >= 75).length;
