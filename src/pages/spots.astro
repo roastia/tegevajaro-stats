@@ -35,16 +35,21 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
         {spots.map(s => (
           <li id={`spot-${s.id}`} data-id={s.id}>
             <button class="spot-heart" type="button" data-heart={s.id} aria-pressed="false" aria-label={`${s.name}にハート`}><Fragment set:html={HEART} /></button>
-            <div class="spot-go">
-              <span class="spot-head"><Fragment set:html={icon('pin')} /><b>{s.name}</b>{s.area && <small>{s.area}</small>}</span>
-              <span class="spot-dist">スタジアムから{s.dist}</span>
-              <span class="spot-info">{s.info}</span>
-            </div>
-            <div class="spot-links">
-              {s.site && <a class="spot-btn" href={s.site} target="_blank" rel="noopener noreferrer">公式サイト<span aria-hidden="true">↗</span></a>}
-              <a class="spot-btn" href={s.maps} target="_blank" rel="noopener noreferrer">Googleマップ<span aria-hidden="true">↗</span></a>
-            </div>
-            {s.x && <p class="spot-by">教えてくれた人<a class="spot-btn" href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`教えてくれた人 @${s.x_handle} さんの X アカウントを開く`}>@{s.x_handle}</a></p>}
+            {/* ふだんは名前だけ。押すと距離・ひとこと・リンクが開く（1画面にたくさん並べるため） */}
+            <details class="spot-d">
+              <summary class="spot-sum"><span class="spot-head"><Fragment set:html={icon('pin')} /><b>{s.name}</b>{s.area && <small>{s.area}</small>}</span></summary>
+              <div class="spot-body">
+                <div class="spot-go">
+                  <span class="spot-dist">スタジアムから{s.dist}</span>
+                  <span class="spot-info">{s.info}</span>
+                </div>
+                <div class="spot-links">
+                  {s.site && <a class="spot-btn" href={s.site} target="_blank" rel="noopener noreferrer">公式サイト<span aria-hidden="true">↗</span></a>}
+                  <a class="spot-btn" href={s.maps} target="_blank" rel="noopener noreferrer">Googleマップ<span aria-hidden="true">↗</span></a>
+                </div>
+                {s.x && <p class="spot-by">教えてくれた人<a class="spot-btn" href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`教えてくれた人 @${s.x_handle} さんの X アカウントを開く`}>@{s.x_handle}</a></p>}
+              </div>
+            </details>
           </li>
         ))}
       </ul>
@@ -143,6 +148,9 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
       const KEY = (id: string) => `tg:heart:${id}`;
       const get = (id: string) => { try { return localStorage.getItem(KEY(id)) === '1'; } catch { return false; } };
       const put = (id: string, on: boolean) => { try { on ? localStorage.setItem(KEY(id), '1') : localStorage.removeItem(KEY(id)); } catch { /* 覚えられなくても押せる */ } };
+      // #spot-〇〇 へのリンクで来たら、そのスポットを開いておく
+      const hashOpen = () => { const li = location.hash.startsWith('#spot-') ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null; li?.querySelector('details')?.setAttribute('open', ''); };
+      hashOpen(); addEventListener('hashchange', hashOpen);
       const btns = [...ul.querySelectorAll<HTMLButtonElement>('[data-heart]')];
       for (const b of btns) b.setAttribute('aria-pressed', String(get(b.dataset.heart!)));
       ul.addEventListener('click', e => {
