@@ -1032,3 +1032,8 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
   .spot-name { font-size: .9rem; }
   .spot-km { padding: 1px 7px; }
 }
+
+/* おすすめスポット：検索とジャンル */
+.spot-ctl { margin: 8px 0 4px; }
+.spot-none { margin: 10px 0; }
+.spot-g { margin-right: 6px; color: var(--muted); vertical-align: 1px; }

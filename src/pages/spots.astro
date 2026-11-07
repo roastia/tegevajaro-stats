@@ -2,13 +2,14 @@
 import Base from '../layouts/Base.astro';
 import Acc from '../components/Acc.astro';
 import { readCsv } from '../lib/data.js';
-import { icon, href, xUrl, mapsUrl, siteUrl, STADIUM, distanceKm, distanceLabel } from '../lib/util.js';
+import { icon, href, xUrl, mapsUrl, siteUrl, STADIUM, distanceKm, distanceLabel, SPOT_GENRES } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 // 載せるのは、こちらで確認して src/data/spots.csv に入れたものだけ（投稿はそのままは出さない）
 // スタジアムから近い順に並べ、直線距離を出す。公式サイトと Google マップは別のボタン
 const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '')
   .map(s => { const km = distanceKm(STADIUM.lat, STADIUM.lng, +s.lat, +s.lng); return { ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng, s.name, s.place_id), site: siteUrl(s.url), km, dist: distanceLabel(km) }; })
   .sort((a, b) => a.km - b.km);
+const genres = SPOT_GENRES.map(g => ({ g, c: spots.filter(s => s.genre === g).length })).filter(x => x.c);
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 // ハート（ログインなしで押せる。数は出さず、多い順に並べかえるだけ）。受付（Cloudflare Workers）があるときだけみんなの分で並ぶ
 const heartsApi = SITE.spots.api ? new URL('/api/hearts', SITE.spots.api).href : '';
@@ -28,18 +29,29 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
   <section class="card">
 
     {spots.length > 0
-      ? <p class="note">気に入った場所は、ハートで応援！</p>
+      ? <>
+          <p class="note">気に入った場所は、ハートで応援！</p>
+          <div class="controls spot-ctl">
+            <input id="sq" type="search" placeholder="名前・よみ・ローマ字で検索" aria-label="スポットの名前で検索（漢字・ひらがな・ローマ字）" />
+            {genres.length > 1 && <div class="seg" id="genreSeg" role="group" aria-label="ジャンル">
+              <button type="button" data-genre="" aria-pressed="true">すべて</button>
+              {genres.map(x => <button type="button" data-genre={x.g} aria-pressed="false">{x.g}</button>)}
+            </div>}
+          </div>
+          <p class="note spot-none" id="spotNone" hidden>見つかりませんでした。ほかの言葉やジャンルで探してみてください。</p>
+        </>
       : <div class="spot-empty"><p>まだありません。最初のおすすめを教えてください！</p><a class="btn-main" href="#post">おすすめを教える</a></div>}
     {spots.length > 0 && (
       <ul class="spot-list" id="spotUl" data-hearts={heartsApi || undefined}>
         {spots.map(s => (
-          <li id={`spot-${s.id}`} data-id={s.id}>
+          <li id={`spot-${s.id}`} data-id={s.id} data-name={s.name} data-kana={s.kana || undefined} data-genre={s.genre || undefined}>
             <button class="spot-heart" type="button" data-heart={s.id} aria-pressed="false" aria-label={`${s.name}にハート`}><Fragment set:html={HEART} /></button>
             {/* ふだんは「名前・スタジアムからの距離・開く印」の1行だけ。押すと、ひとこと・リンクが開く（1画面にたくさん並べるため） */}
             <details class="spot-d">
               <summary class="spot-sum"><span class="spot-row"><Fragment set:html={icon('pin')} /><b class="spot-name">{s.name.split(/[ 　]+/).map((w, i) => <>{i > 0 && ' '}<span class="nw spot-np">{w}</span></>)}</b><span class="spot-km" aria-label={`スタジアムから${s.dist}`}><Fragment set:html={icon('stadium')} />{s.dist}</span><span class="spot-more" aria-hidden="true"></span></span></summary>
               <div class="spot-body">
                 <div class="spot-go">
+                  {s.genre && <span class="chip spot-g">{s.genre}</span>}
                   <span class="spot-info">{s.info}</span>
                 </div>
                 <div class="spot-links">
@@ -139,6 +151,32 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
 </Base>
 
 <script>
+  import { nameKeys, matchName } from '../lib/namesearch.js';
+  // ---- 名前検索（打つそばから絞り込む）とジャンル ----
+  {
+    const ul = document.getElementById('spotUl');
+    const q = document.getElementById('sq') as HTMLInputElement | null;
+    if (ul && q) {
+      const items = [...ul.querySelectorAll<HTMLElement>(':scope > li')];
+      const keys = new Map(items.map(li => [li, nameKeys({ name: li.dataset.name, kana: li.dataset.kana })]));
+      const seg = document.getElementById('genreSeg');
+      const none = document.getElementById('spotNone')!;
+      let genre = '';
+      const draw = () => {
+        const s = q.value.trim();
+        let shown = 0;
+        for (const li of items) { li.hidden = (!!s && !matchName(keys.get(li)!, s)) || (!!genre && li.dataset.genre !== genre); if (!li.hidden) shown++; }
+        none.hidden = shown > 0;
+      };
+      q.addEventListener('input', draw);
+      seg?.addEventListener('click', e => {
+        const b = (e.target as HTMLElement).closest('button'); if (!b) return;
+        genre = b.dataset.genre || '';
+        seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+        draw();
+      });
+    }
+  }
   // ---- ハート：押すと塗りつぶし（この端末に覚える）。受付があれば送って、みんなのハートが多い順に並べかえる ----
   {
     const ul = document.getElementById('spotUl');

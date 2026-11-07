@@ -86,3 +86,6 @@ export function distanceLabel(km) {
   if (km < 10) return `約${km.toFixed(1)}km`;
   return `約${Math.round(km)}km`;
 }
+
+// おすすめスポットのジャンル（この順で絞り込みボタンを出す。スポットのない分は出さない）
+export const SPOT_GENRES = ['ごはん', 'スイーツ・カフェ', '観光・景色', '温泉・銭湯', '買い物・おみやげ'];

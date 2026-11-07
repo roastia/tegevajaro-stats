@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readCsv, getData, getShareables, sharePath } from '../src/lib/data.js';
 import { RECORDS } from '../src/lib/meta.js';
-import { xLength } from '../src/lib/util.js';
+import { xLength, SPOT_GENRES } from '../src/lib/util.js';
 import { SITE } from '../src/config/site.js';
 import fs from 'node:fs';
 import { updatePost } from '../src/lib/updates.js';
@@ -167,6 +167,8 @@ test('おすすめスポット：載せる場所のデータの形（緯度経�
     assert.ok(![r.name, r.area, r.info].some(v => /https?:|<|>/.test(v || '')), `URL やタグは入れない：${r.name}`);
     assert.ok(!r.url || /^https:\/\/[^\s<>"']+$/.test(r.url), `公式サイトは https の URL：${r.name}`);
     assert.ok(/^ChIJ[A-Za-z0-9_-]{10,}$/.test(r.place_id || ''), `Google マップの place_id がない：${r.name}`);
+    assert.ok(SPOT_GENRES.includes(r.genre), `ジャンルが決めた中にない：${r.name}「${r.genre}」`);
+    assert.ok(/^[ぁ-ゖー ]+$/.test(r.kana || ''), `よみ（ひらがな）がない：${r.name}`);
   }
 });
 
@@ -241,4 +243,13 @@ test('新しいトピック：前半リードは負けがないときだけ出�
   const hc = d.topics.find(t => t.id === 'homecrowd');
   const total = matches.filter(m => m.ha === 'H').reduce((s, m) => s + n(m.attendance), 0);
   if (hc) assert.ok(hc.big.includes(total.toLocaleString()), hc.big);
+});
+
+test('おすすめスポットの検索：名前・よみ・ローマ字で見つかる', async () => {
+  const { nameKeys, matchName } = await import('../src/lib/namesearch.js');
+  const s = readCsv('spots').find(r => r.id === 's5');
+  if (!s) return;
+  const k = nameKeys({ name: s.name, kana: s.kana });
+  for (const q of ['拉麺', 'らーめん', 'ラーメンマン', 'ramen']) assert.ok(matchName(k, q), q);
+  assert.ok(!matchName(k, 'すし'));
 });
