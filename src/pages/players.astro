@@ -118,7 +118,7 @@ const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
     {facts.map(f => (
       <article class="card fact reveal" id={`b-${f.id}`}>
         <div class="label"><Fragment set:html={icon(f.icon)} />{f.label}</div>
-        <div class="big" data-count>{f.big}</div>
+        <div class="big">{f.big}</div>
         <div class="hl">{f.headline}</div>
         <div class="sub">{f.sub}</div>
         <p class="cheer">{f.cheer}</p>

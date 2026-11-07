@@ -1,4 +1,4 @@
-// すべてのページで動く小さなスクリプト：スクロール位置・誕生日・紙吹雪（当日だけ読み込む）・数字のカウントアップ
+// すべてのページで動く小さなスクリプト：スクロール位置・誕生日・紙吹雪（当日だけ読み込む）
 import { icon, xIntent, xLabel, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 import { nextMatch, splitLeft } from '../lib/nextmatch.js';
@@ -170,29 +170,6 @@ for (const e of document.querySelectorAll('[data-birth]')) {
   if (e.matches('.ages li')) e.classList.add('bd');
   const slot = e.querySelector('[data-bslot]');
   if (slot) { const c = h('span', slot.dataset.bslot); c.innerHTML = icon('cake'); c.append(b.days === 0 ? '今日が誕生日！' : `あと${b.days}日`); slot.replaceWith(c); }
-}
-
-/* ---------- 数字のカウントアップ（画面に入ったとき） ---------- */
-if (!reduced && 'IntersectionObserver' in window) {
-  const io = new IntersectionObserver(entries => {
-    for (const en of entries) {
-      if (!en.isIntersecting) continue;
-      io.unobserve(en.target);
-      const el = en.target, final = el.textContent;
-      const m = final.match(/^([^\d+-]*)([+-]?)([\d,]+(?:\.\d+)?)(.*)$/s);
-      if (!m) continue;
-      const target = Number(m[3].replace(/,/g, '')), dec = (m[3].split('.')[1] || '').length, comma = m[3].includes(',');
-      const t0 = performance.now(), dur = 900;
-      const step = now => {
-        const k = Math.min(1, (now - t0) / dur), v = target * (1 - Math.pow(1 - k, 3));
-        let s = v.toFixed(dec); if (comma) s = Number(s).toLocaleString('ja-JP', { minimumFractionDigits: dec, maximumFractionDigits: dec });
-        el.textContent = m[1] + m[2] + s + m[4];
-        if (k < 1) requestAnimationFrame(step); else el.textContent = final;
-      };
-      requestAnimationFrame(step);
-    }
-  }, { threshold: 0.6 });
-  document.querySelectorAll('[data-count]').forEach(e => io.observe(e));
 }
 
 /* ---------- 同じ誕生日の人（誕生日を押すと開く。Popover API） ---------- */
