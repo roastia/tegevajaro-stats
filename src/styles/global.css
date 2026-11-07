@@ -885,7 +885,8 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 @media (min-width: 761px) { .spot-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .spot-by { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; white-space: nowrap; margin: 10px 0 0; font-size: .8rem; font-weight: 700; color: var(--muted); }
 /* ハイライト：ゴールを決めた選手の名前は Jリーグ公式の選手ページへのリンク */
-.glist a.gname { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+.glist a.gname { color: var(--fg); text-decoration: none; text-underline-offset: 2px; }
+.glist a.gname:hover { text-decoration: underline; }
 .spot-by .spot-btn { padding-top: 2px; padding-bottom: 2px; }
 /* 開いているアコーディオンの見出しは、スクロール中も上のメニューの下に貼りつく（次の見出しが来たら入れ替わる） */
 .acc[open] > .acc-h { position: sticky; top: var(--stick, 0px); z-index: 5; box-shadow: 0 6px 10px -8px rgba(58, 50, 54, .3); }
