@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getData, readCsv } from '../lib/data.js';
 import { clubUrl } from '../config/clubs.js';
-import { href } from '../lib/util.js';
+import { href, icon, playerUrl } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 // 日程：これからの試合（fixtures.csv のうち、結果がまだ入っていない節）を、前回の対戦といっしょに並べる
 const d = getData();
@@ -13,6 +13,10 @@ const wd = s => { const [y, m, dd] = s.split('-').map(Number); return WD[new Dat
 const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}`; };
 const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
 const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
+// 試合の日が誕生日の選手（その日に何歳になるか）。名前は Jリーグ公式の選手ページへ
+const urlOf = new Map(d.players.map(p => [p.name, playerUrl(p.jl_url)]));
+const bdOn = date => d.profiles.filter(p => p.birth && p.birth.slice(5) === date.slice(5))
+  .map(p => ({ name: p.name, age: Number(date.slice(0, 4)) - Number(p.birth.slice(0, 4)), url: urlOf.get(p.name) || '' }));
 // 前回の対戦（今季）
 const prevOf = f => d.matches.filter(m => m.opponent === f.opponent).sort((a, b) => Number(b.round) - Number(a.round))[0];
 const home = fixtures.filter(f => f.ha === 'H').length;
@@ -30,6 +34,7 @@ const months = [...new Set(fixtures.map(f => f.date.slice(0, 7)))].map(k => [k, 
               {list.map(f => {
                 const p = prevOf(f);
                 const url = clubUrl(f.opponent_full) || clubUrl(f.opponent);
+                const bd = bdOn(f.date);
                 return (
                   <li class={`fx-row${f === fixtures[0] ? ' next' : ''}`} data-date={f.date}>
                     <div class="fx-when">
@@ -45,6 +50,7 @@ const months = [...new Set(fixtures.map(f => f.date.slice(0, 7)))].map(k => [k, 
                         <span class="fx-wait" hidden>結果は更新待ち</span>
                       </div>
                       <div class="fx-venue">{f.venue}</div>
+                      {bd.length > 0 && <div class="fx-bd"><Fragment set:html={icon('cake')} /><span>この日は{bd.map((b, i) => <>{i > 0 && '・'}{b.url ? <a href={b.url} target="_blank" rel="noopener noreferrer">{b.name}</a> : b.name}選手（{b.age}歳）</>)}の誕生日！</span></div>}
                     </div>
                     <div class="fx-prev">{p
                       ? <span>前回 第{p.round}節 <span class={`fx-res ${resCls[p.result]}`}>{p.gf}-{p.ga} {resWord[p.result]}</span></span>
