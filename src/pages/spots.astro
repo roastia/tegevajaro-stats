@@ -7,7 +7,7 @@ import { SITE } from '../config/site.js';
 // 載せるのは、こちらで確認して src/data/spots.csv に入れたものだけ（投稿はそのままは出さない）
 // スタジアムから近い順に並べ、直線距離を出す。公式サイトと Google マップは別のボタン
 const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '')
-  .map(s => { const km = distanceKm(STADIUM.lat, STADIUM.lng, +s.lat, +s.lng); return { ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng), site: siteUrl(s.url), km, dist: distanceLabel(km) }; })
+  .map(s => { const km = distanceKm(STADIUM.lat, STADIUM.lng, +s.lat, +s.lng); return { ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng, s.name, s.place_id), site: siteUrl(s.url), km, dist: distanceLabel(km) }; })
   .sort((a, b) => a.km - b.km);
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 // ハート（ログインなしで押せる。数は出さず、多い順に並べかえるだけ）。受付（Cloudflare Workers）があるときだけみんなの分で並ぶ

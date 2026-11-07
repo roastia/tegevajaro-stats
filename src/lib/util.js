@@ -65,7 +65,11 @@ export const xUrl = h => /^[A-Za-z0-9_]{1,15}$/.test(String(h || '')) ? `https:/
 /** 緯度経度から Google マップのリンク */
 /** おすすめスポットの公式サイト（https だけ。確かめて spots.csv の url に入れたもの） */
 export const siteUrl = u => /^https:\/\/[^\s<>"']+$/.test(u || '') ? u : '';
-export const mapsUrl = (lat, lng) => Number.isFinite(+lat) && Number.isFinite(+lng) && lat !== '' && lng !== '' ? `https://www.google.com/maps/search/?api=1&query=${+lat},${+lng}` : '';
+// Google マップ：place_id があればそのお店・施設のページを開く（緯度経度だけだと、ただのピンになる）
+export const mapsUrl = (lat, lng, name = '', placeId = '') => {
+  if (/^[A-Za-z0-9_-]{10,}$/.test(placeId || '') && name) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&query_place_id=${placeId}`;
+  return Number.isFinite(+lat) && Number.isFinite(+lng) && lat !== '' && lng !== '' ? `https://www.google.com/maps/search/?api=1&query=${+lat},${+lng}` : '';
+};
 
 /** ホームスタジアム（Google マップの施設の位置。いちご宮崎新富サッカー場の公式サイトの地図リンクから） */
 export const STADIUM = { name: 'いちご宮崎新富サッカー場', lat: 32.0737818, lng: 131.4909384 };

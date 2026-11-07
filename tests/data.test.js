@@ -156,7 +156,7 @@ test('スタメン：各試合11人・出場記録の先発と一致・フォー
   assert.ok(L.games.every(g => g.lines.flat().every(p => p.role)), 'すべての選手にポジション名');
 });
 
-test('おすすめスポット：載せる場所のデータの形（緯度経度は宮崎近辺の数字・X アカウントの形）', () => {
+test('おすすめスポット：載せる場所のデータの形（緯度経度は宮崎近辺の数字・X アカウントの形・Google マップの place_id）', () => {
   const rows = readCsv('spots');
   const ids = new Set();
   for (const r of rows) {
@@ -166,6 +166,7 @@ test('おすすめスポット：載せる場所のデータの形（緯度経�
     assert.ok(!r.x_handle || /^[A-Za-z0-9_]{1,15}$/.test(r.x_handle), `X アカウントの形：${r.name}`);
     assert.ok(![r.name, r.area, r.info].some(v => /https?:|<|>/.test(v || '')), `URL やタグは入れない：${r.name}`);
     assert.ok(!r.url || /^https:\/\/[^\s<>"']+$/.test(r.url), `公式サイトは https の URL：${r.name}`);
+    assert.ok(/^ChIJ[A-Za-z0-9_-]{10,}$/.test(r.place_id || ''), `Google マップの place_id がない：${r.name}`);
   }
 });
 
