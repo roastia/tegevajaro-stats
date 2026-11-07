@@ -948,7 +948,8 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 #spotList .note { display: block; }
 .spot-info { display: block; }
 /* もうすぐ誕生日の選手名：ハイライトのゴールの名前と同じ（ピンク文字・下線のリンク。ポストボタンの見た目にしない） */
-.bcard a.pl-link { all: unset; color: var(--fg); font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.bcard a.pl-link { all: unset; color: var(--fg); font: inherit; text-underline-offset: 2px; cursor: pointer; }
+.bcard a.pl-link:hover { text-decoration: underline; }
 .bcard a.pl-link:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
 
 /* ---------- 日程（schedule.astro） ---------- */
@@ -989,7 +990,8 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .upd-list .ss { display: inline; }
 .fx-bd { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 2px 10px; border-radius: 999px; background: var(--gold-soft); color: var(--gold-ink); font-size: .78rem; font-weight: 700; }
 .fx-bd .ic { width: 1.05em; height: 1.05em; flex: none; }
-.fx-bd a { color: var(--fg); }
+.fx-bd a { color: var(--fg); text-decoration: none; text-underline-offset: 2px; }
+.fx-bd a:hover { text-decoration: underline; }
 .fx-bd .ss { display: inline; }
 /* 得点板：数字が入るまで（書き出したままの空の枠）は数字を見せない */
 .fb.fb-wait .fl > span { color: transparent; }
