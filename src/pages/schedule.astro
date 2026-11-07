@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import { getData, readCsv } from '../lib/data.js';
 import { clubUrl } from '../config/clubs.js';
 import { href } from '../lib/util.js';
+import { SITE } from '../config/site.js';
 // 日程：これからの試合（fixtures.csv のうち、結果がまだ入っていない節）を、前回の対戦といっしょに並べる
 const d = getData();
 const played = new Set(d.matches.map(m => String(m.round)));
@@ -21,7 +22,7 @@ const months = [...new Set(fixtures.map(f => f.date.slice(0, 7)))].map(k => [k, 
   <section class="card fx-card">
     {fixtures.length > 0 ? (
       <>
-        <p class="fx-sum">残り<b>{fixtures.length}</b>試合<span class="fx-sum-ha">（ホーム{home}・アウェイ{fixtures.length - home}）</span></p>
+        {SITE.fixturesAll && <p class="fx-sum">残り<b>{fixtures.length}</b>試合<span class="fx-sum-ha">（ホーム{home}・アウェイ{fixtures.length - home}）</span></p>}
         {months.map(([k, list]) => (
           <section class="fx-month">
             <h2 class="fx-mh">{Number(k.slice(5))}月</h2>

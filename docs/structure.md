@@ -7,7 +7,7 @@
 - `src/lib/data.js` … CSV 読み込み → 計算 → ページへ。`getShareables()` がポストできるもの（トピック・ランキング・背景）
 - `src/lib/og.js` … リンクのサムネイル画像（1200×630 PNG、テゲスタ！のロゴ。全ページ共通の `/og/site.png`）を Satori + resvg でビルド時に生成
 - `src/pages/updates.astro` … 更新履歴（フッターの「更新履歴」から）。中身は `src/data/updates.json`（日付ごとの項目と関係するページ）、ポスト文は `src/lib/updates.js`
-- `src/pages/schedule.astro` … メニューの「日程」。`fixtures.csv` のうち結果がまだ入っていない試合を月ごとに並べ、相手クラブの公式サイト・会場・今季の前回の対戦を添える。日付が過ぎて結果が未反映の試合には「結果は更新待ち」（ブラウザで日本時間の今日とくらべる）
+- `src/pages/schedule.astro` … メニューの「日程」。「残り〇試合（ホーム〇・アウェイ〇）」は、シーズンの全日程が `fixtures.csv` に入って `site.js` の `fixturesAll` を true にしたときだけ出す。`fixtures.csv` のうち結果がまだ入っていない試合を月ごとに並べ、相手クラブの公式サイト・会場・今季の前回の対戦を添える。日付が過ぎて結果が未反映の試合には「結果は更新待ち」（ブラウザで日本時間の今日とくらべる）
 - `src/pages/` … 注目トピック（/）・ランキング・選手（`players.astro`：上から選手名鑑・年齢一覧・出身都道府県・同じ母校・ユース出身・チームデータ。前の `/roots/` は `/players/` へ移す）・ハイライト（`goals.astro`：試合ごとのハイライト・ゴール・スタメン図。スタメンの計算は `src/lib/lineups.js`。前の `/lineups/` は `/goals/` へ移す）、サムネイル画像 `/og/site.png`
 - `public/logo-tegesta.svg` … サイトのロゴ（テゲスタ！の手描き文字をなぞった SVG）。ヘッダーとポスト用画像（白にして）で使う。`favicon.svg`・`apple-touch-icon.png` はロゴの「テ」
 - `src/scripts/site.js` … スクロール位置・誕生日（日本時間の今日から計算）・紙吹雪・カウントアップ
