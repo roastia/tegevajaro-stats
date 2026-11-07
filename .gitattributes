@@ -1,0 +1,11 @@
+# Mac と Windows のどちらで直しても、改行は LF（Mac 式）にそろえる。
+# Windows で保存しても「全行が書きかわった」ように見えないようにするため
+* text=auto eol=lf
+
+# 画像・フォントは文字として扱わない（改行の変換をしない）
+*.png binary
+*.jpg binary
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
