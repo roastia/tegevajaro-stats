@@ -179,3 +179,19 @@ test('スタジアムからの距離の計算と表示', async () => {
   assert.equal(distanceLabel(3.456), '約3.5km');
   assert.equal(distanceLabel(24.6), '約25km');
 });
+
+test('会場の位置：全試合に日本の中の位置が入っていて、日程の会場はすべて venues.csv にある', () => {
+  const inJapan = (lat, lng) => lat > 24 && lat < 46 && lng > 122 && lng < 146;
+  for (const m of matches) assert.ok(inJapan(Number(m.venue_lat), Number(m.venue_lng)), `第${m.round}節 ${m.venue}：${m.venue_lat},${m.venue_lng}`);
+  const venues = readCsv('venues');
+  for (const v of venues) assert.ok(inJapan(Number(v.lat), Number(v.lng)), v.venue);
+  const known = new Set(venues.map(v => v.venue));
+  for (const f of readCsv('fixtures')) assert.ok(known.has(f.venue), `第${f.round}節の会場「${f.venue}」の位置が venues.csv にない`);
+});
+
+test('アウェイ遠征：最遠の会場は宮崎から2,000km以内（位置の入れ忘れで地球の裏まで行かない）', () => {
+  const t = getData().topics.find(x => x.id === 'travel');
+  if (!t) return;
+  const far = Number((t.sub.match(/最遠は.*?約([\d,]+)km/) || [])[1]?.replace(/,/g, '') || 0);
+  assert.ok(far > 0 && far < 2000, t.sub);
+});

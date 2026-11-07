@@ -57,7 +57,9 @@ const family = n => n.split(' ')[0];
 const short = n => { const fam = family(n); const same = players.rows.filter(p => family(p.name) === fam).length > 1; return same ? fam + (n.split(' ')[1] || '').slice(0, 1) : fam; };
 const byScorer = new Map(); for (const g of mzGoals.filter(g => g.type === 'g')) byScorer.set(g.name, (byScorer.get(g.name) || 0) + 1);
 const scorers = [...byScorer].map(([n, c]) => short(n) + (c > 1 ? c : '')).join('・') || 'なし';
-const prevVenue = matches.rows.find(m => m.venue === fx.venue) || {};
+// 会場の位置（遠征距離に使う）：src/data/venues.csv から。表にない会場なら書き込まずに止める（位置が空だと距離が狂うため）
+const prevVenue = read('venues').rows.map(v => ({ venue_lat: v.lat, venue_lng: v.lng, venue: v.venue })).find(v => v.venue === fx.venue);
+if (!prevVenue) { console.error(`会場「${fx.venue}」の位置が src/data/venues.csv にありません。地図で確かめて足してから、もう一度実行してください`); process.exit(1); }
 const [y, mo, d] = J.date.split('-').map(Number);
 const wd = '日月火水木金土'[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
 const mrow = { round: R, date: J.date, opponent: fx.opponent, ha: J.ha, gf, ga, result, first_goal: first ? first[0] : '', scorers,

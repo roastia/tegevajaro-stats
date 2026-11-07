@@ -407,7 +407,8 @@ dash.calc('topics', {
     const R = Math.PI / 180, km = (a, b) => { const x = Math.sin((b[0] - a[0]) * R / 2) ** 2 + Math.cos(a[0] * R) * Math.cos(b[0] * R) * Math.sin((b[1] - a[1]) * R / 2) ** 2; return 2 * 6371 * Math.asin(Math.sqrt(x)); };
     const home = ms.find(m => m.ha === 'H');
     if (home) {
-      const aw = ms.filter(m => m.ha === 'A');
+      // 会場の位置が入っていない試合は数えない（空の位置を 0,0 として計算しないように）
+      const aw = ms.filter(m => m.ha === 'A' && n(m.venue_lat) && n(m.venue_lng));
       const total = Math.round(aw.reduce((s, m) => s + 2 * km([n(home.venue_lat), n(home.venue_lng)], [n(m.venue_lat), n(m.venue_lng)]), 0));
       const far = aw.map(m => ({ m, d: km([n(home.venue_lat), n(home.venue_lng)], [n(m.venue_lat), n(m.venue_lng)]) })).sort((a, b) => b.d - a.d)[0];
       add('travel', '✈️', 'アウェイ遠征', `今季のアウェイ遠征は往復約${total.toLocaleString()}km！`, `${total.toLocaleString()}km`, `地球${(total / 40075 * 100).toFixed(0)}%周分（直線距離）。最遠は${far.m.opponent}戦の約${Math.round(far.d).toLocaleString()}km`, '声はどこまでも届く');
