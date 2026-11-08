@@ -999,13 +999,13 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .fx-cal-btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #D9506F; }
 .fx-cal-file { font-size: .85rem; }
 .fx-cal .note { flex: 1 1 100%; margin: 0; }
-/* おすすめスポット：ふだんは「名前・距離・開く印・ハート」の1行だけ（押すと開く）。PC は3列まで
+/* おすすめスポット：ふだんは「ハート・名前・距離・開く印」の1行だけ（押すと開く）。PC は3列まで
    summary は Safari で横並び（flex）が効かないことがあるので、中の .spot-row で並べる */
 .spot-list { align-items: start; gap: 8px; }
 @media (min-width: 761px) { .spot-list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); } }
 .spot-list li { padding: 0; }
-.spot-list .spot-heart { top: 6px; right: 4px; }
-.spot-sum { display: block; list-style: none; cursor: pointer; padding: 4px 48px 4px 12px; border-radius: var(--radius); -webkit-tap-highlight-color: transparent; }
+.spot-list .spot-heart { top: 6px; left: 4px; right: auto; }
+.spot-sum { display: block; list-style: none; cursor: pointer; padding: 4px 12px 4px 48px; border-radius: var(--radius); -webkit-tap-highlight-color: transparent; }
 .spot-sum::-webkit-details-marker { display: none; }
 .spot-sum::marker { content: ''; }
 .spot-sum:hover, .spot-sum:active { background: var(--soft); }
@@ -1026,7 +1026,7 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .spot-name { font-size: .95rem; }
 /* スマホ：名前の欄を広くとるため、📍と距離のアイコンを省いて字を少し小さく */
 @media (max-width: 760px) {
-  .spot-sum { padding-left: 12px; }
+  .spot-sum { padding-left: 46px; padding-right: 10px; }
   .spot-row { gap: 5px; }
   .spot-row > .ic, .spot-km .ic { display: none; }
   .spot-name { font-size: .9rem; }
@@ -1036,4 +1036,4 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 /* おすすめスポット：検索とジャンル */
 .spot-ctl { margin: 8px 0 4px; }
 .spot-none { margin: 10px 0; }
-.spot-g { margin-right: 6px; color: var(--muted); vertical-align: 1px; }
+.spot-g { align-self: flex-start; width: fit-content; margin: 0 0 4px; color: var(--muted); }
