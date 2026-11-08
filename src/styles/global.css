@@ -1012,7 +1012,6 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .spot-d[open] > .spot-sum { border-radius: var(--radius) var(--radius) 0 0; }
 .spot-sum:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; }
 .spot-row { display: flex; align-items: center; gap: 6px; min-height: 44px; }
-.spot-row > .ic { flex: none; width: 1em; height: 1em; color: var(--ink); }
 .spot-name { flex: 1 1 auto; min-width: 0; font-size: 1rem; line-height: 1.35; }
 .spot-km { flex: none; display: inline-flex; align-items: center; gap: 3px; padding: 1px 8px; border-radius: 999px; background: var(--soft); color: var(--ink); font-size: .75rem; font-weight: 700; white-space: nowrap; }
 .spot-km .ic { width: 1.05em; height: 1.05em; }
@@ -1024,11 +1023,11 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 /* スポットの名前は空白（「〇〇直売所 ルーピン」の間など）で折り返す。1語が入りきらないときだけ語の中で折る */
 .spot-np { display: inline-block; max-width: 100%; word-break: keep-all; overflow-wrap: anywhere; }
 .spot-name { font-size: .95rem; }
-/* スマホ：名前の欄を広くとるため、📍と距離のアイコンを省いて字を少し小さく */
+/* スマホ：名前の欄を広くとるため、距離のアイコンを省いて字を少し小さく */
 @media (max-width: 760px) {
   .spot-sum { padding-left: 46px; padding-right: 10px; }
   .spot-row { gap: 5px; }
-  .spot-row > .ic, .spot-km .ic { display: none; }
+  .spot-km .ic { display: none; }
   .spot-name { font-size: .9rem; }
   .spot-km { padding: 1px 7px; }
 }
