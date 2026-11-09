@@ -8,8 +8,8 @@ import { SITE } from '../config/site.js';
 const GROUPS = [
   ['official', '公式', 'link'],
   ['program', '番組', 'play'],
-  ['group', 'サポーター団体', 'flag'],
-  ['youtube', 'サポーターのYouTube', 'play'],
+  ['group', '団体', 'flag'],
+  ['youtube', 'YouTube', 'play'],
   ['read', '読みもの', 'gift'],
 ];
 const rows = readCsv('links').map(r => ({ ...r, url: siteUrl(r.url), host: (() => { try { return new URL(r.url).host.replace(/^www\./, ''); } catch { return ''; } })() })).filter(r => r.name && r.url);
@@ -18,11 +18,11 @@ const linksApi = SITE.spots.api ? new URL('/api/links', SITE.spots.api).href : '
 const ready = !!(linksApi && SITE.spots.turnstileSiteKey);
 const fans = rows.filter(r => r.group === 'group' || r.group === 'youtube').length;
 ---
-<Base current="links" title="リンク集" description="テゲバジャーロ宮崎を応援・発信しているサポーターのYouTubeチャンネルやサポーター団体、応援番組のリンク集（非公式）。">
+<Base current="links" title="リンク集" description="テゲバジャーロ宮崎を応援・発信している団体やYouTubeチャンネル、応援番組のリンク集（非公式）。">
   <section class="card links-hero">
     <h2 class="links-h">テゲバを応援する人たち</h2>
     <p class="page-lead">テゲバジャーロ宮崎を応援し、発信している人たちのリンク集です。ゴール裏で声を出す人、遠征を記録する人、試合を語り合う人。テゲバを応援している人は、こんなにいます。気になるチャンネルをのぞいて、いっしょに盛り上がりましょう！</p>
-    <p class="links-count">サポーター団体・チャンネル <b>{fans}</b></p>
+    <p class="links-count">団体・チャンネル <b>{fans}</b></p>
     <div class="miya-acts"><a class="btn-sub" href="#post">テゲバの情報を教える</a></div>
   </section>
   {GROUPS.map(([id, label, ic]) => {
