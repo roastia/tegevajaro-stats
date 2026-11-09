@@ -59,7 +59,6 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
                   <a class="spot-btn" href={s.maps} target="_blank" rel="noopener noreferrer">Googleマップ<span aria-hidden="true">↗</span></a>
                 </div>
                 {s.x && <p class="spot-by">教えてくれた人<a class="spot-btn" href={s.x} target="_blank" rel="noopener noreferrer nofollow ugc" aria-label={`教えてくれた人 @${s.x_handle} さんの X アカウントを開く`}>@{s.x_handle}</a></p>}
-                <p class="spot-rm"><a href={href(`removal/?item=${s.id}`)}>掲載をやめる依頼</a></p>
               </div>
             </details>
           </li>
@@ -81,7 +80,7 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
         <li>載せるかどうか・載せる文面は、こちらで判断します（個人のお宅、宣伝、悪口などは載せません）。ひとことは、短く整えたり書き換えたりすることがあります。</li>
         <li>同じ回線（Wi-Fi など）からの投稿は1日10件まで、同じ内容は1回だけ受け付けます。</li>
         <li>あとで X のユーザー名を変えても、掲載済みの表示は変更できません。ごめんなさい。</li>
-        <li>載せた内容を消してほしいときは、各スポットの「掲載をやめる依頼」から送ってください。理由は問わず、確認できしだい取り下げます。</li>
+        <li>載せた内容を消してほしいときは、<a href={href('removal/')}>こちら</a>からご連絡ください。</li>
       </ul>
     </details>
     {ready ? (
