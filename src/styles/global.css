@@ -1066,3 +1066,9 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .rm-name { flex: 1; min-width: 0; }
 .rm-kind { flex: none; font-size: .7rem; color: var(--muted); }
 .rm-none { margin: 0; }
+
+/* よくある質問 */
+.faq { display: grid; gap: 6px; }
+.faq-q { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 14px; }
+.faq-q summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+.faq-q p { margin: 6px 0 0; }

@@ -26,3 +26,5 @@
 - 選手名のリンク：表示された文字の中の選手名を、ブラウザで Jリーグ公式の選手ページへのリンクに包む（`src/lib/playerlinks.js`。名前→URL は Base.astro の `#pl-urls`、対象の場所は site.js の最後）。新しい場所に選手名を出したら、そこのセレクタを足す。ダッシュボード版は `linkPlayers`（描き直しのたびに包む）
 
 - `src/pages/links.astro` ＋ `src/data/links.csv`：リンク集（id・group・name・url。ひとことは、まちがいやすく中身も変わるので載せない）。公式は公式サイト1つだけ、サポーター団体・サポーターのYouTubeを中心に。足すときは URL を開いて、テゲバのサポーターが発信しているか・今も動いているかを確かめてから
+
+- 検索・AI 向け（AIO）：`src/lib/seo.js` が構造化データ（WebSite・WebPage〔dateModified=asOf〕・FAQPage・試合日程の SportsEvent・選手・リンク・スポット）と「よくある質問」を、サイトの数字だけから作る。`/llms.txt`（`src/pages/llms.txt.ts`）は AI 向けのサイト紹介。`/robots.txt` は検索・AI のクローラーを名前で許可。数字を変えたら（試合後の更新）自動で追従する。推測や外の情報は足さない

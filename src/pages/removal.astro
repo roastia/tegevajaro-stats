@@ -15,7 +15,7 @@ const items = [
 const api = SITE.spots.api ? new URL('/api/removal', SITE.spots.api).href : '';
 const ready = !!(api && SITE.spots.turnstileSiteKey);
 ---
-<Base current="removal" title="掲載をやめる依頼" description="テゲスタ！のおすすめスポット・リンク集に載っている内容の、掲載をやめる依頼の受付です。">
+<Base current="removal" noindex title="掲載をやめる依頼" description="テゲスタ！のおすすめスポット・リンク集に載っている内容の、掲載をやめる依頼の受付です。">
   <section class="card spot-form-card">
     <h2 class="links-h">掲載をやめる依頼</h2>
     <p class="page-lead">おすすめスポットやリンク集に載っているもので、掲載をやめてほしいものがあれば、ここから送ってください。<b>理由は問いません。</b>確認できしだい、取り下げます（数日かかることがあります）。</p>

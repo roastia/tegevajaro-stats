@@ -4,6 +4,7 @@ import { getData, readCsv } from '../lib/data.js';
 import { clubUrl } from '../config/clubs.js';
 import { href, icon, playerUrl } from '../lib/util.js';
 import { SITE } from '../config/site.js';
+import { eventsLd } from '../lib/seo.js';
 // 日程：これからの試合（fixtures.csv のうち、結果がまだ入っていない節）を、前回の対戦といっしょに並べる
 const d = getData();
 const played = new Set(d.matches.map(m => String(m.round)));
@@ -22,7 +23,7 @@ const prevOf = f => d.matches.filter(m => m.opponent === f.opponent).sort((a, b)
 const home = fixtures.filter(f => f.ha === 'H').length;
 const months = [...new Set(fixtures.map(f => f.date.slice(0, 7)))].map(k => [k, fixtures.filter(f => f.date.slice(0, 7) === k)]);
 ---
-<Base current="schedule" title="試合日程" description={`テゲバジャーロ宮崎のこれからの試合日程（J2 2026/27）。節・日時・ホーム／アウェイ・会場と、今季の前回の対戦結果をまとめています。`}>
+<Base current="schedule" ld={fixtures.length ? [eventsLd(fixtures)] : []} title="試合日程" description={`テゲバジャーロ宮崎のこれからの試合日程（J2 2026/27）。節・日時・ホーム／アウェイ・会場と、今季の前回の対戦結果をまとめています。`}>
   <section class="card fx-card">
     {fixtures.length > 0 ? (
       <>

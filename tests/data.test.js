@@ -268,3 +268,17 @@ test('リンク集：URL は https、名前があり、決めた分類だけ・�
   const ids = rows.map(r => r.id);
   assert.ok(ids.every(id => /^l\d{1,4}$/.test(id)) && new Set(ids).size === ids.length, 'id は l〇 で重ならない');
 });
+
+test('検索・AI 向け：よくある質問はサイトの数字と合い、日程の開始時刻は日本時間', async () => {
+  const { faqItems, eventsLd } = await import('../src/lib/seo.js');
+  const fx = readCsv('fixtures');
+  const faq = faqItems(getData(), fx, new Date('2026-11-10T00:00:00Z'));
+  const rank = faq.find(x => x.q.includes('順位'));
+  if (SITE.rank) assert.ok(rank && rank.a.includes(`${SITE.rank}位`) && rank.a.includes(SITE.roundLabel), rank && rank.a);
+  const top = Math.max(...readCsv('players').map(p => n(p.goals)));
+  const sc = faq.find(x => x.q.includes('得点王'));
+  assert.ok(sc && sc.a.includes(`${top}得点`), sc && sc.a);
+  for (const e of eventsLd(fx).itemListElement) {
+    if (e.item.startDate.includes('T')) assert.match(e.item.startDate, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\+09:00$/);
+  }
+});

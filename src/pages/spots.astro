@@ -4,6 +4,7 @@ import Acc from '../components/Acc.astro';
 import { readCsv } from '../lib/data.js';
 import { icon, href, xUrl, mapsUrl, siteUrl, STADIUM, distanceKm, distanceLabel, SPOT_GENRES } from '../lib/util.js';
 import { SITE } from '../config/site.js';
+import { spotsLd } from '../lib/seo.js';
 // 載せるのは、こちらで確認して src/data/spots.csv に入れたものだけ（投稿はそのままは出さない）
 // スタジアムから近い順に並べ、直線距離を出す。公式サイトと Google マップは別のボタン
 const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '')
@@ -15,7 +16,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 const heartsApi = SITE.spots.api ? new URL('/api/hearts', SITE.spots.api).href : '';
 const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 12.3A4.88 4.88 0 0 1 11.2 5.4L12 6.2l.8-.8a4.88 4.88 0 0 1 6.9 6.9z"/></svg>';
 ---
-<Base current="spots" title="みやざき情報・アウェイ観戦ガイド" description="テゲバジャーロ宮崎のホーム、いちご宮崎新富サッカー場へのアクセス・スタグル・観戦ルールの案内（公式ページへのリンク）と、テゲサポおすすめの宮崎のスポット（非公式）。">
+<Base current="spots" ld={spots.length ? [spotsLd(spots)] : []} title="みやざき情報・アウェイ観戦ガイド" description="テゲバジャーロ宮崎のホーム、いちご宮崎新富サッカー場へのアクセス・スタグル・観戦ルールの案内（公式ページへのリンク）と、テゲサポおすすめの宮崎のスポット（非公式）。">
   <section class="miya-hero">
     <h2 class="welcome-h welcome-img"><img src={href('welcome-miyazaki.svg')} alt="ようこそみやざきへ！" width="2020" height="301" /></h2>
     <p>遠くから、ようこそお越しくださいました！試合の前も後も、宮崎をゆっくり楽しんでいってください。スタジアムへの行きかたや観戦ルールなどの案内と、地元のテゲサポがおすすめする場所をまとめました。「また来たいな」と思ってもらえたら、うれしいです。</p>

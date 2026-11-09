@@ -9,6 +9,8 @@ import Acc from '../components/Acc.astro';
 import { icon, xLength, flatPost } from '../lib/util.js';
 import { formSummary, RES_WORD } from '../lib/form.js';
 import { SITE } from '../config/site.js';
+import { readCsv } from '../lib/data.js';
+import { faqItems, faqLd } from '../lib/seo.js';
 const fs = formSummary(getData().matches);
 // 首位浮上はランキングのページの先頭に出す
 const items = getShareables().filter(s => s.kind === 't' && s.id !== 'climb');
@@ -17,8 +19,10 @@ const ms = getData().milestones;
 const msUrl = `${SITE.url}/`;
 const msText = milestonePost(ms, t => xLength(flatPost(`${t}\n${SITE.hashtags}`, SITE.roundLabel), msUrl) <= 280) + `\n${SITE.hashtags}`;
 const msNear = ms.near.slice(0, 6);
+// よくある質問：今の順位・得点王・次の試合など、サイトの数字から作る（検索や AI の要約で、いつ時点の答えかが伝わるように）
+const faq = faqItems(getData(), readCsv('fixtures'));
 ---
-<Base current="topics">
+<Base current="topics" ld={[faqLd(faq)]}>
   <section class="card formcard reveal" id="form">
     <div class="label"><Fragment set:html={icon('chartup')} />直近5試合</div>
     <div class="ftitle">{fs.show}</div>
@@ -68,4 +72,14 @@ const msNear = ms.near.slice(0, 6);
     </section>
     </Acc>
   )}
+  <Acc id="faq" title="よくある質問" icon="magnifier" open={false}>
+    <section class="card faq">
+      {faq.map(x => (
+        <details class="faq-q">
+          <summary>{x.q}</summary>
+          <p>{x.a}</p>
+        </details>
+      ))}
+    </section>
+  </Acc>
 </Base>

@@ -4,6 +4,7 @@ import Acc from '../components/Acc.astro';
 import { readCsv } from '../lib/data.js';
 import { siteUrl, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
+import { linksLd } from '../lib/seo.js';
 // リンク集：src/data/links.csv。テゲバを応援・発信している人たちのチャンネルを中心に（公式は公式サイト1つだけ）
 const GROUPS = [
   ['official', '公式', 'link'],
@@ -18,7 +19,7 @@ const linksApi = SITE.spots.api ? new URL('/api/links', SITE.spots.api).href : '
 const ready = !!(linksApi && SITE.spots.turnstileSiteKey);
 const fans = rows.filter(r => r.group === 'group' || r.group === 'youtube').length;
 ---
-<Base current="links" title="リンク集" description="テゲバジャーロ宮崎を応援・発信している団体やYouTubeチャンネル、応援番組のリンク集（非公式）。">
+<Base current="links" ld={[linksLd(rows)]} title="リンク集" description="テゲバジャーロ宮崎を応援・発信している団体やYouTubeチャンネル、応援番組のリンク集（非公式）。">
   <section class="card links-hero">
     <h2 class="links-h">テゲバを応援する人たち</h2>
     <p class="page-lead">テゲバジャーロ宮崎を応援し、発信している人たちのリンク集です。ゴール裏で声を出す人、遠征を記録する人、試合を語り合う人。テゲバを応援している人は、こんなにいます。気になるチャンネルをのぞいて、いっしょに盛り上がりましょう！</p>

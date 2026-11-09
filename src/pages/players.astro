@@ -6,6 +6,7 @@ import { getData, getShareables } from '../lib/data.js';
 import { icon, playerUrl, href } from '../lib/util.js';
 import { ICON_OF_RECORD, plainTitle } from '../lib/meta.js';
 import { SITE } from '../config/site.js';
+import { playersLd } from '../lib/seo.js';
 // 上段：選手名鑑（背番号・プロフィール・称号）／下段：チームデータ（経歴・出身・年齢から作るトピック）
 const d = getData();
 const facts = getShareables().filter(s => s.kind === 'b');
@@ -30,7 +31,7 @@ d.rankings.forEach(({ meta, rows }, idx) => {
 });
 const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
 ---
-<Base current="players" title="選手名鑑・チームデータ" description="テゲバジャーロ宮崎の選手名鑑（背番号・年齢・出身地・出身校と今季の称号）と、大学経由・アカデミー育ち・平均年齢などのチームデータ（非公式）。">
+<Base current="players" ld={[playersLd(players, d.players)]} title="選手名鑑・チームデータ" description="テゲバジャーロ宮崎の選手名鑑（背番号・年齢・出身地・出身校と今季の称号）と、大学経由・アカデミー育ち・平均年齢などのチームデータ（非公式）。">
   <section class="bday" data-bday hidden></section>
   <Acc id="titles" title="選手名鑑" icon="medal" count={players.length}>
   <section class="card">
