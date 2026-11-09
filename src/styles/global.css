@@ -1047,7 +1047,6 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .link-item:hover { border-color: var(--brand); background: var(--soft); }
 .link-item:focus-visible { outline: 3px solid var(--brand); outline-offset: 1px; }
 .link-name { font-weight: 700; color: var(--ink); }
-.link-name::after { content: ' ↗'; font-weight: 400; }
 .link-host { display: block; font-size: .72rem; font-weight: 400; color: var(--muted); }
 .link-note { font-size: .82rem; color: var(--muted); }
 .links-foot { margin: 4px 4px 0; }
