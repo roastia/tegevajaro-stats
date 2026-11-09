@@ -40,4 +40,4 @@
   - 「情報が古い・まちがっている」は、消さずに直してすむなら直す（迷ったら消す）
 - 取り下げ方：spots.csv・links.csv から行を消してコミット。**id は使い回さない**（スポットはハートが id にひもづくため）。スポットを消したら人に `npm run spots:names` を案内
 - 済んだら status を done（取り下げた）か kept（そのまま）に：`npx wrangler@4.150.0 d1 execute tegesta-spots --remote --command "UPDATE removal_requests SET status='done' WHERE id IN (1)"`
-- 目安：依頼が届いたら1週間以内に対応
+- 目安：依頼が届いたら、できるだけ早く対応する
