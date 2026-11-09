@@ -1036,3 +1036,18 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .spot-ctl { margin: 8px 0 4px; }
 .spot-none { margin: 10px 0; }
 .spot-g { align-self: flex-start; width: fit-content; margin: 0 0 4px; color: var(--muted); }
+
+/* リンク集 */
+.links-h { margin: 0 0 6px; font-size: 1.15rem; color: var(--ink); }
+.links-count { margin: 8px 0 0; font-size: .85rem; color: var(--muted); }
+.links-count b { font-size: 1.3rem; color: var(--ink); margin-left: 4px; }
+.link-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+@media (min-width: 761px) { .link-list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); } }
+.link-item { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--fg); text-decoration: none; height: 100%; }
+.link-item:hover { border-color: var(--brand); background: var(--soft); }
+.link-item:focus-visible { outline: 3px solid var(--brand); outline-offset: 1px; }
+.link-name { font-weight: 700; color: var(--ink); }
+.link-name::after { content: ' ↗'; font-weight: 400; }
+.link-host { display: block; font-size: .72rem; font-weight: 400; color: var(--muted); }
+.link-note { font-size: .82rem; color: var(--muted); }
+.links-foot { margin: 4px 4px 0; }

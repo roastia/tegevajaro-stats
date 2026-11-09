@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import Acc from '../components/Acc.astro';
+import { readCsv } from '../lib/data.js';
+import { siteUrl } from '../lib/util.js';
+// リンク集：src/data/links.csv。テゲバを応援・発信している人たちのチャンネルを中心に（公式は公式サイト1つだけ）
+const GROUPS = [
+  ['official', '公式', 'link'],
+  ['program', '番組', 'play'],
+  ['group', 'サポーター団体', 'flag'],
+  ['youtube', 'サポーターのYouTube', 'play'],
+  ['read', '読みもの', 'gift'],
+];
+const rows = readCsv('links').map(r => ({ ...r, url: siteUrl(r.url), host: (() => { try { return new URL(r.url).host.replace(/^www\./, ''); } catch { return ''; } })() })).filter(r => r.name && r.url);
+const fans = rows.filter(r => r.group === 'group' || r.group === 'youtube').length;
+---
+<Base current="links" title="リンク集" description="テゲバジャーロ宮崎を応援・発信しているサポーターのYouTubeチャンネルやサポーター団体、応援番組のリンク集（非公式）。">
+  <section class="card links-hero">
+    <h2 class="links-h">テゲバを応援する人たち</h2>
+    <p class="page-lead">テゲバジャーロ宮崎を応援し、発信している人たちのリンク集です。ゴール裏で声を出す人、遠征を記録する人、試合を語り合う人。テゲバを応援している人は、こんなにいます。気になるチャンネルをのぞいて、いっしょに盛り上がりましょう！</p>
+    <p class="links-count">サポーター団体・チャンネル <b>{fans}</b></p>
+  </section>
+  {GROUPS.map(([id, label, ic]) => {
+    const list = rows.filter(r => r.group === id);
+    return list.length > 0 && (
+      <Acc id={`links-${id}`} title={label} icon={ic} count={list.length > 1 ? list.length : ''}>
+        <section class="card">
+          <ul class="link-list">
+            {list.map(r => (
+              <li>
+                <a class="link-item" href={r.url} target="_blank" rel="noopener noreferrer">
+                  <span class="link-name">{r.name}</span><span class="link-host">{r.host}</span>
+                  {r.note && <span class="link-note">{r.note}</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </Acc>
+    );
+  })}
+  <p class="note links-foot">リンク先は、それぞれの運営者のページです。テゲスタ！とは関係ありません。載っている内容の変更や、掲載をやめてほしいときはご連絡ください。</p>
+</Base>
