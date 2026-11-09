@@ -116,7 +116,7 @@ const nav = [
         <li>各メディア・クラブ公式サイト（得点時間・経歴の補足、スポーツナビの選手名のよみ、観戦ガイド・アクセス、試合日程）</li>
         <li>テゲサポのみなさん（おすすめスポットの情報）</li>
       </ul>
-      <p>データ時点：{SITE.roundLabel}（{SITE.asOf}）・<a href={href('updates/')}>更新履歴</a>・<a href={href('links/')}>リンク集</a></p>
+      <p>データ時点：{SITE.roundLabel}（{SITE.asOf}）・<a href={href('updates/')}>更新履歴</a></p>
     </div>
   </footer>
   <script type="application/json" id="bday-data" is:inline set:html={JSON.stringify(bdays).replace(/</g, '\\u003c')}></script>
