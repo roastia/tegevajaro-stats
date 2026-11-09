@@ -25,4 +25,4 @@
 - 直近5試合・誕生日・首位浮上・順位の動きの説明・ハイライトの絞り込みは、たたまずに上に出す。ダッシュボード版も同じ（`accBox()` と `details.tg-acc`）。
 - 選手名のリンク：表示された文字の中の選手名を、ブラウザで Jリーグ公式の選手ページへのリンクに包む（`src/lib/playerlinks.js`。名前→URL は Base.astro の `#pl-urls`、対象の場所は site.js の最後）。新しい場所に選手名を出したら、そこのセレクタを足す。ダッシュボード版は `linkPlayers`（描き直しのたびに包む）
 
-- `src/pages/links.astro` ＋ `src/data/links.csv`：リンク集（group・name・url・note）。公式は公式サイト1つだけ、サポーター団体・サポーターのYouTubeを中心に。足すときは URL を開いて、テゲバのサポーターが発信しているか・今も動いているかを確かめてから
+- `src/pages/links.astro` ＋ `src/data/links.csv`：リンク集（id・group・name・url。ひとことは、まちがいやすく中身も変わるので載せない）。公式は公式サイト1つだけ、サポーター団体・サポーターのYouTubeを中心に。足すときは URL を開いて、テゲバのサポーターが発信しているか・今も動いているかを確かめてから

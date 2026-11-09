@@ -35,7 +35,6 @@ const fans = rows.filter(r => r.group === 'group' || r.group === 'youtube').leng
               <li>
                 <a class="link-item" href={r.url} target="_blank" rel="noopener noreferrer">
                   <span class="link-name">{r.name}</span><span class="link-host">{r.host}</span>
-                  {r.note && <span class="link-note">{r.note}</span>}
                 </a>
               </li>
             ))}

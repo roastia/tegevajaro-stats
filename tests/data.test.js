@@ -254,12 +254,12 @@ test('おすすめスポットの検索：名前・よみ・ローマ字で見�
   assert.ok(!matchName(k, 'すし'));
 });
 
-test('リンク集：URL は https、名前とひとことがあり、決めた分類だけ・公式は1つ', () => {
+test('リンク集：URL は https、名前があり、決めた分類だけ・公式は1つ', () => {
   const rows = readCsv('links');
   const groups = new Set(['official', 'program', 'group', 'youtube', 'read']);
   const urls = new Set();
   for (const r of rows) {
-    assert.ok(r.name && r.note, `名前とひとこと：${r.name}`);
+    assert.ok(r.name, `名前：${r.url}`);
     assert.ok(groups.has(r.group), `分類：${r.name}「${r.group}」`);
     assert.match(r.url, /^https:\/\/[^\s<>"']+$/, r.name);
     assert.ok(!urls.has(r.url), `URL が重なっている：${r.name}`); urls.add(r.url);
