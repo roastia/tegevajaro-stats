@@ -265,4 +265,6 @@ test('リンク集：URL は https、名前とひとことがあり、決めた�
     assert.ok(!urls.has(r.url), `URL が重なっている：${r.name}`); urls.add(r.url);
   }
   assert.equal(rows.filter(r => r.group === 'official').length, 1);
+  const ids = rows.map(r => r.id);
+  assert.ok(ids.every(id => /^l\d{1,4}$/.test(id)) && new Set(ids).size === ids.length, 'id は l〇 で重ならない');
 });

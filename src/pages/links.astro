@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Acc from '../components/Acc.astro';
 import { readCsv } from '../lib/data.js';
-import { siteUrl } from '../lib/util.js';
+import { siteUrl, href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 // リンク集：src/data/links.csv。テゲバを応援・発信している人たちのチャンネルを中心に（公式は公式サイト1つだけ）
 const GROUPS = [
@@ -53,7 +53,7 @@ const fans = rows.filter(r => r.group === 'group' || r.group === 'youtube').leng
         <li>送ってもらった URL は、すぐにはページに載りません。確認してから、このページに載せます。</li>
         <li>載せるかどうか・載せる文面は、こちらで判断します（個人の情報がわかるもの、宣伝、悪口などは載せません）。</li>
         <li>同じ回線（Wi-Fi など）からの送信は1日10件まで、同じ URL は1回だけ受け付けます。</li>
-        <li>載せた内容を消してほしいときは、ご連絡ください。</li>
+        <li>載せた内容を消してほしいときは、<a href={href('removal/')}>掲載をやめる依頼</a>から送ってください。理由は問わず、確認できしだい取り下げます。</li>
       </ul>
     </details>
     {ready ? (
@@ -78,7 +78,7 @@ const fans = rows.filter(r => r.group === 'group' || r.group === 'youtube').leng
     </details>
   </section>
   </Acc>
-  <p class="note links-foot">リンク先は、それぞれの運営者のページです。テゲスタ！とは関係ありません。載っている内容の変更や、掲載をやめてほしいときはご連絡ください。</p>
+  <p class="note links-foot">リンク先は、それぞれの運営者のページです。テゲスタ！とは関係ありません。掲載をやめてほしいときは、<a href={href('removal/')}>掲載をやめる依頼</a>から送ってください。</p>
 </Base>
 
 <script>

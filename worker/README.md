@@ -101,3 +101,8 @@ npm run links:pull     # private/links-inbox.json に保存
 ```sh
 npx wrangler@4.150.0 d1 execute tegesta-spots --remote --command "UPDATE link_submissions SET status='approved' WHERE id IN (1)"
 ```
+
+## 掲載をやめる依頼（/api/removal）
+`/removal/` のフォームから、対象（s〇・l〇）と理由・ひとことだけを受け付けます（連絡先は受け取らない）。ルールはほかの受付と同じ（Turnstile・1日10件・同じ対象は1日1回）。
+
+はじめて使うとき：`schema.sql` を流し直して（`removal_requests` の表が増える）`deploy`。届いたものは `npm run removals:pull` で `private/removals-inbox.json` に。対応の方針は `docs/spots.md`「掲載をやめる依頼」。

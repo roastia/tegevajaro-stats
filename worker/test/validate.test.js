@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateSubmission, validateLink, jstDay, ipHash, contentKey, sha256 } from '../src/validate.js';
+import { validateSubmission, validateLink, validateRemoval, REMOVAL_REASONS, jstDay, ipHash, contentKey, sha256 } from '../src/validate.js';
 
 test('ふつうの投稿は通る', () => {
   const r = validateSubmission({ name: '道の駅 日向', area: '日向市', info: '試合前の腹ごしらえに', x_handle: '@tegesapo_1' });
@@ -56,4 +56,13 @@ test('リンク集の情報提供：URL の形だけ受け、https:// がなけ�
   assert.equal(validateLink({ url: 'https://user:pass@example.com/' }).ok, false);
   assert.equal(validateLink({ url: 'https://example.com/' + 'a'.repeat(300) }).ok, false);
   assert.equal(validateLink({ url: 'https://example.com', website: 'spam' }).ok, false);
+});
+
+test('掲載をやめる依頼：対象は s〇・l〇、理由は決めた中から、ひとことは200文字まで', () => {
+  assert.deepEqual(validateRemoval({ item: 's5', reason: REMOVAL_REASONS[1], note: '' }), { ok: true, value: { item: 's5', reason: REMOVAL_REASONS[1], note: '' } });
+  assert.equal(validateRemoval({ item: 'l12', reason: 'その他', note: 'お願いします' }).ok, true);
+  assert.equal(validateRemoval({ item: 'x1', reason: 'その他' }).ok, false);
+  assert.equal(validateRemoval({ item: 's1', reason: 'なんとなく' }).ok, false);
+  assert.equal(validateRemoval({ item: 's1', reason: 'その他', note: 'あ'.repeat(201) }).ok, false);
+  assert.equal(validateRemoval({ item: 's1', reason: 'その他', website: 'spam' }).ok, false);
 });

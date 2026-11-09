@@ -1,0 +1,98 @@
+---
+import Base from '../layouts/Base.astro';
+import { readCsv } from '../lib/data.js';
+import { href } from '../lib/util.js';
+import { SITE } from '../config/site.js';
+// 掲載をやめる依頼：おすすめスポット（s〇）・リンク集（l〇）が対象。連絡先は受け取らない。受付はほかと同じ Worker（/api/removal）
+// 対応の方針：理由を問わず、確認できしだい取り下げる（本人確認はしない）。docs/spots.md「掲載をやめる依頼」
+const REASONS = ['自分が投稿した', 'お店・施設・場所の関係者', 'リンク先の運営者', '情報が古い・まちがっている', 'その他'];
+const spots = readCsv('spots').filter(s => s.id && s.name);
+const links = readCsv('links').filter(l => l.id && l.name);
+const api = SITE.spots.api ? new URL('/api/removal', SITE.spots.api).href : '';
+const ready = !!(api && SITE.spots.turnstileSiteKey);
+---
+<Base current="removal" title="掲載をやめる依頼" description="テゲスタ！のおすすめスポット・リンク集に載っている内容の、掲載をやめる依頼の受付です。">
+  <section class="card spot-form-card">
+    <h2 class="links-h">掲載をやめる依頼</h2>
+    <p class="page-lead">おすすめスポットやリンク集に載っているもので、掲載をやめてほしいものがあれば、ここから送ってください。<b>理由は問いません。</b>確認できしだい、取り下げます（数日かかることがあります）。</p>
+    {ready ? (
+      <form class="spot-form" id="rmForm" novalidate data-api={api} data-sitekey={SITE.spots.turnstileSiteKey}>
+        <label>掲載をやめてほしいもの<span class="req">必須</span>
+          <select name="item" id="rmItem" required>
+            <option value="">選んでください</option>
+            <optgroup label="おすすめスポット">{spots.map(s => <option value={s.id}>{s.name}</option>)}</optgroup>
+            <optgroup label="リンク集">{links.map(l => <option value={l.id}>{l.name}</option>)}</optgroup>
+          </select>
+        </label>
+        <fieldset class="rm-reason">
+          <legend>理由<span class="req">必須</span></legend>
+          {REASONS.map(r => <label class="rm-r"><input type="radio" name="reason" value={r} required />{r}</label>)}
+        </fieldset>
+        <label>ひとこと<span class="opt">任意</span><textarea name="note" maxlength="200" rows="3" placeholder="例：お店を閉めました／載せている説明がちがいます"></textarea></label>
+        <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <div class="ts" id="rmTs"></div>
+        <button class="spot-send" type="submit">送る</button>
+        <p class="spot-msg" id="rmMsg" role="status" aria-live="polite"></p>
+      </form>
+    ) : (
+      <p class="spot-wait">受付は準備中です。</p>
+    )}
+    <details class="spot-privacy">
+      <summary>送った内容の扱い</summary>
+      <ul>
+        <li>送ってもらうのは「掲載をやめてほしいもの・理由・ひとこと（任意）」だけです。お名前や連絡先は送られないので、個別のお返事はできません。取り下げたかどうかは、このサイトでご確認ください。</li>
+        <li>同じ回線から1日10件までの確認のため、IP アドレスを、元に戻せない形（日ごとに変わる鍵でハッシュ化した値）にして2日間だけ使い、そのあと消します。IP アドレスそのものは保存しません。</li>
+        <li>ボット対策に Cloudflare Turnstile を使っています。</li>
+      </ul>
+    </details>
+    <p class="note"><a href={href('spots/')}>おすすめスポット</a>・<a href={href('links/')}>リンク集</a>にもどる</p>
+  </section>
+</Base>
+
+<script>
+  const form = document.getElementById('rmForm') as HTMLFormElement | null;
+  if (form) {
+    // ?item=s5 で来たら、その掲載を選んでおく
+    const want = new URLSearchParams(location.search).get('item') || '';
+    const sel = document.getElementById('rmItem') as HTMLSelectElement;
+    if (/^[sl]\d{1,4}$/.test(want) && [...sel.options].some(o => o.value === want)) sel.value = want;
+    const msg = document.getElementById('rmMsg')!;
+    const send = form.querySelector<HTMLButtonElement>('.spot-send')!;
+    let token = '';
+    let widget: string | undefined;
+    const say = (t: string, ok = false) => { msg.textContent = t; msg.classList.toggle('ok', ok); };
+    const render = () => {
+      if (widget !== undefined) return;
+      widget = (window as any).turnstile.render('#rmTs', {
+        sitekey: form.dataset.sitekey, action: 'removal', language: 'ja', appearance: 'interaction-only',
+        callback: (t: string) => { token = t; }, 'expired-callback': () => { token = ''; }, 'error-callback': () => { token = ''; },
+      });
+    };
+    if ((window as any).turnstile) render();
+    else if (!document.getElementById('ts-js')) {
+      (window as any).onTsLoad = render;
+      const s = document.createElement('script');
+      s.id = 'ts-js'; s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTsLoad'; s.async = true;
+      document.head.append(s);
+    }
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const f = new FormData(form);
+      const body = { item: String(f.get('item') || ''), reason: String(f.get('reason') || ''), note: String(f.get('note') || ''), website: String(f.get('website') || '') };
+      if (!body.item) { say('掲載をやめてほしいものを選んでください'); return; }
+      if (!body.reason) { say('理由を選んでください'); return; }
+      if (!token) { say('確認中です。少し待ってから、もう一度「送る」を押してください'); return; }
+      send.disabled = true; say('送っています…');
+      try {
+        const r = await fetch(form.dataset.api!, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, turnstile: token }), credentials: 'omit', referrerPolicy: 'no-referrer' });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && d.ok) { form.reset(); say('受け付けました。確認できしだい、取り下げます。', true); }
+        else say(d.error || '送れませんでした。時間をおいて、もう一度お試しください');
+      } catch { say('送れませんでした。電波のよいところで、もう一度お試しください'); }
+      finally {
+        send.disabled = false; token = '';
+        try { (window as any).turnstile?.reset(widget); } catch { /* 次の送信で確認し直す */ }
+      }
+    });
+  }
+</script>

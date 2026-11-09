@@ -1050,3 +1050,12 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .link-host { display: block; font-size: .72rem; font-weight: 400; color: var(--muted); }
 .link-note { font-size: .82rem; color: var(--muted); }
 .links-foot { margin: 4px 4px 0; }
+
+/* 掲載をやめる依頼 */
+.spot-rm { margin: 8px 0 0; font-size: .75rem; }
+.spot-rm a { color: var(--muted); }
+.spot-form select { font: inherit; font-weight: 400; font-size: 16px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--fg); width: 100%; grid-column: 1 / -1; }
+.rm-reason { border: 0; margin: 0; padding: 0; display: grid; gap: 4px; }
+.rm-reason legend { font-size: .88rem; font-weight: 700; padding: 0; margin-bottom: 4px; }
+.rm-r { display: flex !important; align-items: center; gap: 8px; font-weight: 400 !important; }
+.rm-r input { width: auto; }

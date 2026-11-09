@@ -49,3 +49,13 @@ CREATE TABLE IF NOT EXISTS link_submissions (
   url        TEXT    NOT NULL,
   status     TEXT    NOT NULL DEFAULT 'pending'  -- pending / approved / rejected
 );
+
+-- 掲載をやめる依頼（公開しない受け箱）。対象（spots.csv の s〇・links.csv の l〇）と理由だけ。連絡先は受け取らない
+CREATE TABLE IF NOT EXISTS removal_requests (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at TEXT    NOT NULL,
+  item       TEXT    NOT NULL,
+  reason     TEXT    NOT NULL,
+  note       TEXT    NOT NULL DEFAULT '',
+  status     TEXT    NOT NULL DEFAULT 'pending'  -- pending / done（取り下げた） / kept（そのまま）
+);

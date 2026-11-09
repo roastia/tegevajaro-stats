@@ -10,6 +10,7 @@
     "roster": "node tools/check_roster.mjs",
     "spots:pull": "sh tools/pull_spots.sh",
     "links:pull": "sh tools/pull_links.sh",
+    "removals:pull": "sh tools/pull_removals.sh",
     "spots:names": "node tools/spot_names.mjs",
     "snapshot": "node tools/rank_snapshot.mjs"
   },

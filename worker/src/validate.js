@@ -77,3 +77,17 @@ export function validateLink(input) {
   }
   return { ok: true, value: { url: u.href } };
 }
+
+// 掲載をやめる依頼：対象（おすすめスポット s〇・リンク集 l〇）と理由。連絡先は受け取らない
+export const REMOVAL_REASONS = ['自分が投稿した', 'お店・施設・場所の関係者', 'リンク先の運営者', '情報が古い・まちがっている', 'その他'];
+export function validateRemoval(input) {
+  if (!input || typeof input !== 'object') return { ok: false, error: '送信内容を読み取れませんでした' };
+  if (String(input.website ?? '').trim() !== '') return { ok: false, error: '送信できませんでした' };
+  const item = typeof input.item === 'string' ? input.item : '';
+  if (!/^[sl]\d{1,4}$/.test(item)) return { ok: false, error: '掲載をやめてほしいものを選んでください' };
+  const reason = typeof input.reason === 'string' ? input.reason : '';
+  if (!REMOVAL_REASONS.includes(reason)) return { ok: false, error: '理由を選んでください' };
+  const note = clean(input.note, 200);
+  if (note.length > 200) return { ok: false, error: 'ひとことは200文字までです' };
+  return { ok: true, value: { item, reason, note } };
+}
