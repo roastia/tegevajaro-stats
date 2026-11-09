@@ -8,6 +8,10 @@ import { SITE } from '../config/site.js';
 const REASONS = ['自分が投稿した', 'お店・施設・場所の関係者', 'リンク先の運営者', '情報が古い・まちがっている', 'その他'];
 const spots = readCsv('spots').filter(s => s.id && s.name);
 const links = readCsv('links').filter(l => l.id && l.name);
+const items = [
+  ...spots.map(s => ({ id: s.id, name: s.name, kana: s.kana, kind: 'spot' })),
+  ...links.map(l => ({ id: l.id, name: l.name, kana: '', kind: 'link' })),
+];
 const api = SITE.spots.api ? new URL('/api/removal', SITE.spots.api).href : '';
 const ready = !!(api && SITE.spots.turnstileSiteKey);
 ---
@@ -17,13 +21,25 @@ const ready = !!(api && SITE.spots.turnstileSiteKey);
     <p class="page-lead">おすすめスポットやリンク集に載っているもので、掲載をやめてほしいものがあれば、ここから送ってください。<b>理由は問いません。</b>確認できしだい、取り下げます（数日かかることがあります）。</p>
     {ready ? (
       <form class="spot-form" id="rmForm" novalidate data-api={api} data-sitekey={SITE.spots.turnstileSiteKey}>
-        <label>掲載をやめてほしいもの<span class="req">必須</span>
-          <select name="item" id="rmItem" required>
-            <option value="">選んでください</option>
-            <optgroup label="おすすめスポット">{spots.map(s => <option value={s.id}>{s.name}</option>)}</optgroup>
-            <optgroup label="リンク集">{links.map(l => <option value={l.id}>{l.name}</option>)}</optgroup>
-          </select>
-        </label>
+        <fieldset class="rm-pick">
+          <legend>掲載をやめてほしいもの<span class="req">必須</span></legend>
+          <div class="controls rm-ctl">
+            <div class="seg" id="rmTabs" role="group" aria-label="種類">
+              <button type="button" data-kind="" aria-pressed="true">すべて</button>
+              <button type="button" data-kind="spot" aria-pressed="false">おすすめスポット</button>
+              <button type="button" data-kind="link" aria-pressed="false">リンク集</button>
+            </div>
+            <input id="rmQ" type="search" placeholder="名前・よみ・ローマ字で検索" aria-label="名前で検索（漢字・ひらがな・ローマ字）" />
+          </div>
+          <ul class="rm-list" id="rmList">
+            {items.map(it => (
+              <li data-kind={it.kind} data-name={it.name} data-kana={it.kana || undefined}>
+                <label class="rm-item"><input type="radio" name="item" value={it.id} required /><span class="rm-name">{it.name}</span><span class="rm-kind">{it.kind === 'spot' ? 'おすすめスポット' : 'リンク集'}</span></label>
+              </li>
+            ))}
+          </ul>
+          <p class="note rm-none" id="rmNone" hidden>見つかりませんでした。ほかの言葉や種類で探してみてください。</p>
+        </fieldset>
         <fieldset class="rm-reason">
           <legend>理由<span class="req">必須</span></legend>
           {REASONS.map(r => <label class="rm-r"><input type="radio" name="reason" value={r} required />{r}</label>)}
@@ -50,12 +66,41 @@ const ready = !!(api && SITE.spots.turnstileSiteKey);
 </Base>
 
 <script>
+  import { nameKeys, matchName } from '../lib/namesearch.js';
   const form = document.getElementById('rmForm') as HTMLFormElement | null;
   if (form) {
+    // 種類のタブと名前検索（選手名と同じく、漢字・ひらがな・カタカナ・ローマ字で打つそばから絞り込む）
+    const list = document.getElementById('rmList')!;
+    const rows = [...list.querySelectorAll<HTMLElement>(':scope > li')];
+    // よみがないもの（リンク集）は名前そのものを、よみ代わりに使う（カタカナの名前をひらがなでも探せるように）
+    const keys = new Map(rows.map(li => [li, nameKeys({ name: li.dataset.name, kana: li.dataset.kana || li.dataset.name })]));
+    const q = document.getElementById('rmQ') as HTMLInputElement;
+    const tabs = document.getElementById('rmTabs')!;
+    const none = document.getElementById('rmNone')!;
+    let kind = '';
+    const draw = () => {
+      const t = q.value.trim(); let shown = 0;
+      for (const li of rows) {
+        // 選んだものは、絞り込んでも見えたままにする（何を選んだか分かるように）
+        const checked = !!li.querySelector<HTMLInputElement>('input:checked');
+        const hit = !((!!kind && li.dataset.kind !== kind) || (!!t && !matchName(keys.get(li)!, t)));
+        li.hidden = !hit && !checked;
+        if (hit) shown++;
+      }
+      none.hidden = shown > 0;
+    };
+    q.addEventListener('input', draw);
+    tabs.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest('button'); if (!b) return;
+      kind = b.dataset.kind || '';
+      tabs.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      draw();
+    });
+    list.addEventListener('change', draw);
     // ?item=s5 で来たら、その掲載を選んでおく
     const want = new URLSearchParams(location.search).get('item') || '';
-    const sel = document.getElementById('rmItem') as HTMLSelectElement;
-    if (/^[sl]\d{1,4}$/.test(want) && [...sel.options].some(o => o.value === want)) sel.value = want;
+    const pre = /^[sl]\d{1,4}$/.test(want) ? list.querySelector<HTMLInputElement>(`input[value="${want}"]`) : null;
+    if (pre) { pre.checked = true; draw(); }
     const msg = document.getElementById('rmMsg')!;
     const send = form.querySelector<HTMLButtonElement>('.spot-send')!;
     let token = '';

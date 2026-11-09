@@ -1057,3 +1057,13 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .rm-reason legend { font-size: .88rem; font-weight: 700; padding: 0; margin-bottom: 4px; }
 .rm-r { display: flex !important; align-items: center; gap: 8px; font-weight: 400 !important; }
 .rm-r input { width: auto; }
+.rm-pick { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; min-width: 0; }
+.rm-pick legend { font-size: .88rem; font-weight: 700; padding: 0; margin-bottom: 6px; }
+.rm-list { list-style: none; margin: 0; padding: 4px; display: grid; gap: 4px; max-height: 18rem; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; }
+.rm-item { display: flex !important; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; font-weight: 400 !important; cursor: pointer; }
+.rm-item:hover { background: var(--soft); }
+.rm-item:has(input:checked) { background: var(--soft); outline: 2px solid var(--brand); }
+.rm-item input { width: auto; flex: none; }
+.rm-name { flex: 1; min-width: 0; }
+.rm-kind { flex: none; font-size: .7rem; color: var(--muted); }
+.rm-none { margin: 0; }
