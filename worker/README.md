@@ -82,3 +82,22 @@ Cloudflare のダッシュボードの D1 → `tegesta-spots` → 「Explore Dat
 
 ## 料金
 Workers・D1・Turnstile とも無料プランで始められます。このサイトの投稿数なら無料枠に収まる見込みですが、上限の数字は変わることがあるので、Cloudflare の料金ページで確かめてください。
+
+## リンク集への情報提供（/api/links）
+リンク集ページ（`src/pages/links.astro`）の「テゲバの情報を教えて！」から、URL だけを受け付けます。おすすめスポットと同じ Worker・同じ Turnstile・同じルール（1日10件・同じ URL は1日1回。件数はスポットとは別に数える）です。
+
+はじめて使うとき（1回だけ）：
+```sh
+cd worker
+npx wrangler@4.150.0 d1 execute tegesta-spots --remote --file schema.sql   # link_submissions の表を足す（ほかの表はそのまま）
+npx wrangler@4.150.0 deploy
+```
+
+届いた URL を見る：
+```sh
+npm run links:pull     # private/links-inbox.json に保存
+```
+載せたら `src/data/links.csv` に1行足し（URL を開いて、テゲバの情報を発信しているか・今も動いているかを確かめてから）、status を approved / rejected に：
+```sh
+npx wrangler@4.150.0 d1 execute tegesta-spots --remote --command "UPDATE link_submissions SET status='approved' WHERE id IN (1)"
+```

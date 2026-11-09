@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateSubmission, jstDay, ipHash, contentKey, sha256 } from '../src/validate.js';
+import { validateSubmission, validateLink, jstDay, ipHash, contentKey, sha256 } from '../src/validate.js';
 
 test('ふつうの投稿は通る', () => {
   const r = validateSubmission({ name: '道の駅 日向', area: '日向市', info: '試合前の腹ごしらえに', x_handle: '@tegesapo_1' });
@@ -45,4 +45,15 @@ test('ハート：スポットの id と押した・外したの形', () => {
   assert.equal(validateHeart({ id: 'x1', on: true }).ok, false);
   assert.equal(validateHeart({ id: 's1', on: 'yes' }).ok, false);
   assert.equal(validateHeart(null).ok, false);
+});
+
+test('リンク集の情報提供：URL の形だけ受け、https:// がなければ補う', () => {
+  assert.deepEqual(validateLink({ url: 'https://www.youtube.com/@tatsu51' }), { ok: true, value: { url: 'https://www.youtube.com/@tatsu51' } });
+  assert.equal(validateLink({ url: 'note.com/someone' }).value.url, 'https://note.com/someone');
+  assert.equal(validateLink({ url: '' }).ok, false);
+  assert.equal(validateLink({ url: 'テゲバ最高' }).ok, false);
+  assert.equal(validateLink({ url: 'javascript:alert(1)' }).ok, false);
+  assert.equal(validateLink({ url: 'https://user:pass@example.com/' }).ok, false);
+  assert.equal(validateLink({ url: 'https://example.com/' + 'a'.repeat(300) }).ok, false);
+  assert.equal(validateLink({ url: 'https://example.com', website: 'spam' }).ok, false);
 });

@@ -1,6 +1,6 @@
 // 投稿の中身の点検（Worker とテストの両方で使う純粋関数）
 
-export const LIMITS = { name: 60, area: 30, info: 300, body: 4096 };
+export const LIMITS = { name: 60, area: 30, info: 300, url: 300, body: 4096 };
 
 // 制御文字・見えない文字（ゼロ幅・方向制御）を取り除き、空白をまとめる
 const clean = (s, max) => String(s ?? '')
@@ -61,4 +61,19 @@ export function validateHeart(input) {
   const id = typeof input.id === 'string' ? input.id : '';
   if (!/^s\d{1,4}$/.test(id) || typeof input.on !== 'boolean') return { ok: false };
   return { ok: true, value: { id, on: input.on } };
+}
+
+// リンク集への情報提供：テゲバの情報を載せているページの URL だけ
+export function validateLink(input) {
+  if (!input || typeof input !== 'object') return { ok: false, error: '送信内容を読み取れませんでした' };
+  if (String(input.website ?? '').trim() !== '') return { ok: false, error: '送信できませんでした' };
+  const raw = clean(input.url, LIMITS.url);
+  if (!raw) return { ok: false, error: 'URL を入れてください' };
+  if (raw.length > LIMITS.url) return { ok: false, error: `URL は${LIMITS.url}文字までです` };
+  let u;
+  try { u = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`); } catch { return { ok: false, error: 'URL の形になっていないようです（https:// から始まるアドレスを入れてください）' }; }
+  if (!/^https?:$/.test(u.protocol) || u.username || u.password || !/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(u.hostname) || /\s/.test(raw)) {
+    return { ok: false, error: 'URL の形になっていないようです（https:// から始まるアドレスを入れてください）' };
+  }
+  return { ok: true, value: { url: u.href } };
 }

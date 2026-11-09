@@ -41,3 +41,11 @@ CREATE TABLE IF NOT EXISTS heart_marks (
 -- 中身は spots.csv から `npm run spots:names` で入れ直す（サイトに公開している名前だけ）
 CREATE TABLE IF NOT EXISTS spot_names (id TEXT PRIMARY KEY, name TEXT NOT NULL, area TEXT NOT NULL DEFAULT '');
 CREATE VIEW IF NOT EXISTS hearts_named AS SELECT s.id AS spot, s.name, s.area, COALESCE(h.n, 0) AS n FROM spot_names s LEFT JOIN hearts h ON h.spot = s.id ORDER BY n DESC, s.id;
+
+-- リンク集への情報提供（公開しない受け箱）。送ってもらうのは URL だけ
+CREATE TABLE IF NOT EXISTS link_submissions (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at TEXT    NOT NULL,              -- ISO 8601（UTC）
+  url        TEXT    NOT NULL,
+  status     TEXT    NOT NULL DEFAULT 'pending'  -- pending / approved / rejected
+);

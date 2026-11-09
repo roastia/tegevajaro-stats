@@ -1,8 +1,8 @@
 // テゲスタ！ おすすめスポットの投稿受付（Cloudflare Workers + D1 + Turnstile）
-// - 受け付けるのは POST /api/spots（投稿）と /api/hearts（ハート：POST で押す・外す、GET で並び順だけ）。投稿の中身やハートの数を返す API は作らない（中身は wrangler で取り出す）
+// - 受け付けるのは POST /api/spots（投稿）・POST /api/links（リンク集への情報提供：URL だけ）と /api/hearts（ハート：POST で押す・外す、GET で並び順だけ）。投稿の中身やハートの数を返す API は作らない（中身は wrangler で取り出す）
 // - IP アドレスは保存しない（日ごとの鍵でハッシュ化した値だけを2日間だけ置く）
 // - 連投の対策：Turnstile を毎回必須・同じ回線から1日 IP_DAILY_LIMIT 件まで・同じ日の同じ内容は受けない
-import { validateSubmission, validateHeart, jstDay, ipHash, contentKey, sha256, LIMITS } from './validate.js';
+import { validateSubmission, validateLink, validateHeart, jstDay, ipHash, contentKey, sha256, LIMITS } from './validate.js';
 
 const SECURITY_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -18,7 +18,7 @@ const json = (status, body, origin) => new Response(JSON.stringify(body), {
 });
 
 // hosts：Turnstile を解いたページのホスト名がこの中にあるかも確かめる（ほかのサイトで取ったトークンを使い回させない）
-async function verifyTurnstile(token, secret, ip, hosts) {
+async function verifyTurnstile(token, secret, ip, hosts, action = 'spot') {
   if (!token || typeof token !== 'string' || token.length > 2048) return false;
   const form = new FormData();
   form.append('secret', secret);
@@ -28,7 +28,7 @@ async function verifyTurnstile(token, secret, ip, hosts) {
     const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form });
     if (!r.ok) return false;
     const d = await r.json();
-    return d.success === true && (!d.action || d.action === 'spot') && hosts.includes(d.hostname);
+    return d.success === true && (!d.action || d.action === action) && hosts.includes(d.hostname);
   } catch { return false; }  // 確認できないときは受け付けない
 }
 
@@ -70,6 +70,49 @@ async function hearts(request, env, okOrigin) {
   return json(200, { ok: true }, okOrigin);
 }
 
+// ---- リンク集への情報提供（URL だけ。おすすめスポットと同じルール：Turnstile・1日10件・同じ内容は1日1回） ----
+async function links(request, env, okOrigin, allowed) {
+  if (request.method === 'OPTIONS') {
+    if (!okOrigin) return new Response(null, { status: 403 });
+    return new Response(null, { status: 204, headers: {
+      'Access-Control-Allow-Origin': okOrigin, 'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400', Vary: 'Origin' } });
+  }
+  if (request.method !== 'POST') return json(405, { ok: false, error: 'method not allowed' }, okOrigin);
+  if (!okOrigin) return json(403, { ok: false, error: '送信できませんでした' });
+  if (!(request.headers.get('Content-Type') || '').startsWith('application/json')) return json(415, { ok: false, error: '送信できませんでした' }, okOrigin);
+  if (Number(request.headers.get('Content-Length') || 0) > LIMITS.body) return json(413, { ok: false, error: '内容が長すぎます' }, okOrigin);
+  let input;
+  try {
+    const text = await request.text();
+    if (text.length > LIMITS.body) return json(413, { ok: false, error: '内容が長すぎます' }, okOrigin);
+    input = JSON.parse(text);
+  } catch { return json(400, { ok: false, error: '送信内容を読み取れませんでした' }, okOrigin); }
+  const v = validateLink(input);
+  if (!v.ok) return json(400, { ok: false, error: v.error }, okOrigin);
+  const ip = request.headers.get('CF-Connecting-IP') || '';
+  if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, allowed.map(o => new URL(o).hostname), 'link'))) {
+    return json(403, { ok: false, error: '確認に失敗しました。ページを開き直してもう一度お試しください' }, okOrigin);
+  }
+  const day = jstDay();
+  const dup = await sha256('link|' + v.value.url.toLowerCase().replace(/\/+$/, ''));
+  if (await env.DB.prepare('SELECT 1 FROM dup_hashes WHERE day = ? AND hash = ?').bind(day, dup).first()) {
+    return json(409, { ok: false, error: '同じ URL が、今日すでに届いています。ありがとうございます！' }, okOrigin);
+  }
+  // 1日の件数は、おすすめスポットの投稿とは別に数える（同じ IP_DAILY_LIMIT 件まで）
+  const max = Math.max(1, Number(env.IP_DAILY_LIMIT) || 10);
+  const hash = await ipHash(ip + '|link', env.IP_HASH_SECRET, day);
+  const cnt = await env.DB.prepare(
+    'INSERT INTO ip_counts (day, ip_hash, n) VALUES (?, ?, 1) ON CONFLICT(day, ip_hash) DO UPDATE SET n = n + 1 WHERE n < ? RETURNING n'
+  ).bind(day, hash, max).first();
+  if (!cnt) return json(429, { ok: false, error: `この回線からの送信は、今日はいっぱいです（1日${max}件まで）。また明日お願いします` }, okOrigin);
+  await env.DB.batch([
+    env.DB.prepare('INSERT OR IGNORE INTO dup_hashes (day, hash) VALUES (?, ?)').bind(day, dup),
+    env.DB.prepare('INSERT INTO link_submissions (created_at, url) VALUES (?, ?)').bind(new Date().toISOString(), v.value.url),
+  ]);
+  return json(201, { ok: true }, okOrigin);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -78,6 +121,7 @@ export default {
     const okOrigin = allowed.includes(origin) ? origin : '';
 
     if (url.pathname === '/api/hearts') return hearts(request, env, okOrigin);
+    if (url.pathname === '/api/links') return links(request, env, okOrigin, allowed);
     if (url.pathname !== '/api/spots') return json(404, { ok: false, error: 'not found' });
 
     if (request.method === 'OPTIONS') {
