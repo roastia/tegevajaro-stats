@@ -1073,3 +1073,4 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 main > * + * { margin-top: 14px; }
 main > .acc:first-child, :where(main > *) > .acc:first-child { margin-top: 0; }
 main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top: 14px; }   /* margin: 0 の指定より強くする */
+.amp { font-weight: 400; font-size: .72em; margin: 0 .2em; color: var(--muted); }   /* 2人組の「＆」は控えめに */

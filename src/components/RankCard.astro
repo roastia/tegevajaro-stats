@@ -1,5 +1,6 @@
 ---
 import PostBox from './PostBox.astro';
+import Name from './Name.astro';
 import { icon, splitDisp } from '../lib/util.js';
 import { ICON_OF_RECORD, plainTitle } from '../lib/meta.js';
 import { SITE } from '../config/site.js';
@@ -33,12 +34,12 @@ const title = plainTitle(meta.title);
   <div class="pop" id={pid} popover><b>{title}</b><br />{meta.note}</div>
   {meta.cheer && <p class="cheer">{meta.cheer}</p>}
   <div class="champ">
-    <span class="nm">{climbed && <span class="climb">首位浮上！</span>}{champs.map(r => r.name).join('・')}</span>
+    <span class="nm">{climbed && <span class="climb">首位浮上！</span>}{champs.map((r, i) => <>{i > 0 && '・'}<Name name={r.name} /></>)}</span>
   </div>
   <ol class="rank">
     {top.map(r => (
       <li class={r.cls} tabindex={r.det ? 0 : undefined} role={r.det ? 'button' : undefined} aria-expanded={r.det ? 'false' : undefined}>
-        <span class={`bar w${r.w}`}></span><span class="rk">{r._rank}</span><span class="nm">{r.name}{r.mv && <span class={r.mv.cls} title={r.mv.lb}><span class="vh">{r.mv.lb}</span><span aria-hidden="true">{r.mv.txt}</span></span>}</span><span class="dv">{r.main}</span>
+        <span class={`bar w${r.w}`}></span><span class="rk">{r._rank}</span><span class="nm"><Name name={r.name} />{r.mv && <span class={r.mv.cls} title={r.mv.lb}><span class="vh">{r.mv.lb}</span><span aria-hidden="true">{r.mv.txt}</span></span>}</span><span class="dv">{r.main}</span>
         {r.det && <span class="det" hidden>{r.det}</span>}
       </li>
     ))}
@@ -49,7 +50,7 @@ const title = plainTitle(meta.title);
       <ol class="rank" start={top.length + 1}>
         {rest.map(r => (
           <li class={r.cls} tabindex={r.det ? 0 : undefined} role={r.det ? 'button' : undefined} aria-expanded={r.det ? 'false' : undefined}>
-            <span class={`bar w${r.w}`}></span><span class="rk">{r._rank}</span><span class="nm">{r.name}{r.mv && <span class={r.mv.cls} title={r.mv.lb}><span class="vh">{r.mv.lb}</span><span aria-hidden="true">{r.mv.txt}</span></span>}</span><span class="dv">{r.main}</span>
+            <span class={`bar w${r.w}`}></span><span class="rk">{r._rank}</span><span class="nm"><Name name={r.name} />{r.mv && <span class={r.mv.cls} title={r.mv.lb}><span class="vh">{r.mv.lb}</span><span aria-hidden="true">{r.mv.txt}</span></span>}</span><span class="dv">{r.main}</span>
             {r.det && <span class="det" hidden>{r.det}</span>}
           </li>
         ))}

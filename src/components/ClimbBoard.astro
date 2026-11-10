@@ -1,6 +1,7 @@
 ---
 // ランキングのページの先頭：テゲスタ！ランキングの首位交代を1件ずつ（記録・新しい首位・数字・前の節からの順位・前の首位）
 import PostBox from './PostBox.astro';
+import Name from './Name.astro';
 import { icon, href } from '../lib/util.js';
 import { ICON_OF_RECORD } from '../lib/meta.js';
 import { SITE } from '../config/site.js';
@@ -19,7 +20,7 @@ const { climbs, prevRound, round, share } = Astro.props;
         <a class="cl-rec" href={`#rank-${c.id}`}><Fragment set:html={icon(ICON_OF_RECORD[c.id] || 'star')} />{c.title}<span aria-hidden="true">›</span></a>
         {c.leaders.map(l => (
           <div class="cl-who">
-            <span class="cl-name">{l.name}</span>
+            <span class="cl-name"><Name name={l.name} /></span>
             {l.value && <span class="cl-val">{l.value}</span>}
           </div>
         ))}
@@ -28,7 +29,7 @@ const { climbs, prevRound, round, share } = Astro.props;
           <span class="cl-arrow" aria-hidden="true">→</span>
           <span class="cl-to">1位</span>
         </div>
-        {c.was.length > 0 && <p class="cl-was">第{prevRound}節の1位：{c.was.join('・')}</p>}
+        {c.was.length > 0 && <p class="cl-was">第{prevRound}節の1位：{c.was.map((w, i) => <>{i > 0 && '・'}<Name name={w} /></>)}</p>}
       </li>
     ))}
   </ol>

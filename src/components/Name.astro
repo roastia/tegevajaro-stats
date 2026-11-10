@@ -1,0 +1,6 @@
+---
+// 選手名の表示。2人組（「A＆B」）の「＆」だけを細く小さくして、名前を目立たせる
+interface Props { name: string }
+const parts = String(Astro.props.name ?? '').split('＆');
+---
+{parts.map((p, i) => <>{i > 0 && <span class="amp">＆</span>}{p}</>)}
