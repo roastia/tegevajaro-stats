@@ -279,6 +279,13 @@ test('検索・AI 向け：よくある質問はサイトの数字と合い、�
   const sc = faq.find(x => x.q.includes('得点王'));
   assert.ok(sc && sc.a.includes(`${top}得点`), sc && sc.a);
   for (const e of eventsLd(fx).itemListElement) {
-    if (e.item.startDate.includes('T')) assert.match(e.item.startDate, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\+09:00$/);
+    const it = e.item;
+    if (it.startDate.includes('T')) {
+      assert.match(it.startDate, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\+09:00$/);
+      assert.equal(new Date(it.endDate) - new Date(it.startDate), 2 * 3600e3, it.name);
+    }
+    // Search Console の推奨項目
+    for (const k of ['endDate', 'image', 'organizer', 'description', 'performer']) assert.ok(it[k] && (!Array.isArray(it[k]) || it[k].length), `${it.name} に ${k} がない`);
+    assert.equal(it.performer.length, 2);
   }
 });

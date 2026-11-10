@@ -42,20 +42,36 @@ export function faqItems(d, fixtures, now = new Date()) {
 export const faqLd = items => ({ '@context': 'https://schema.org', '@type': 'FAQPage',
   mainEntity: items.map(x => ({ '@type': 'Question', name: x.q, acceptedAnswer: { '@type': 'Answer', text: x.a } })) });
 
-/** これからの試合（SportsEvent）。日本時間で書く */
+/** これからの試合（SportsEvent）。日本時間で書く
+ * Search Console の推奨項目（endDate・image・organizer・description・performer）もそろえる。
+ * endDate はキックオフの2時間後（前後半90分＋ハーフタイム・アディショナルタイムの目安）。キックオフ未定の日は日付だけ */
+const LEAGUE = { '@type': 'Organization', name: '公益社団法人日本プロサッカーリーグ（Jリーグ）', url: 'https://www.jleague.jp/' };
+const plus2h = (date, ko) => {
+  const [h, m] = ko.split(':').map(Number);
+  const t = new Date(Date.UTC(...date.split('-').map((v, i) => i === 1 ? Number(v) - 1 : Number(v)), h, m) + 2 * 3600e3);
+  const p = n => String(n).padStart(2, '0');
+  return `${t.getUTCFullYear()}-${p(t.getUTCMonth() + 1)}-${p(t.getUTCDate())}T${p(t.getUTCHours())}:${p(t.getUTCMinutes())}:00+09:00`;
+};
 export function eventsLd(fixtures) {
   return { '@context': 'https://schema.org', '@type': 'ItemList', name: `${SITE.team}の試合日程`,
     itemListElement: fixtures.map((f, i) => {
       const other = { '@type': 'SportsTeam', name: f.opponent_full || f.opponent };
+      const home = f.ha === 'H' ? TEAM : other, away = f.ha === 'H' ? other : TEAM;
       return { '@type': 'ListItem', position: i + 1, item: {
         '@type': 'SportsEvent',
-        name: `明治安田J2リーグ 第${f.round}節 ${f.ha === 'H' ? `${SITE.team} vs ${other.name}` : `${other.name} vs ${SITE.team}`}`,
+        name: `明治安田J2リーグ 第${f.round}節 ${home.name} vs ${away.name}`,
+        description: `明治安田J2リーグ 第${f.round}節。${SITE.team}の${f.ha === 'H' ? 'ホーム' : 'アウェイ'}戦（対戦相手：${other.name}、会場：${f.venue}）。`,
         startDate: f.kickoff ? `${f.date}T${f.kickoff}:00+09:00` : f.date,
+        endDate: f.kickoff ? plus2h(f.date, f.kickoff) : f.date,
         eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
         sport: 'サッカー',
-        location: { '@type': 'Place', name: f.venue },
-        homeTeam: f.ha === 'H' ? TEAM : other,
-        awayTeam: f.ha === 'H' ? other : TEAM,
+        image: [`${SITE.url}/og/site.png`],
+        location: { '@type': 'Place', name: f.venue, address: { '@type': 'PostalAddress', addressCountry: 'JP' } },
+        organizer: LEAGUE,
+        performer: [home, away],
+        homeTeam: home,
+        awayTeam: away,
       } };
     }) };
 }
