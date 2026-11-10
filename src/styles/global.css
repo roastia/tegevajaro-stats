@@ -611,6 +611,8 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .pos-x { --pc: #B9AEB3; --pc-soft: #F5F2F3; --pc-ink: var(--muted); --pc-on: var(--fg); }
 .pband { background: var(--pc-soft); color: var(--fg); border-bottom: 3px solid var(--pc); }
 .pband .jersey.on-color { filter: none; opacity: .85; }
+.pband .jersey-lg { width: 2.8rem; height: 2.8rem; }   /* 名前と情報の2行と同じくらいの高さ */
+.pband { gap: 10px; padding-block: 10px; }
 .pnum { -webkit-text-stroke-color: var(--pc-ink); }
 .pname a { color: var(--fg); }
 .pmeta { color: var(--muted); opacity: 1; }
