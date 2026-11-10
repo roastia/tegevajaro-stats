@@ -1,0 +1,19 @@
+---
+// チャント1件（コンパクト）：1行目＝背番号・名前・コール、2行目＝原曲、右に「聴く」
+import { siteUrl, icon } from '../lib/util.js';
+interface Props { label?: string; name?: string; tag?: string; call?: string; song?: string; artist?: string; youtube?: string }
+const { label, name, tag, call, song, artist, youtube } = Astro.props;
+const orig = song ? (artist ? `${song}（${artist}）` : song) : '';
+const url = youtube ? siteUrl(youtube) : '';
+---
+<li class="chant">
+  {(name || call) && (
+    <p class="chant-who">
+      {tag && <span class="chant-no">{tag}</span>}
+      {name && <span class="chant-name">{name}</span>}
+      {call && <span class="chant-call"><span class="chant-lb">コール</span>{call}</span>}
+    </p>
+  )}
+  {orig && <p class="chant-song"><span class="chant-lb">原曲</span>{orig}</p>}
+  {url && <a class="chant-play" href={url} target="_blank" rel="noopener noreferrer" aria-label={`${label ?? name ?? ''}のチャントを聴く（YouTube）`}><Fragment set:html={icon('play')} />聴く</a>}
+</li>
