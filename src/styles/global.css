@@ -49,7 +49,7 @@ img, svg { max-width: 100%; }
 .site-nav a { display: block; white-space: nowrap; padding: 10px 12px; color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent; }
 .site-nav a[aria-current='page'] { color: var(--ink); border-bottom-color: var(--brand); font-weight: 700; }
 .site-nav a:hover { color: var(--ink); }
-main { padding: 16px 0 40px; display: flex; flex-direction: column; gap: 18px; }
+main { padding: 16px 0 40px; display: flex; flex-direction: column; gap: 0; }
 .page-lead { margin: 0; color: var(--muted); }
 
 /* cards */
@@ -898,7 +898,7 @@ a.club-link, a.club-link:hover { color: inherit; text-decoration: none; }
 [popover].pop.hov { pointer-events: none; }
 [popover].pop.hov::backdrop { background: transparent; }
 /* ランキングの先頭：首位交代ボード（1件ずつカードに分ける） */
-.climbs { margin: 14px 0 8px; display: grid; gap: 10px; }
+.climbs { margin: 14px 0 0; display: grid; gap: 10px; }
 .climbs-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
 .climbs-k { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--ink); font-size: .9rem; }
 .climbs-k .ic { width: 1.1em; height: 1.1em; }
@@ -1046,7 +1046,7 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .link-item:focus-visible { outline: 3px solid var(--brand); outline-offset: 1px; }
 .link-name { font-weight: 700; color: var(--ink); }
 .link-host { display: block; font-size: .72rem; font-weight: 400; color: var(--muted); }
-.links-foot { margin: 4px 4px 0; }
+.links-foot { margin-inline: 4px; }
 
 /* 掲載をやめる依頼 */
 .spot-form select { font: inherit; font-weight: 400; font-size: 16px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--fg); width: 100%; grid-column: 1 / -1; }
@@ -1071,3 +1071,8 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .faq-q summary { cursor: pointer; font-weight: 700; color: var(--ink); }
 .faq-q p { margin: 6px 0 0; }
 .link-body { min-width: 0; }   /* リンクのまとまりは外枠なし（各リンクのカードだけ） */
+
+/* 項目の間隔：どのページも、ランキングの開け閉めの項目と同じ 14px にそろえる */
+main > * + * { margin-top: 14px; }
+main > .acc:first-child, :where(main > *) > .acc:first-child { margin-top: 0; }
+main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top: 14px; }   /* margin: 0 の指定より強くする */
