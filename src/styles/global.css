@@ -718,7 +718,6 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .away-guide a.ag-go { justify-self: start; white-space: nowrap; font-size: .8rem; font-weight: 700; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--apri); background: #fff; color: var(--apri-ink); text-decoration: none; }
 .away-guide a.ag-go:hover { background: var(--apri-soft); }
 .away-guide a.ag-go.ext::after { content: ' ↗'; }
-.away-guide a.ag-go.in::after { content: ' ↓'; }
 @media (max-width: 640px) { .away-guide .ag-list li { grid-template-columns: 1fr; } }
 /* ===== みやざき情報：色とボタンで見やすく ===== */
 .btn-main, .btn-sub { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 18px; border-radius: 999px; font-weight: 700; font-size: .9rem; text-decoration: none; white-space: nowrap; }
@@ -731,7 +730,6 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .miya-hero .welcome-h { margin: 0 0 6px; font-size: 1.5rem; }
 .miya-hero p { margin: 0; }
 .miya-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.miya-acts a[href^='#']::after, .spot-empty a::after { content: ' ↓'; }
 .away-guide { margin-top: 14px; }
 .ag-tiles { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); }
 .ag-tiles li { display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
