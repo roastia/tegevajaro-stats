@@ -903,7 +903,7 @@ a.club-link, a.club-link:hover { color: inherit; text-decoration: none; }
 .climbs-hl { margin: 0; font-weight: 700; font-size: 1.05rem; }
 .climbs-hl b { font-size: 1.8rem; color: var(--ink); margin-right: 2px; }
 .climbs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
-.climbs-list li { display: grid; gap: 6px; align-content: start; padding: 12px 14px; border: 1px solid var(--line); border-left: 4px solid var(--brand); border-radius: var(--radius); background: #fff; }
+.climbs-list li { display: grid; gap: 6px; align-content: start; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
 .cl-rec { display: inline-flex; align-items: center; gap: 6px; justify-self: start; font-size: .85rem; font-weight: 700; color: var(--ink); text-decoration: none; }
 .cl-rec .ic { width: 1.1em; height: 1.1em; }
 .cl-rec:hover { text-decoration: underline; }
