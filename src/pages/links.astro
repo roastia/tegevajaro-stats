@@ -24,7 +24,6 @@ const fans = rows.filter(r => r.group === 'group' || r.group === 'youtube').leng
     <h2 class="links-h">テゲバを応援する人たち</h2>
     <p class="page-lead">テゲバジャーロ宮崎を応援し、発信している人たちのリンク集です。ゴール裏で声を出す人、遠征を記録する人、試合を語り合う人。テゲバを応援している人は、こんなにいます。気になるチャンネルをのぞいて、いっしょに盛り上がりましょう！</p>
     <p class="links-count">団体・チャンネル <b>{fans}</b></p>
-    <div class="miya-acts"><a class="btn-sub" href="#post">テゲバの情報を教える</a></div>
   </section>
   {GROUPS.map(([id, label, ic]) => {
     const list = rows.filter(r => r.group === id);
