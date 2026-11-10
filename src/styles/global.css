@@ -529,7 +529,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .site-nav a.nav-miya:hover { color: #A44E14; }
 .site-nav a.nav-miya[aria-current='page'] { color: #A44E14; border-bottom-color: #E8833A; }
 
-/* スマホ：メニューは横スクロールをやめ、タブを2段に並べる（どこに何があるか一目でわかる）。2段目は「日程・リンク・チャント・みやざき情報」。みやざき情報はオレンジのタブ */
+/* スマホ：メニューは横スクロールをやめ、タブを2段に並べる（どこに何があるか一目でわかる）。2段目は「日程・チャント・リンク・みやざき情報」。みやざき情報はオレンジのタブ */
 @media (max-width: 640px) {
   .site-nav ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 8px 16px; overflow: visible; touch-action: auto; }
   .site-nav li { min-width: 0; }
