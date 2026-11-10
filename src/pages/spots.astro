@@ -20,10 +20,6 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
   <section class="miya-hero">
     <h2 class="welcome-h welcome-img"><img src={href('welcome-miyazaki.svg')} alt="ようこそみやざきへ！" width="2020" height="301" /></h2>
     <p>遠くから、ようこそお越しくださいました！試合の前も後も、宮崎をゆっくり楽しんでいってください。スタジアムへの行きかたや観戦ルールなどの案内と、地元のテゲサポがおすすめする場所をまとめました。「また来たいな」と思ってもらえたら、うれしいです。</p>
-    <div class="miya-acts">
-      <a class="btn-main" href="#spotList"><Fragment set:html={icon('pin')} />おすすめスポットを見る</a>
-      <a class="btn-sub" href="#post">おすすめを教える</a>
-    </div>
   </section>
 
   <Acc id="spotList" title="おすすめスポット" icon="pin" count={spots.length || ''}>
