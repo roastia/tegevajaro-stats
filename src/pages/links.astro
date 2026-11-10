@@ -30,7 +30,7 @@ const fans = rows.filter(r => r.group === 'group' || r.group === 'youtube').leng
     const list = rows.filter(r => r.group === id);
     return list.length > 0 && (
       <Acc id={`links-${id}`} title={label} icon={ic} count={list.length > 1 ? list.length : ''}>
-        <section class="card">
+        <section class="link-body">
           <ul class="link-list">
             {list.map(r => (
               <li>

@@ -1072,3 +1072,4 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .faq-q { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 14px; }
 .faq-q summary { cursor: pointer; font-weight: 700; color: var(--ink); }
 .faq-q p { margin: 6px 0 0; }
+.link-body { min-width: 0; }   /* リンクのまとまりは外枠なし（各リンクのカードだけ） */
