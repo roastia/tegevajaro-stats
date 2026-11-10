@@ -529,23 +529,22 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .site-nav a.nav-miya:hover { color: #A44E14; }
 .site-nav a.nav-miya[aria-current='page'] { color: #A44E14; border-bottom-color: #E8833A; }
 
-/* スマホ：メニューは横スクロールをやめ、タブを2段に並べる（どこに何があるか一目でわかる）。「みやざき情報」は2マス分のオレンジのタブ */
+/* スマホ：メニューは横スクロールをやめ、タブを2段に並べる（どこに何があるか一目でわかる）。2段目は「日程・リンク・チャント・みやざき情報」。みやざき情報はオレンジのタブ */
 @media (max-width: 640px) {
   .site-nav ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 8px 16px; overflow: visible; touch-action: auto; }
   .site-nav li { min-width: 0; }
   .site-nav a { display: flex; align-items: center; justify-content: center; gap: 2px; height: 34px; padding: 0 2px; font-size: 12.5px; letter-spacing: -.02em;
     border: 1px solid var(--line); border-bottom-width: 1px; border-radius: 9px; background: #fff; color: var(--fg); }
   .site-nav a[aria-current='page'] { background: var(--brand-deep); border-color: var(--brand-deep); color: #fff; font-weight: 700; }
-  .site-nav li:has(> a.nav-miya) { grid-column: span 2; }   /* 2段目：日程（1マス）＋リンク（1マス）＋みやざき情報（2マス） */
-  .site-nav a.nav-miya { border-color: #E8A06A; color: #B8571A; background: #FFF6EE; font-weight: 700; }
+  .site-nav a.nav-miya { border-color: #E8A06A; color: #B8571A; background: #FFF6EE; font-weight: 700; gap: 1px; letter-spacing: -.07em; font-size: 11.5px; }
   .site-nav a.nav-miya[aria-current='page'] { background: #E8833A; border-color: #E8833A; color: #fff; }
-  .site-nav a.nav-miya::before { content: ''; width: 1em; height: 1em; background: currentColor; flex: none;
+  .site-nav a.nav-miya::before { content: ''; width: .9em; height: .9em; background: currentColor; flex: none;
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-6.2-6-6.2-11.2a6.2 6.2 0 0112.4 0C18.2 15 12 21 12 21z'/%3E%3Ccircle cx='12' cy='9.8' r='2.2'/%3E%3C/svg%3E") center / contain no-repeat;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-6.2-6-6.2-11.2a6.2 6.2 0 0112.4 0C18.2 15 12 21 12 21z'/%3E%3Ccircle cx='12' cy='9.8' r='2.2'/%3E%3C/svg%3E") center / contain no-repeat; }
 }
 .spot-form .field-hint { margin: -6px 0 0; font-size: .78rem; }
 .spot-form .field-hint .nw { white-space: nowrap; }
-@media (max-width: 345px) { .site-nav ul { gap: 4px; padding-inline: 12px; } .site-nav a { font-size: 11px; letter-spacing: -.04em; } }
+@media (max-width: 345px) { .site-nav ul { gap: 4px; padding-inline: 12px; } .site-nav a { font-size: 11px; letter-spacing: -.04em; } .site-nav a.nav-miya { letter-spacing: -.08em; font-size: 10.5px; } }
 
 /* 非公式の表記：ロゴの横に小さく（必須ルール1。消さない） */
 .site-head .head-sub { display: flex; flex-direction: column; gap: 1px; padding-bottom: 2px; }
@@ -1074,3 +1073,23 @@ main > * + * { margin-top: 14px; }
 main > .acc:first-child, :where(main > *) > .acc:first-child { margin-top: 0; }
 main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top: 14px; }   /* margin: 0 の指定より強くする */
 .amp { font-weight: 400; font-size: .72em; margin: 0 .2em; color: var(--muted); }   /* 2人組の「＆」は控えめに */
+
+/* ---- チャント ---- */
+.chant-credit { margin: 12px 0 0; font-size: .95rem; color: var(--ink); }
+.chant-credit-sub { margin: 4px 0 0; font-size: .85rem; color: var(--muted); }
+.chant-group { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chant-lead { margin: 0 0 10px; font-size: .9rem; }
+.chant-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+@media (min-width: 761px) { .chant-list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); } }
+.chant { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); }
+.chant p { margin: 0; }
+.chant-who { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.chant-no { font-size: .72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chant-name { font-weight: 700; color: var(--ink); }
+.chant-call { font-size: .8rem; color: var(--muted); }
+.chant-call b { margin-left: 6px; font-size: 1rem; color: var(--brand-deep); }
+.chant-song { font-size: .82rem; color: var(--fg); }
+.chant-play { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 4px 12px; border: 1px solid var(--brand); border-radius: 999px; font-size: .8rem; font-weight: 700; color: var(--brand-deep); text-decoration: none; }
+.chant-play:hover { background: var(--soft); }
+.chant-play:focus-visible { outline: 3px solid var(--brand); outline-offset: 1px; }
+.chant-play .ic { width: 1em; height: 1em; }

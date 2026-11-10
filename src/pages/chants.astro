@@ -1,0 +1,106 @@
+---
+import Base from '../layouts/Base.astro';
+import Acc from '../components/Acc.astro';
+import { readCsv } from '../lib/data.js';
+import { siteUrl, icon } from '../lib/util.js';
+import { chantsLd } from '../lib/seo.js';
+// チャント：src/data/chants.csv。チャントはすべて宮崎ブーゲンビリーバーが作ったもの（docs/chants.md）
+// 歌詞は載せない（ブーゲンビリーバーの歌詞カードへリンクする）。音源は YouTube へのリンクだけ（埋め込まない）
+const rows = readCsv('chants').filter(r => r.name);
+const of = k => rows.filter(r => r.kind === k);
+// 選手名・背番号は選手データから（チャントの表に名前の区切りがないので、空白を除いて照らし合わせる）
+const key = s => String(s).replace(/\s/g, '');
+const roster = new Map(readCsv('players').map(p => [key(p.name), p]));
+const players = of('player').map(r => ({ ...r, p: roster.get(key(r.name)) }))
+  .sort((a, b) => Number(a.p?.no ?? 999) - Number(b.p?.no ?? 999));
+const staff = of('staff');
+const team = of('team');
+const memorial = of('memorial');
+const movies = of('movie');
+const cards = of('card');
+const group = readCsv('links').filter(r => /ブーゲンビリーバー/.test(r.name))
+  .map(r => ({ url: siteUrl(r.url), label: (r.name.match(/（(.+)）/)?.[1] ?? r.name) }));
+const song = r => r.song ? (r.artist ? `${r.song}（${r.artist}）` : r.song) : '';
+---
+<Base current="chants" ld={[chantsLd(rows)]} title="チャント" description="テゲバジャーロ宮崎の選手チャント・チームチャントの一覧。コール・原曲・音源（YouTube）をまとめています。チャントは宮崎ブーゲンビリーバーが作ったものです（非公式）。">
+  <section class="card links-hero">
+    <h2 class="links-h">いっしょに歌おう！</h2>
+    <p class="page-lead">テゲバジャーロ宮崎の選手チャント・チームチャントの一覧です。コールと原曲、音源へのリンクをまとめました。スタジアムで声を合わせる前に、ここで予習しておきましょう！</p>
+    <p class="chant-credit">チャント：<b>宮崎ブーゲンビリーバー</b></p>
+    <p class="chant-credit-sub">チャントはすべて、ゴール裏で応援を先導している宮崎ブーゲンビリーバーが作ったものです。いつも熱い応援をありがとうございます！</p>
+    <ul class="chant-group">
+      {group.map(g => <li><a class="btn-sub" href={g.url} target="_blank" rel="noopener noreferrer">{g.label}</a></li>)}
+    </ul>
+  </section>
+
+  <Acc id="chants-lyrics" title="歌詞カード" icon="card" count={cards.length}>
+    <section class="link-body">
+      <p class="chant-lead">歌詞は、宮崎ブーゲンビリーバーが公開している歌詞カードで見られます。</p>
+      <ul class="link-list">
+        {cards.map(r => (
+          <li><a class="link-item" href={siteUrl(r.youtube)} target="_blank" rel="noopener noreferrer"><span class="link-name">{r.name}</span><span class="link-host">x.com</span></a></li>
+        ))}
+      </ul>
+    </section>
+  </Acc>
+
+  <Acc id="chants-players" title="選手チャント" icon="flame" count={players.length + staff.length}>
+    <ul class="chant-list">
+      {players.map(r => (
+        <li class="chant">
+          <p class="chant-who">{r.p && <span class="chant-no">{r.p.pos} {r.p.no}</span>}<span class="chant-name">{r.p?.name ?? r.name}</span></p>
+          {r.call && <p class="chant-call">コール<b>{r.call}</b></p>}
+          {song(r) && <p class="chant-song">原曲：{song(r)}</p>}
+          {r.youtube && <a class="chant-play" href={siteUrl(r.youtube)} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />音源を聴く</a>}
+        </li>
+      ))}
+      {staff.map(r => (
+        <li class="chant">
+          <p class="chant-who"><span class="chant-no">監督</span><span class="chant-name">{r.name}</span></p>
+          {r.call && <p class="chant-call">コール<b>{r.call}</b></p>}
+          {song(r) && <p class="chant-song">原曲：{song(r)}</p>}
+          {r.youtube && <a class="chant-play" href={siteUrl(r.youtube)} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />音源を聴く</a>}
+        </li>
+      ))}
+    </ul>
+  </Acc>
+
+  <Acc id="chants-team" title="チームチャント" icon="flag" count={team.length}>
+    <ul class="chant-list">
+      {team.map(r => (
+        <li class="chant">
+          <p class="chant-who"><span class="chant-name">{r.name}</span></p>
+          {r.call && <p class="chant-call">コール<b>{r.call}</b></p>}
+          {song(r) && <p class="chant-song">原曲：{song(r)}</p>}
+          {r.youtube && <a class="chant-play" href={siteUrl(r.youtube)} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />音源を聴く</a>}
+        </li>
+      ))}
+    </ul>
+  </Acc>
+
+  {memorial.map(r => (
+    <Acc id="chants-kudo" title={r.name} icon="star">
+      <section class="link-body">
+        <p class="chant-lead">2022年にテゲバでプレーした工藤壮人さん（FW・9番）のチャントです。命日の10月21日に歌われています。</p>
+        <ul class="chant-list">
+          <li class="chant">
+            {song(r) && <p class="chant-song">原曲：{song(r)}</p>}
+            {r.youtube && <a class="chant-play" href={siteUrl(r.youtube)} target="_blank" rel="noopener noreferrer"><Fragment set:html={icon('play')} />音源を聴く</a>}
+          </li>
+        </ul>
+      </section>
+    </Acc>
+  ))}
+
+  <Acc id="chants-movies" title="まとめ動画" icon="play" count={movies.length}>
+    <section class="link-body">
+      <ul class="link-list">
+        {movies.map(r => (
+          <li><a class="link-item" href={siteUrl(r.youtube)} target="_blank" rel="noopener noreferrer"><span class="link-name">{r.name}</span><span class="link-host">youtube.com</span></a></li>
+        ))}
+      </ul>
+    </section>
+  </Acc>
+
+  <p class="note">コール・原曲・音源は、宮崎ブーゲンビリーバーの歌詞カード・紹介ポスト・YouTube をもとにまとめています。原曲がわからないチャントは、空けています。テゲスタ！は宮崎ブーゲンビリーバーとは別の、非公式のサイトです。</p>
+</Base>
