@@ -321,3 +321,18 @@ test('画像でポスト：短い文は X に収まり、自分のコメント�
     assert.ok(!paths.has(p), p); paths.add(p);
   }
 });
+
+test('誕生日：ビルド時とブラウザで同じ HTML（日本時間で数え、マスコットは年齢なし）', async () => {
+  const { bdayPeople, bdayState, bdayKey, hbdHtml, soonHtml, todayJst } = await import('../src/lib/bday.js');
+  const people = bdayPeople([{ no: '38', name: '小西 宏登', pos: 'MF', birth: '2002-11-12' }], [{ name: 'ジャーロくん', birth: '11-11' }]);
+  // 11/11 の 23:30（日本時間）は、まだ 11/11
+  const t = todayJst(new Date('2026-11-11T14:30:00Z'));
+  const st = bdayState(people, t);
+  assert.equal(bdayKey(st.today), 'ジャーロくん:0');
+  assert.equal(bdayKey(st.soon), 'ジャーロくん:0|小西 宏登:1');
+  assert.ok(!/歳/.test(hbdHtml(st.today)), 'マスコットは年齢を出さない');
+  const st2 = bdayState(people, todayJst(new Date('2026-11-12T03:00:00Z')));
+  assert.match(hbdHtml(st2.today, { '小西 宏登': 'https://www.jleague.jp/player/1/' }), /24歳/);
+  assert.match(soonHtml(st2.soon), /小西 宏登/);
+  assert.equal(hbdHtml([]), '');
+});

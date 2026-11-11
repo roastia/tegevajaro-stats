@@ -1,4 +1,5 @@
 ---
+import BdaySoon from '../components/BdaySoon.astro';
 import Acc from '../components/Acc.astro';
 import Base from '../layouts/Base.astro';
 import PostBox from '../components/PostBox.astro';
@@ -32,7 +33,7 @@ d.rankings.forEach(({ meta, rows }, idx) => {
 const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
 ---
 <Base current="players" ld={[playersLd(players, d.players)]} title="選手名鑑・チームデータ" description="テゲバジャーロ宮崎の選手名鑑（背番号・年齢・出身地・出身校と今季の称号）と、大学経由・アカデミー育ち・平均年齢などのチームデータ（非公式）。">
-  <section class="bday" data-bday hidden></section>
+  <BdaySoon />
   <Acc id="titles" title="選手名鑑" icon="medal" count={players.length}>
   <section class="card">
     <p class="note">背番号・年齢・出身地・出身校と、今季の称号がひと目でわかる選手カード。称号はランキングで3位以内に入るとゲット。推しの称号をチェックして、応援の話題にどうぞ。名前を押すとJリーグ公式の選手ページ（写真・経歴）が開きます。</p>

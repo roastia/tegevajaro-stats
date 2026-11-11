@@ -1,0 +1,7 @@
+---
+// 「もうすぐ誕生日」：ビルドの日（日本時間）で先に HTML にしておく。ブラウザで日付が違うときだけ site.js が作り直す（src/lib/bday.js）
+import { getData } from '../lib/data.js';
+import { bdayPeople, bdayState, bdayKey, soonHtml } from '../lib/bday.js';
+const { soon } = bdayState(bdayPeople(getData().profiles));
+---
+<section class="bday" data-bday hidden={!soon.length} data-key={bdayKey(soon)} set:html={soonHtml(soon)}></section>

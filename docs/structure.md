@@ -5,6 +5,7 @@
 - `src/lib/calcs.js` … ランキング計算（純粋関数）。ダッシュボード版で検算済みのロジック
 - `src/lib/meta.js` … ランキングの定義（タイトル・応援のひとこと・説明・出典）、アイコン、称号キャラ
 - `src/lib/data.js` … CSV 読み込み → 計算 → ページへ。`getShareables()` がポストできるもの（トピック・ランキング・背景）
+- `src/lib/bday.js` … 誕生日のお祝い（ページ上の「お誕生日おめでとう！」・「もうすぐ誕生日」`src/components/BdaySoon.astro`）。ビルド時（毎日 0:05 日本時間）とブラウザで同じ HTML を作り、ブラウザの今日がビルドの日と違うときだけ site.js が作り直す（あとから枠が出て画面がずれる・ちらつくのを防ぐ）。マスコットは `SITE.mascots`（年齢なし）
 - `src/lib/shareimg.js` ＋ `src/pages/share/[slug].png.ts` … 「画像でポスト」用の画像（1080×1350・縦長 4:5。注目トピック・ランキング・首位浮上の1件ずつ。`/share/t-〇〇.png`・`/share/r-〇〇.png`）を Satori + resvg でビルド時に生成。下の帯にロゴ・テゲバのスタッツ・非公式サポーターサイト・時点・データ元。ボタンは `PostBox` に `img`・`short` を渡すと「画像でポスト」になり、スマホは共有メニュー（X を選ぶと画像つき）、PC は画像のダウンロード＋X の投稿画面（短い文）。動きは `src/scripts/site.js` の最後
 - `src/lib/og.js` … リンクのサムネイル画像（1200×630 PNG、テゲスタ！のロゴ。全ページ共通の `/og/site.png`）を Satori + resvg でビルド時に生成
 - `dashboard/` … ダッシュボード版（Claude のダッシュボード）の中身の控え。公開版のビルドには使わない（`dashboard/README.md`）

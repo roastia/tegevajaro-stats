@@ -1,5 +1,6 @@
 // すべてのページで動く小さなスクリプト：スクロール位置・誕生日・紙吹雪（当日だけ読み込む）
 import { icon, xIntent, xLabel, href } from '../lib/util.js';
+import { bdayInfo, bdayState, bdayKey, hbdHtml, soonHtml } from '../lib/bday.js';
 import { SITE } from '../config/site.js';
 import { nextMatch, splitLeft } from '../lib/nextmatch.js';
 import { makeFlipBoard } from '../lib/flipboard.js';
@@ -89,94 +90,43 @@ const snapChips = root => {
   let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(run, 100); });
 }
 
-/* ---------- 誕生日（日本時間の今日から数える） ---------- */
-function todayJst() {
-  const [y, m, d] = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('-').map(Number);
-  return new Date(Date.UTC(y, m - 1, d));
-}
-export function bdayInfo(birth) {
-  if (!birth) return null;
-  const [y, m, d] = birth.split('-').map(Number);
-  const t = todayJst();
-  let next = new Date(Date.UTC(t.getUTCFullYear(), m - 1, d));
-  if (next < t) next = new Date(Date.UTC(t.getUTCFullYear() + 1, m - 1, d));
-  const age = t.getUTCFullYear() - y - ((t.getUTCMonth() + 1 < m || (t.getUTCMonth() + 1 === m && t.getUTCDate() < d)) ? 1 : 0);
-  return { days: Math.round((next - t) / 86400000), turning: next.getUTCFullYear() - y, age, m, d };
-}
+/* ---------- 誕生日（日本時間の今日から数える。HTML は src/lib/bday.js でビルド時と同じものを作る） ---------- */
 let people = [];
 try { people = JSON.parse(document.getElementById('bday-data')?.textContent || '[]'); } catch { people = []; }
-const soon = people.map(p => ({ p, b: bdayInfo(p.birth) })).filter(x => x.b && x.b.days <= 31).sort((a, b) => a.b.days - b.b.days);
-const today = soon.filter(x => x.b.days === 0);
-
+const { soon, today } = bdayState(people);
 const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-// 名前の前に「背番号」バッジ（数字だけだと背番号とわかりにくいため）
-// 名前の前に背番号入りシャツのイラスト
-const jnoName = p => {
-  const nm = h('span', 'nm');
-  if (p.mascot) { const ic = h('span', 'bmascot'); ic.innerHTML = icon('party'); nm.append(ic, h('span', null, p.name)); return nm; }
-  const img = h('img', 'jersey jersey-sm on-color'); img.src = href(`chars/numbers-s/${p.no}.png`); img.alt = `背番号${p.no}`; img.width = 44; img.height = 44; img.decoding = 'async';
-  nm.append(img, h('span', null, p.name));
-  return nm;
-};
-const bdayBtn = (birth, label) => { const b = h('button', 'bdbtn'); b.type = 'button'; b.dataset.bdayOpen = birth; b.innerHTML = icon('cake'); b.append(label); return b; };
-const postLink = (text, label, cls = 'bpost') => { const a = h('a', cls); a.href = xIntent(text, SITE.url + '/', ''); a.target = '_blank'; a.rel = 'noopener noreferrer'; a.innerHTML = `<span>${xLabel(label)}</span>`; return a; };
-
-// 呼び方と年齢：マスコットは「選手」を付けず、年齢も出さない
+// 呼び方：マスコットは「選手」を付けない
 const callName = p => p.mascot ? p.name : `${p.name}選手`;
-const ageText = (p, b, pre = '') => p.mascot ? '' : `${pre}${b.turning}歳`;
+
+// ページ上の「お誕生日おめでとう！」：ビルドした日と今日が同じなら、ビルドした HTML のまま（作り直さない＝ずれない）
 const hbd = document.getElementById('hbd');
-if (hbd && today.length) {
-  const names = today.map(({ p }) => callName(p)).join('・');
-  const cake = h('div', 'cake'); cake.innerHTML = icon('cake');
-  // 1人ずつ：背番号のシャツ・名前（Jリーグ公式の選手ページへ）・年齢（大きく）
+if (hbd && hbd.dataset.key !== bdayKey(today)) {
   let plUrls = {};
   try { plUrls = JSON.parse(document.getElementById('pl-urls')?.textContent || '{}'); } catch { plUrls = {}; }
-  const who = h('div', 'who');
-  for (const { p, b } of today) {
-    const one = h('span', 'hbd-p');
-    if (p.mascot) { const ic = h('span', 'bmascot'); ic.innerHTML = icon('party'); one.append(ic); }
-    else { const img = h('img', 'jersey jersey-sm on-color'); img.src = href(`chars/numbers-s/${p.no}.png`); img.alt = `背番号${p.no}`; img.width = 44; img.height = 44; img.decoding = 'async'; one.append(img); }
-    const url = !p.mascot && plUrls[p.name];
-    const nm = url ? h('a', 'pl-link hbd-nm', `${p.name}選手`) : h('span', 'hbd-nm', p.mascot ? p.name : `${p.name}選手`);
-    if (url) { nm.href = url; nm.target = '_blank'; nm.rel = 'noopener noreferrer'; }
-    one.append(nm, h('span', 'hbd-age', p.mascot ? 'おめでとう！' : `${b.turning}歳`));
-    who.append(one);
-  }
-  hbd.append(cake, h('div', 'msg', 'お誕生日おめでとう！'), who,
-    postLink(`今日は${names}の誕生日！${today.length === 1 && !today[0].p.mascot ? `${today[0].b.turning}歳、` : ''}おめでとうございます🎂🎉 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`, 'お祝いをXでポスト'));
-  hbd.hidden = false;
-  if (!reduced && !sessionStorageGet('confetti')) {
-    // 紙吹雪の部品は、誕生日の当日だけ読み込む（ふだんのページを軽くするため）
-    import('canvas-confetti').then(({ default: lib }) => {
-      const confetti = lib.create(null, { resize: true, useWorker: false });   // Worker は CSP で止まるので使わない
-      const colors = ['#F16682', '#F5C84A', '#FFFFFF', '#C8375F', '#F2A93B'];
-      confetti({ particleCount: 120, spread: 80, origin: { y: 0.25 }, colors, disableForReducedMotion: true });
-      setTimeout(() => confetti({ particleCount: 80, angle: 60, spread: 60, origin: { x: 0, y: 0.5 }, colors, disableForReducedMotion: true }), 400);
-      setTimeout(() => confetti({ particleCount: 80, angle: 120, spread: 60, origin: { x: 1, y: 0.5 }, colors, disableForReducedMotion: true }), 700);
-      sessionStorageSet('confetti', '1');
-    }).catch(() => { /* 読み込めなくてもお祝いの表示はそのまま */ });
-  }
+  hbd.innerHTML = hbdHtml(today, plUrls);
+  hbd.dataset.key = bdayKey(today);
+  hbd.hidden = !today.length;
+}
+if (hbd && today.length && !reduced && !sessionStorageGet('confetti')) {
+  // 紙吹雪の部品は、誕生日の当日だけ読み込む（ふだんのページを軽くするため）。1回のタブで1度だけ
+  import('canvas-confetti').then(({ default: lib }) => {
+    const confetti = lib.create(null, { resize: true, useWorker: false });   // Worker は CSP で止まるので使わない
+    const colors = ['#F16682', '#F5C84A', '#FFFFFF', '#C8375F', '#F2A93B'];
+    confetti({ particleCount: 120, spread: 80, origin: { y: 0.25 }, colors, disableForReducedMotion: true });
+    setTimeout(() => confetti({ particleCount: 80, angle: 60, spread: 60, origin: { x: 0, y: 0.5 }, colors, disableForReducedMotion: true }), 400);
+    setTimeout(() => confetti({ particleCount: 80, angle: 120, spread: 60, origin: { x: 1, y: 0.5 }, colors, disableForReducedMotion: true }), 700);
+    sessionStorageSet('confetti', '1');
+  }).catch(() => { /* 読み込めなくてもお祝いの表示はそのまま */ });
 }
 function sessionStorageGet(k) { try { return sessionStorage.getItem(k); } catch { return null; } }
 function sessionStorageSet(k, v) { try { sessionStorage.setItem(k, v); } catch { /* noop */ } }
 
-// 「もうすぐ誕生日」バナー（ページ内に .bday[data-bday] があれば）
+// 「もうすぐ誕生日」：こちらもビルドした日と同じなら、そのまま
 for (const box of document.querySelectorAll('.bday[data-bday]')) {
-  if (!soon.length) continue;
-  const t = h('h2'); t.innerHTML = icon('cake'); t.append(soon[0].b.days === 0 ? '今日は誕生日！' : 'もうすぐ誕生日');
-  const row = h('div', 'row');
-  for (const { p, b } of soon) {
-    const c = h('div', 'bcard' + (b.days === 0 ? ' today' : ''));
-    if (b.days === 0) c.append(h('span', 'cd', 'TODAY'), jnoName(p), h('span', 'bg2', 'おめでとう！'), h('span', 'cd', p.mascot ? '今日が誕生日' : `今日で${b.turning}歳`));
-    else c.append(h('span', 'cd', `あと${b.days}日`), jnoName(p), bdayBtn(p.birth, `${b.m}月${b.d}日${p.mascot ? '' : 'で'}`), h('span', 'bg2', p.mascot ? 'お誕生日' : `${b.turning}歳`));
-    const text = b.days === 0
-      ? `今日${b.m}月${b.d}日は${callName(p)}の${ageText(p, b)}${p.mascot ? '' : 'の'}誕生日！おめでとうございます🎂 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`
-      : `${b.m}月${b.d}日は${callName(p)}の${ageText(p, b)}${p.mascot ? '' : 'の'}誕生日🎂 あと${b.days}日！ みんなでお祝いしよう\n${SITE.hashtags}`;
-    c.append(postLink(text, b.days === 0 ? 'Xでお祝い' : 'Xでポスト'));
-    row.append(c);
-  }
-  box.append(t, row);
-  box.hidden = false;
+  if (box.dataset.key === bdayKey(soon)) continue;
+  box.innerHTML = soonHtml(soon);
+  box.dataset.key = bdayKey(soon);
+  box.hidden = !soon.length;
 }
 
 // 選手カード・年齢一覧の誕生日表示
