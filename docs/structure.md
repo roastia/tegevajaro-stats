@@ -5,7 +5,7 @@
 - `src/lib/calcs.js` … ランキング計算（純粋関数）。ダッシュボード版で検算済みのロジック
 - `src/lib/meta.js` … ランキングの定義（タイトル・応援のひとこと・説明・出典）、アイコン、称号キャラ
 - `src/lib/data.js` … CSV 読み込み → 計算 → ページへ。`getShareables()` がポストできるもの（トピック・ランキング・背景）
-- `src/lib/shareimg.js` ＋ `src/pages/share/[slug].png.ts` … 「画像でポスト」用の画像（1080×1350・縦長 4:5。注目トピック・ランキング・首位浮上の1件ずつ。`/share/t-〇〇.png`・`/share/r-〇〇.png`）を Satori + resvg でビルド時に生成。下の帯にロゴ・非公式サポーターサイト・tegestats.com・時点・データ元。ボタンは `PostBox` に `img`・`short` を渡すと「画像でポスト」になり、スマホは共有メニュー（X を選ぶと画像つき）、PC は画像のダウンロード＋X の投稿画面（短い文）。動きは `src/scripts/site.js` の最後
+- `src/lib/shareimg.js` ＋ `src/pages/share/[slug].png.ts` … 「画像でポスト」用の画像（1080×1350・縦長 4:5。注目トピック・ランキング・首位浮上の1件ずつ。`/share/t-〇〇.png`・`/share/r-〇〇.png`）を Satori + resvg でビルド時に生成。下の帯にロゴ・テゲバのスタッツ・非公式サポーターサイト・時点・データ元。ボタンは `PostBox` に `img`・`short` を渡すと「画像でポスト」になり、スマホは共有メニュー（X を選ぶと画像つき）、PC は画像のダウンロード＋X の投稿画面（短い文）。動きは `src/scripts/site.js` の最後
 - `src/lib/og.js` … リンクのサムネイル画像（1200×630 PNG、テゲスタ！のロゴ。全ページ共通の `/og/site.png`）を Satori + resvg でビルド時に生成
 - `dashboard/` … ダッシュボード版（Claude のダッシュボード）の中身の控え。公開版のビルドには使わない（`dashboard/README.md`）
 - `integrations/stable-names.mjs` … ビルド後に `_astro/` の CSS・JS のファイル名から記号（.AbCd1234）を外し、ページの中の参照も書きかえる。公開のたびに名前が変わると、ブラウザに残った古いページ（GitHub Pages は10分ほど覚える・先読み）が消えたファイルを探してデザインなしになるため

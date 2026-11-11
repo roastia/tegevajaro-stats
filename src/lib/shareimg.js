@@ -1,6 +1,6 @@
 // 「画像でポスト」用の画像（1080×1350・縦長 4:5）をビルド時に作る。注目トピック・ランキングの1件ずつ
 // 中身はページのポスト用カードと同じ（見出し・大きな数字・補足・応援）。画像だけ広まっても出どころがわかるよう、
-// 下の帯に「テゲスタ！ 非公式サポーターサイト・tegestats.com・時点・データ元」を入れる。写真・エンブレムは使わない
+// 下の帯に「テゲスタ！ テゲバのスタッツ・非公式サポーターサイト・時点・データ元」を入れる。写真・エンブレムは使わない
 import fs from 'node:fs';
 import path from 'node:path';
 import satori from 'satori';
@@ -76,9 +76,12 @@ export function shareTree(item, asOf = SITE.roundLabel) {
     item.cheer && h('div', { display: 'flex', flex: 'none', marginTop: 'auto', paddingTop: 20, marginBottom: 52 }, wrapEl(item.cheer, fit(item.cheer, 1900, 52, 36), C.ink, 700)),
   );
   const foot = h('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 150, padding: `0 ${PAD}px`, backgroundColor: '#FFFFFF', borderTop: `3px solid ${C.line}` },
-    h('div', { display: 'flex', flexDirection: 'column', gap: 10 },
-      img(logoUri(), 268, 60),
-      h('div', { display: 'flex', fontSize: 22, color: C.muted, gap: 12 }, h('div', { display: 'flex' }, '非公式サポーターサイト'), h('div', { display: 'flex', fontWeight: 700, color: C.fg }, 'tegestats.com'))),
+    // サイトのヘッダーと同じ並び：ロゴの右に「テゲバのスタッツ」「非公式サポーターサイト」の2行
+    h('div', { display: 'flex', alignItems: 'center', gap: 22 },
+      img(logoUri(), 286, 64),
+      h('div', { display: 'flex', flexDirection: 'column', lineHeight: 1.35 },
+        h('div', { display: 'flex', fontSize: 27, fontWeight: 700, color: '#6B6066' }, SITE.tagline),
+        h('div', { display: 'flex', fontSize: 20, fontWeight: 700, color: C.muted }, '非公式サポーターサイト'))),
     h('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', fontSize: 22, color: C.muted, lineHeight: 1.4 },
       h('div', { display: 'flex', fontWeight: 700, color: C.fg, fontSize: 28 }, `${item.upto ? `第${item.upto}節まで` : `${asOf}時点`}`),
       ...creditOf(item).map(t => h('div', { display: 'flex' }, t))));
