@@ -1,5 +1,6 @@
 ---
 import PostBox from './PostBox.astro';
+import { shareImgPath, shortPost } from '../lib/shareimg.js';
 import Name from './Name.astro';
 import { icon, splitDisp } from '../lib/util.js';
 import { ICON_OF_RECORD, plainTitle } from '../lib/meta.js';
@@ -57,5 +58,5 @@ const title = plainTitle(meta.title);
       </ol>
     </details>
   )}
-  {share && <PostBox what={share.label} text={share.text} url={`${SITE.url}/ranking/#rank-${meta.id}`} asOf={meta.upto ? `第${meta.upto}節` : undefined} />}
+  {share && <PostBox what={share.label} text={share.text} img={shareImgPath(share)} short={shortPost(share)} url={`${SITE.url}/ranking/#rank-${meta.id}`} asOf={meta.upto ? `第${meta.upto}節` : undefined} />}
 </section>

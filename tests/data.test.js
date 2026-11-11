@@ -306,3 +306,18 @@ test('チャント：歌詞の列はなく、音源は YouTube・歌詞カード
     if (r.kind === 'player') { assert.ok(roster.has(r.name.replace(/\s/g, '')), `選手にいない：${r.name}`); assert.ok(r.call && r.youtube, r.name); }
   }
 });
+
+test('画像でポスト：短い文は X に収まり、自分のコメントを書く余白（全角70字ぶん以上）が残る', async () => {
+  const { shortPost, shareImgPath } = await import('../src/lib/shareimg.js');
+  const { getShareables } = await import('../src/lib/data.js');
+  const { flatPost, xLength } = await import('../src/lib/util.js');
+  const items = getShareables().filter(s => s.kind === 't' || s.kind === 'r');
+  const paths = new Set();
+  for (const it of items) {
+    const n = xLength(flatPost(shortPost(it), ''), `${SITE.url}/ranking/#rank-${it.id}`);
+    assert.ok(n <= 280 - 140, `${it.kind}-${it.id}: ${n}`);
+    const p = shareImgPath(it);
+    assert.match(p, /^share\/[tr]-[\w-]+\.png$/, p);
+    assert.ok(!paths.has(p), p); paths.add(p);
+  }
+});

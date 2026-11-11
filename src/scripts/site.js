@@ -324,3 +324,42 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
   try { urls = JSON.parse(document.getElementById('pl-urls')?.textContent || '{}'); } catch { urls = {}; }
   linkPlayers(document, urls, '.rank .nm, .bcard .nm, .champ .nm, .cl-name, .ages .nm, .pref-tip .nm, .school-links td:nth-child(2), .ms-list .who', ['.pitch .pl[data-name]', '.pl-n']);
 }
+
+/* ---------- 画像でポスト（注目トピック・ランキング） ----------
+   スマホ（指で操作する端末で、画像の共有ができるとき）：共有メニューを開く。X を選ぶと画像と短い文が入った投稿画面になる。
+   それ以外（PC など）：画像をダウンロードし、ボタンのリンクどおり X の投稿画面（短い文入り）を開く。 */
+{
+  const btns = [...document.querySelectorAll('a.postimg[data-img]')];
+  const touch = matchMedia('(pointer: coarse)').matches;
+  let canFiles = false;
+  try { canFiles = touch && !!navigator.canShare && navigator.canShare({ files: [new File([''], 'x.png', { type: 'image/png' })] }); } catch { canFiles = false; }
+  const blobs = new Map();
+  const load = (a) => {
+    if (!blobs.has(a)) blobs.set(a, fetch(a.dataset.img).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(b => new File([b], a.dataset.file || 'tegesta.png', { type: 'image/png' })));
+    return blobs.get(a);
+  };
+  if (canFiles && 'IntersectionObserver' in window) {
+    // 押したときにすぐ共有メニューを開けるよう、見えてきたボタンの画像を先に読んでおく
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { load(e.target).catch(() => {}); io.unobserve(e.target); } }), { rootMargin: '300px' });
+    btns.forEach(a => io.observe(a));
+  }
+  for (const a of btns) {
+    a.addEventListener('click', async (e) => {
+      if (canFiles) {
+        e.preventDefault();
+        try {
+          const file = await load(a);
+          await navigator.share({ files: [file], text: a.dataset.share || '' });
+        } catch (err) {
+          // 共有をやめたときは何もしない。うまく開けなかったときは、画像を開いて保存できるように
+          if (!(err && err.name === 'AbortError')) location.href = a.dataset.img;
+        }
+        return;
+      }
+      // PC：画像をダウンロード（リンクはそのまま X の投稿画面を開く）
+      const d = document.createElement('a');
+      d.href = a.dataset.img; d.download = a.dataset.file || 'tegesta.png';
+      document.body.append(d); d.click(); d.remove();
+    });
+  }
+}

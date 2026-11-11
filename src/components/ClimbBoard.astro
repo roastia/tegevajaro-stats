@@ -1,6 +1,7 @@
 ---
 // ランキングのページの先頭：テゲスタ！ランキングの首位交代を1件ずつ（記録・新しい首位・数字・前の節からの順位・前の首位）
 import PostBox from './PostBox.astro';
+import { shareImgPath, shortPost } from '../lib/shareimg.js';
 import Name from './Name.astro';
 import { icon, href } from '../lib/util.js';
 import { ICON_OF_RECORD } from '../lib/meta.js';
@@ -34,5 +35,5 @@ const { climbs, prevRound, round, share } = Astro.props;
     ))}
   </ol>
   <p class="cheer">テゲスタ！の選手ランキングは毎節動く。次に上がるのは誰だ？</p>
-  <PostBox what="ランキング首位浮上" text={share.text} url={`${SITE.url}/ranking/#t-climb`} />
+  <PostBox what="ランキング首位浮上" text={share.text} img={shareImgPath(share)} short={shortPost(share)} url={`${SITE.url}/ranking/#t-climb`} />
 </section>

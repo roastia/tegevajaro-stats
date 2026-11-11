@@ -110,6 +110,8 @@ export function getShareables() {
     out.push({ kind: 'r', id: meta.id, label: title, icon: ICON_OF_RECORD[meta.id] || 'star', headline: `${title} 1位は${names}！`,
       big: names, sub: val, cheer: meta.cheer || '', note: meta.note,
       top: rows.filter(r => r._rank <= 3).slice(0, 3).map(r => ({ rank: r._rank, name: r.name, display: meta.hideValue ? '' : r.display })),
+      // 画像でポスト用：上位5行まで（表示はメインの数字だけ）。src・upto はデータ元と「第〇節まで」の表記に使う
+      top5: rows.filter(r => r._rank <= 5).slice(0, 5).map(r => ({ rank: r._rank, name: r.name, display: meta.hideValue ? '' : splitDisp(r.display)[0] })), src: meta.src, upto: meta.upto,
       text: postText(`${title}\n1位は${names}${val ? `（${val}）` : ''}！`, '', meta.cheer).replace('\n\n', '\n') });
   }
   for (const f of [...d.roots_facts].sort((a, b) => a.order - b.order)) {

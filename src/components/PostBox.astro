@@ -1,13 +1,22 @@
 ---
-// どのデータのポストかがわかるボタン。押すと X の投稿画面が開く（画像の添付や共有メニューは使わない）
-import { xIntent, xLabel } from '../lib/util.js';
-interface Props { what: string; text: string; url?: string; asOf?: string }
-const { what, text, url } = Astro.props;
+// どのデータのポストかがわかるボタン。押すと X の投稿画面が開く
+// img（画像のパス）を渡すと「画像でポスト」になる：スマホは共有メニュー（X を選ぶと画像つきで開く）、
+// PC は画像をダウンロードして X の投稿画面を開く（src/scripts/site.js）。文は短く（short）して、自分のコメントを書く余白を残す
+import { xIntent, xLabel, href, flatPost } from '../lib/util.js';
+interface Props { what: string; text: string; url?: string; asOf?: string; img?: string; short?: string }
+const { what, text, url, img, short } = Astro.props;
 // チームデータ（/players/#b-〇〇）のポストには「（第〇節時点）」を付けない。asOf="" を渡したときも付けない（更新履歴など）
 const asOf = Astro.props.asOf ?? (/#b-/.test(url || '') ? '' : undefined);
 ---
 <div class="post">
-  <a class="postbtn" href={xIntent(text, url, asOf)} target="_blank" rel="noopener noreferrer">
-    <span><b class="nw">「{what}」</b><span class="nw" set:html={xLabel('をXでポスト')} /></span>
-  </a>
+  {img ? (
+    <a class="postbtn postimg" href={xIntent(short ?? text, url, '')} target="_blank" rel="noopener noreferrer"
+      data-img={href(img)} data-file={img.split('/').pop()} data-share={`${flatPost(short ?? text, '')} ${url ?? ''}`.trim()}>
+      <span><b class="nw">「{what}」</b><span class="nw">を画像でポスト</span></span>
+    </a>
+  ) : (
+    <a class="postbtn" href={xIntent(text, url, asOf)} target="_blank" rel="noopener noreferrer">
+      <span><b class="nw">「{what}」</b><span class="nw" set:html={xLabel('をXでポスト')} /></span>
+    </a>
+  )}
 </div>
