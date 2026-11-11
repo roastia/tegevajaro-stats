@@ -1098,3 +1098,10 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .bmascot .ic { width: 1.3rem; height: 1.3rem; }
 /* 誕生日当日の「お祝いをXでポスト」は真ん中に */
 .hbd > .bpost { align-self: center; justify-self: center; margin-inline: auto; }
+/* 誕生日当日：1人ずつ「背番号のシャツ・名前（リンク）・年齢」。年齢は「もうすぐ誕生日」の「おめでとう！」と同じ色で大きく */
+.hbd .who { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; margin-top: 4px; }
+.hbd-p { display: inline-flex; align-items: center; gap: 10px; }
+.hbd-p .jersey.on-color { filter: none; width: 2.9rem; height: 2.9rem; }
+.hbd-p .bmascot { width: 2.9rem; height: 2.9rem; }
+.hbd-nm { font-weight: 700; font-size: 1.15rem; color: var(--fg); }
+.hbd-age { font-weight: 700; font-size: 1.9rem; line-height: 1; color: var(--ink); }

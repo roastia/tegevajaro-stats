@@ -128,7 +128,21 @@ const hbd = document.getElementById('hbd');
 if (hbd && today.length) {
   const names = today.map(({ p }) => callName(p)).join('・');
   const cake = h('div', 'cake'); cake.innerHTML = icon('cake');
-  hbd.append(cake, h('div', 'msg', 'お誕生日おめでとう！'), h('div', 'who', today.map(({ p, b }) => p.mascot ? `${p.name}（テゲバの公式マスコット）` : `${p.name}選手（背番号${p.no}）　${b.turning}歳`).join('　／　')),
+  // 1人ずつ：背番号のシャツ・名前（Jリーグ公式の選手ページへ）・年齢（大きく）
+  let plUrls = {};
+  try { plUrls = JSON.parse(document.getElementById('pl-urls')?.textContent || '{}'); } catch { plUrls = {}; }
+  const who = h('div', 'who');
+  for (const { p, b } of today) {
+    const one = h('span', 'hbd-p');
+    if (p.mascot) { const ic = h('span', 'bmascot'); ic.innerHTML = icon('party'); one.append(ic); }
+    else { const img = h('img', 'jersey jersey-sm on-color'); img.src = href(`chars/numbers-s/${p.no}.png`); img.alt = `背番号${p.no}`; img.width = 44; img.height = 44; img.decoding = 'async'; one.append(img); }
+    const url = !p.mascot && plUrls[p.name];
+    const nm = url ? h('a', 'pl-link hbd-nm', `${p.name}選手`) : h('span', 'hbd-nm', p.mascot ? p.name : `${p.name}選手`);
+    if (url) { nm.href = url; nm.target = '_blank'; nm.rel = 'noopener noreferrer'; }
+    one.append(nm, h('span', 'hbd-age', p.mascot ? 'おめでとう！' : `${b.turning}歳`));
+    who.append(one);
+  }
+  hbd.append(cake, h('div', 'msg', 'お誕生日おめでとう！'), who,
     postLink(`今日は${names}の誕生日！${today.length === 1 && !today[0].p.mascot ? `${today[0].b.turning}歳、` : ''}おめでとうございます🎂🎉 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`, 'お祝いをXでポスト'));
   hbd.hidden = false;
   if (!reduced && !sessionStorageGet('confetti')) {
