@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import Acc from '../components/Acc.astro';
 import Chant from '../components/Chant.astro';
 import { readCsv } from '../lib/data.js';
-import { siteUrl } from '../lib/util.js';
+import { siteUrl, playerUrl } from '../lib/util.js';
 import { chantsLd } from '../lib/seo.js';
 // チャント：src/data/chants.csv。チャントはすべて宮崎ブーゲンビリーバーが作ったもの（docs/chants.md）
 // 歌詞は載せない（ブーゲンビリーバーの歌詞カードへリンクする）。音源は YouTube へのリンクだけ（埋め込まない）
@@ -46,7 +46,7 @@ const group = readCsv('links').filter(r => /ブーゲンビリーバー/.test(r.
 
   <Acc id="chants-players" title="選手チャント" icon="flame" count={players.length + staff.length}>
     <ul class="chant-list">
-      {players.map(r => <Chant name={r.p?.name ?? r.name} tag={r.p ? `${r.p.pos} ${r.p.no}` : ''} call={r.call} song={r.song} artist={r.artist} youtube={r.youtube} />)}
+      {players.map(r => <Chant name={r.p?.name ?? r.name} link={playerUrl(r.p?.jl_url)} tag={r.p ? `${r.p.pos} ${r.p.no}` : ''} call={r.call} song={r.song} artist={r.artist} youtube={r.youtube} />)}
       {staff.map(r => <Chant name={r.name} tag="監督" call={r.call} song={r.song} artist={r.artist} youtube={r.youtube} />)}
     </ul>
   </Acc>

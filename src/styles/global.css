@@ -1084,7 +1084,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .chant p { margin: 0; grid-column: 1; min-width: 0; }
 .chant-who { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 8px; row-gap: 0; line-height: 1.4; }
 .chant-no { font-size: .7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.chant-name { font-weight: 700; color: var(--ink); }
+.chant-name { font-weight: 700; color: var(--fg); }
 .chant-call { font-weight: 700; color: var(--brand-deep); font-size: .92rem; }
 .chant-lb { margin-right: 4px; font-size: .68rem; font-weight: 400; color: var(--muted); }
 .chant-song { font-size: .78rem; color: var(--fg); line-height: 1.45; }

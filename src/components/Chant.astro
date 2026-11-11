@@ -1,8 +1,9 @@
 ---
 // チャント1件（コンパクト）：1行目＝背番号・名前・コール、2行目＝原曲、右に「聴く」
+// 選手名は黒で、Jリーグ公式の選手ページへのリンク（link）
 import { siteUrl, icon } from '../lib/util.js';
-interface Props { label?: string; name?: string; tag?: string; call?: string; song?: string; artist?: string; youtube?: string }
-const { label, name, tag, call, song, artist, youtube } = Astro.props;
+interface Props { label?: string; name?: string; link?: string; tag?: string; call?: string; song?: string; artist?: string; youtube?: string }
+const { label, name, link, tag, call, song, artist, youtube } = Astro.props;
 const orig = song ? (artist ? `${song}（${artist}）` : song) : '';
 const url = youtube ? siteUrl(youtube) : '';
 ---
@@ -10,7 +11,7 @@ const url = youtube ? siteUrl(youtube) : '';
   {(name || call) && (
     <p class="chant-who">
       {tag && <span class="chant-no">{tag}</span>}
-      {name && <span class="chant-name">{name}</span>}
+      {name && <span class="chant-name">{link ? <a class="pl-link" href={link} target="_blank" rel="noopener noreferrer">{name}</a> : name}</span>}
       {call && <span class="chant-call"><span class="chant-lb">コール</span>{call}</span>}
     </p>
   )}
