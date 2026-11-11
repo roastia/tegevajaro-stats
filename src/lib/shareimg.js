@@ -58,56 +58,136 @@ export const creditOf = item => item.src === 'Football LAB' ? ['データ：Foot
 const nameEl = (name, size, color, weight = 900) => h('div', { display: 'flex', alignItems: 'baseline', fontSize: size, fontWeight: weight, color },
   ...String(name).split('＆').flatMap((p, i) => [i > 0 && h('div', { display: 'flex', fontSize: Math.round(size * .7), fontWeight: 700, color: C.muted, margin: '0 6px' }, '＆'), h('div', { display: 'flex' }, p)]));
 // 文を「、。！？／・空白」のあとで区切り（「テゲスタ！」の！では区切らない）、区切りごとに折り返す（単語の途中で改行しにくくする）
-const chunks = text => String(text).split(/(?<=[、。／・ ]|(?<!テゲスタ)[！？])/).filter(Boolean);
+const chunks = text => String(text).split(/(?<=[、。／・]|(?<!テゲスタ)[！？])/).filter(Boolean);
 // いちばん長い区切りが1行に収まるよう、文字の大きさを上限で抑える（区切りの途中で折り返さないように）
-const fitChunks = (text, size, min) => Math.max(min, Math.min(size, Math.floor((W - PAD * 2) * .95 / Math.max(1, ...chunks(text).map(len)))));
+const fitChunks = (text, size, min, width = W - PAD * 2) => Math.max(min, Math.min(size, Math.floor(width * .95 / Math.max(1, ...chunks(text).map(len)))));
 const wrapEl = (text, size, color, weight = 700) => h('div', { display: 'flex', flexWrap: 'wrap', fontSize: size, fontWeight: weight, color, lineHeight: 1.4 },
   ...chunks(text).map(p => h('div', { display: 'flex' }, p)));
 
-function topicBody(item) {
-  const big = String(item.big || '');
-  // 見出し・大きな数字・補足は、上下の真ん中あたりに置く（下の余白が空きすぎないように）
-  return [h('div', { display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center', paddingBottom: 20 },
-    h('div', { display: 'flex', marginTop: 40 }, wrapEl(item.headline, fitChunks(item.headline, fit(item.headline, 1800, 60, 44), 34), C.fg, 900)),
-    h('div', { display: 'flex', marginTop: 24, marginBottom: 8 }, numEl(big, bigSize(big, W - PAD * 2, 420, 110), C.ink)),
-    item.sub && h('div', { display: 'flex', marginTop: 20 }, wrapEl(item.sub, fit(item.sub, 3400, 42, 32), C.fg)),
-  )];
+/* ---------- デザイン：ユニフォームの布（縫い目・当て布）＋太い筆の帯＋網点。数字は白ふちの黒で大きく ---------- */
+const P = { base: '#EFA9B8', panel: '#F8D0D8', deep: '#D2405F', dark: '#2E2629', patch: '#D9536F', stitch: '#FFF4F6', yellow: '#F2C14E' };
+let fabric;
+const fabricUri = () => fabric ||= 'data:image/png;base64,' + fs.readFileSync(path.resolve(process.cwd(), 'src/assets/share/fabric.png')).toString('base64');
+// 同じ見た目を毎回作る（ギザギザの形を決まった乱数で）
+const rnd = seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+// 白いふち（文字のまわりを白で縁取る）＋右下の影
+const outline = (w, shadow = 'rgba(120,20,45,.35)') => {
+  const s = [];
+  for (let a = 0; a < 16; a++) s.push(`${(Math.cos(a / 8 * Math.PI) * w).toFixed(1)}px ${(Math.sin(a / 8 * Math.PI) * w).toFixed(1)}px 0 #FFFFFF`);
+  s.push(`${w + 4}px ${w + 6}px 0 ${shadow}`);
+  return s.join(', ');
+};
+// 背景（SVG 1枚）：外側の濃い布・中の明るい布と縫い目・襟・当て布・筆の帯・網点
+function backdrop(bandY) {
+  const r = rnd(11);
+  // 筆の帯：左下から右上へ。上下のふちをギザギザに、中にかすれの筋
+  const top = [], bot = [];
+  for (let x = -60; x <= W + 60; x += 24) {
+    const y = bandY - (x / W) * 330;
+    top.push(`${x},${(y - 150 + r() * 34).toFixed(0)}`);
+    bot.push(`${x},${(y + 150 - r() * 34).toFixed(0)}`);
+  }
+  const band = `<polygon points="${[...top, ...bot.reverse()].join(' ')}" fill="${P.deep}"/>`;
+  let streaks = '';
+  for (let i = 0; i < 9; i++) {
+    const x0 = r() * W, len = 120 + r() * 360, dy = (r() - .5) * 240, y0 = bandY - (x0 / W) * 330 + dy;
+    streaks += `<line x1="${x0.toFixed(0)}" y1="${y0.toFixed(0)}" x2="${(x0 + len).toFixed(0)}" y2="${(y0 - len * .305).toFixed(0)}" stroke="${P.base}" stroke-width="${(3 + r() * 7).toFixed(1)}" stroke-linecap="round" opacity=".55"/>`;
+  }
+  // 細い筆の帯（上にもう1本）
+  const t2 = [], b2 = [];
+  for (let x = 360; x <= W + 60; x += 22) { const y = bandY - 230 - ((x - 360) / W) * 330; t2.push(`${x},${(y - 34 + r() * 14).toFixed(0)}`); b2.push(`${x},${(y + 34 - r() * 14).toFixed(0)}`); }
+  const band2 = `<polygon points="${[...t2, ...b2.reverse()].join(' ')}" fill="${P.deep}" opacity=".9"/>`;
+  // 網点（右上、帯の上）
+  let dots = '';
+  for (let gy = 0; gy < 12; gy++) for (let gx = 0; gx < 18; gx++) {
+    const x = 640 + gx * 24 + (gy % 2) * 12, y = bandY - 420 + gy * 22 - (gx * 24) * .1;
+    const rr = Math.max(0, 7 - Math.hypot(gx - 15, gy - 3) * .55);
+    if (rr > .8) dots += `<circle cx="${x}" cy="${y.toFixed(0)}" r="${rr.toFixed(1)}" fill="#FFFFFF" opacity=".85"/>`;
+  }
+  // 当て布（縫い目つき）
+  const patch = (x, y, w, h2, rot) => `<g transform="rotate(${rot} ${x + w / 2} ${y + h2 / 2})"><rect x="${x}" y="${y}" width="${w}" height="${h2}" fill="${P.patch}"/><rect x="${x + 9}" y="${y + 9}" width="${w - 18}" height="${h2 - 18}" fill="none" stroke="${P.stitch}" stroke-width="3" stroke-dasharray="10 8"/></g>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <rect width="${W}" height="${H}" fill="${P.base}"/>
+    <polygon points="-20,40 640,-20 1100,250 1100,${H} -20,${H}" fill="${P.panel}"/>
+    <polyline points="-20,64 640,6 1100,276" fill="none" stroke="${P.stitch}" stroke-width="3" stroke-dasharray="12 9"/>
+    <polygon points="820,-10 1100,-10 1100,250 900,90" fill="#E4889C"/>
+    <polygon points="930,-10 1100,-10 1100,60 1000,40" fill="${P.deep}"/><polyline points="930,-10 1000,40 1100,60" fill="none" stroke="#FFFFFF" stroke-width="6"/>
+    <polyline points="830,-10 905,92 1100,246" fill="none" stroke="${P.stitch}" stroke-width="3" stroke-dasharray="12 9"/>
+    ${band2}${band}${streaks}${dots}
+    ${patch(-26, bandY - 330, 128, 170, -3)}${patch(1000, bandY + 330, 130, 170, 4)}
+  </svg>`;
 }
 
-// ランキング：上位5行まで。1位は黄色の印で大きく。数字は右に大きく
+// 下に引く黄色の筆の線
+const underline = w => svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="26" viewBox="0 0 ${w} 26"><path d="M6 15 C ${w * .3} 6, ${w * .6} 20, ${w - 8} 10" stroke="${P.yellow}" stroke-width="11" fill="none" stroke-linecap="round"/></svg>`);
+// 応援のひとことの右の「ぱっ」
+const burst = svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 90 90"><g stroke="${P.yellow}" stroke-width="9" stroke-linecap="round"><line x1="12" y1="52" x2="42" y2="44"/><line x1="18" y1="22" x2="44" y2="36"/><line x1="44" y1="6" x2="54" y2="30"/></g></svg>`);
+
+// 大きな数字（白ふちの黒い数字＋白ふちのピンクの単位）
+const heroNum = (text, size) => {
+  const m = String(text).match(/^(.*あたり)(.+)$/);
+  const parts = [...(m ? [{ t: m[1], num: false }] : []), ...numParts(m ? m[2] : text)];
+  return h('div', { display: 'flex', alignItems: 'baseline', whiteSpace: 'nowrap', fontWeight: 900, lineHeight: 1 },
+    ...parts.map(p => h('div', { display: 'flex', fontFamily: p.num ? 'SairaNum' : 'Zen', fontSize: p.num ? size : Math.round(size * UNIT * .82),
+      color: p.num ? P.dark : P.deep, textShadow: outline(p.num ? Math.max(6, size / 26) : 5), marginLeft: p.num ? 0 : 10 }, p.t)));
+};
+
+function topicBody(item) {
+  const big = String(item.big || '');
+  return [
+    h('div', { display: 'flex', marginTop: 22, paddingRight: 190 }, wrapEl(item.headline, fitChunks(item.headline, fit(item.headline, 1500, 72, 48), 38, W - PAD * 2 - 190), P.dark, 900)),
+    h('div', { display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10, transform: 'rotate(-3deg)' }, heroNum(big, bigSize(big, W - PAD * 2 - 40, 440, 120))),
+    item.sub && h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', alignSelf: 'center', marginTop: 4 },
+      h('div', { display: 'flex', justifyContent: 'center', textAlign: 'center' }, wrapEl(item.sub, fitChunks(item.sub, fit(item.sub, 2600, 46, 32), 28), P.dark, 900)),
+      img(underline(Math.min(W - PAD * 2, Math.round(len(item.sub) * 30))), Math.min(W - PAD * 2, Math.round(len(item.sub) * 30)), 26, { marginTop: -4 })),
+  ];
+}
+
+// ランキング：1位（1人か2人）は大きく、名前の下に数字を大きく。2位から下は縫い目つきの白い当て布に並べる
 function rankBody(item) {
   const rows = (item.top5 || item.top || []).slice(0, 5);
-  const firsts = rows.filter(r => r.rank === 1).length;   // 1位が何人（何組）いるか。多いときは小さめに
-  const gap = rows.length >= 5 ? 16 : 26;
-  return [h('div', { display: 'flex', marginTop: 34, fontSize: 58, fontWeight: 900, color: C.fg }, `${item.label} 1位は…`),
-    h('div', { display: 'flex', flexDirection: 'column', gap, marginTop: 36 },
-    ...rows.map(r => {
-      const first = r.rank === 1, big = first && firsts <= 2;
-      const vSize = big ? 92 : 60;   // 数字の大きさ
-      const vW = r.display ? Math.ceil(numWidth(r.display) * vSize) + 8 : 0;
-      const size = big ? fit(r.name, W - PAD * 2 - 120 - vW, 68, 40) : fit(r.name, W - PAD * 2 - 100 - vW, first ? 50 : 46, 32);
-      const badge = big ? 92 : 68;
-      return h('div', { display: 'flex', alignItems: 'center', gap: 26 },
-        h('div', { display: 'flex', alignItems: 'center', justifyContent: 'center', width: badge, height: badge, borderRadius: badge, flex: 'none',
-          backgroundColor: first ? C.gold : '#FFFFFF', color: C.fg, fontFamily: 'SairaNum', fontSize: Math.round(badge * .62), fontWeight: 900, paddingTop: 2 }, String(r.rank)),
-        h('div', { display: 'flex', flex: 1, minWidth: 0 }, nameEl(r.name, size, first ? C.ink : C.fg)),
-        r.display && h('div', { display: 'flex', flex: 'none', marginLeft: 'auto' }, numEl(r.display, vSize, first ? C.ink : C.fg, C.muted)));
-    }))];
+  const firsts = rows.filter(r => r.rank === 1);
+  const hero = firsts.length === 1 ? firsts[0] : null;
+  const rest = hero ? rows.filter(r => r !== hero) : rows;
+  const out = [h('div', { display: 'flex', marginTop: 22, paddingRight: 190 }, wrapEl(`${item.label} 1位は…`, fitChunks(`${item.label} 1位は…`, 68, 40, W - PAD * 2 - 190), P.dark, 900))];
+  if (hero) {
+    out.push(h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 10, transform: 'rotate(-3deg)' },
+      h('div', { display: 'flex', alignItems: 'center', gap: 18 },
+        h('div', { display: 'flex', width: 84, height: 84, borderRadius: 84, backgroundColor: C.gold, alignItems: 'center', justifyContent: 'center', fontFamily: 'SairaNum', fontSize: 56, fontWeight: 900, color: P.dark, paddingTop: 2, boxShadow: '0 0 0 6px #FFFFFF' }, '1'),
+        h('div', { display: 'flex', textShadow: outline(5) }, nameEl(hero.name, fit(hero.name, W - PAD * 2 - 110, 84, 48), P.dark))),
+      hero.display && h('div', { display: 'flex', marginTop: 6 }, heroNum(hero.display, bigSize(hero.display, W - PAD * 2 - 60, 230, 90)))));
+  }
+  if (rest.length) {
+    const rowH = rest.length >= 5 ? 66 : 74;
+    out.push(h('div', { display: 'flex', flexDirection: 'column', marginTop: hero ? 40 : 26, padding: '14px 26px', backgroundColor: 'rgba(255,248,250,.93)', border: `3px dashed ${P.deep}`, borderRadius: 18, transform: 'rotate(-1deg)' },
+      ...rest.map((r, i) => {
+        const first = r.rank === 1;
+        const vSize = first ? 58 : 50;
+        const vW = r.display ? Math.ceil(numWidth(r.display) * vSize) + 10 : 0;
+        return h('div', { display: 'flex', alignItems: 'center', gap: 18, height: rowH, borderTop: i ? '2px dotted #E7A9B7' : 'none' },
+          h('div', { display: 'flex', width: 50, height: 50, borderRadius: 50, flex: 'none', alignItems: 'center', justifyContent: 'center', backgroundColor: first ? C.gold : '#FBE0E7', fontFamily: 'SairaNum', fontSize: 36, fontWeight: 900, color: P.dark, paddingTop: 2 }, String(r.rank)),
+          h('div', { display: 'flex', flex: 1, minWidth: 0 }, nameEl(r.name, fit(r.name, W - PAD * 2 - 130 - vW, first ? 46 : 42, 28), first ? P.deep : P.dark)),
+          r.display && h('div', { display: 'flex', flex: 'none' }, numEl(r.display, vSize, first ? P.deep : P.dark, '#8A6B74')));
+      })));
+  }
+  return out;
 }
 
 export function shareTree(item, asOf = SITE.roundLabel) {
   const isRank = item.kind === 'r';
   const tag = isRank ? 'RANKING' : 'TOPIC';
+  const bandY = isRank ? 640 : 760;
   const body = h('div', { display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', padding: `${PAD}px ${PAD}px 0`, position: 'relative' },
-    h('div', { display: 'flex', alignItems: 'center', gap: 16, paddingRight: 200, marginTop: 30 },
-      h('div', { display: 'flex', fontFamily: 'SairaLabel', fontWeight: 900, fontSize: 40, letterSpacing: 3, color: '#FFFFFF', backgroundColor: C.ink, padding: '2px 18px 0', lineHeight: 1.2 }, tag),
-      img(iconUri(item.icon, C.ink), 46, 46),
-      h('div', { display: 'flex', fontSize: 38, color: C.ink, fontWeight: 900 }, item.label)),
+    h('div', { display: 'flex', alignItems: 'center', gap: 16, paddingRight: 220, marginTop: 20 },
+      h('div', { display: 'flex', fontFamily: 'SairaLabel', fontWeight: 900, fontSize: 40, letterSpacing: 3, color: '#FFFFFF', backgroundColor: P.deep, padding: '2px 18px 0', lineHeight: 1.2 }, tag),
+      img(iconUri(item.icon, P.deep), 44, 44),
+      h('div', { display: 'flex', fontSize: 38, color: P.deep, fontWeight: 900 }, item.label)),
     ...(isRank ? rankBody(item) : topicBody(item)),
-    item.cheer && h('div', { display: 'flex', flex: 'none', marginTop: 'auto', paddingTop: 20, marginBottom: 52 }, wrapEl(item.cheer, fitChunks(item.cheer, fit(item.cheer, 1900, 52, 36), 30), C.ink, 900)),
+    item.cheer && h('div', { display: 'flex', flex: 'none', alignItems: 'center', justifyContent: 'center', marginTop: 'auto', paddingTop: 16, marginBottom: 46 },
+      h('div', { display: 'flex', textShadow: outline(4, 'rgba(0,0,0,0)') }, wrapEl(item.cheer, Math.min(fitChunks(item.cheer, fit(item.cheer, 1500, 66, 40), 34), Math.floor((W - PAD * 2 - 100) * .95 / Math.max(1, ...chunks(item.cheer).map(len)))), P.deep, 900)),
+      img(burst, 76, 76, { marginLeft: 6, marginTop: -40 })),
   );
-  const foot = h('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 150, padding: `0 ${PAD}px`, backgroundColor: '#FFFFFF', borderTop: `3px solid ${C.line}` },
-    // サイトのヘッダーと同じ並び：ロゴの右に「テゲバのスタッツ」「非公式サポーターサイト」の2行
+  const foot = h('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 150, padding: `0 ${PAD}px`, backgroundColor: '#FFFFFF', position: 'relative' },
     h('div', { display: 'flex', alignItems: 'center', gap: 22 },
       img(logoUri(), 286, 64),
       h('div', { display: 'flex', flexDirection: 'column', lineHeight: 1.35 },
@@ -116,16 +196,24 @@ export function shareTree(item, asOf = SITE.roundLabel) {
     h('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', fontSize: 22, fontWeight: 700, color: C.muted, lineHeight: 1.4 },
       h('div', { display: 'flex', fontWeight: 900, color: C.fg, fontSize: 28 }, `${item.upto ? `第${item.upto}節まで` : `${asOf}時点`}`),
       ...creditOf(item).map(t => h('div', { display: 'flex' }, t))));
-  return h('div', { width: W, height: H, display: 'flex', flexDirection: 'column', backgroundColor: C.bg, fontFamily: 'Zen', fontWeight: 700, position: 'relative' },
-    // 右上の大きな丸（ページのカードと同じ飾り）とアイコン
-    h('div', { display: 'flex', position: 'absolute', right: -120, top: -120, width: 440, height: 440, borderRadius: 220, backgroundColor: '#FBE0E7' }),
-    h('div', { display: 'flex', position: 'absolute', right: PAD, top: PAD, width: 150, height: 150, borderRadius: 75, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' }, img(iconUri(item.icon, C.ink), 90, 90)),
+  return h('div', { width: W, height: H, display: 'flex', flexDirection: 'column', fontFamily: 'Zen', fontWeight: 700, position: 'relative', backgroundColor: P.base },
+    img(svgUri(backdrop(bandY)), W, H, { position: 'absolute', left: 0, top: 0 }),
+    // 布の目（全体に薄く重ねる）
+    h('div', { display: 'flex', position: 'absolute', left: 0, top: 0, width: W, height: H - 150, backgroundImage: `url(${fabricUri()})`, backgroundRepeat: 'repeat', backgroundSize: '96px 96px' }),
+    // 右上の丸いワッペン（縫い目つき）にアイコン
+    h('div', { display: 'flex', position: 'absolute', right: 64, top: 96, width: 156, height: 156, borderRadius: 156, backgroundColor: '#FBEFF2', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 0 rgba(120,20,45,.25)' },
+      h('div', { display: 'flex', width: 136, height: 136, borderRadius: 136, border: `3px dashed ${P.deep}`, alignItems: 'center', justifyContent: 'center' }, img(iconUri(item.icon, P.deep), 78, 78))),
     body, foot);
 }
 
 export async function renderSharePng(item) {
   const svg = await satori(shareTree(item), { width: W, height: H, fonts: loadFonts() });
-  return new Resvg(svg, { fitTo: { mode: 'width', value: W } }).render().asPng();
+  const png = new Resvg(svg, { fitTo: { mode: 'width', value: W } }).render().asPng();
+  // 布の目があるとファイルが大きくなるので、256色の PNG にして軽くする（sharp は Astro が使っている部品。なければそのまま）
+  try {
+    const { default: sharp } = await import('sharp');
+    return await sharp(png).png({ palette: true, colors: 256, quality: 90, effort: 7, dither: .6 }).toBuffer();
+  } catch { return png; }
 }
 
 /** 画像のファイル名（/share/t-〇〇.png・/share/r-〇〇.png） */
