@@ -845,24 +845,23 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .acc { margin-top: 14px; scroll-margin-top: calc(var(--stick, 56px) + 8px); }
 .acc > summary { list-style: none; }
 .acc > summary::-webkit-details-marker { display: none; }
-.acc-h { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; cursor: pointer; user-select: none; }
-.acc-h:hover { border-color: var(--brand); }
+/* 見出しは枠なし（題名・件数・右へ伸びる線・小さな「閉じる／開く」）。枠は中の押せる項目だけ */
+.acc-h { display: flex; align-items: center; gap: 10px; padding: 6px 0; background: #fff; cursor: pointer; user-select: none; }
+.acc-h:hover .acc-t > span:first-of-type, .acc-h:hover .acc-x { color: var(--brand-deep); }
+.acc-line { flex: 1 1 16px; min-width: 16px; height: 1px; background: var(--line); }
 .acc-h:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
 .acc-t { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; color: var(--fg); min-width: 0; }
 .acc-t .ic { width: 1.2em; height: 1.2em; flex: none; color: var(--ink); }
 .acc-n { flex: none; white-space: nowrap; padding: 0 8px; border-radius: 999px; background: var(--soft2); color: var(--ink); font-size: .75rem; font-weight: 700; }
-.acc-note { margin-left: auto; font-size: .78rem; color: var(--muted); white-space: nowrap; }
-.acc-x { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 10px; border-radius: 999px; border: 1px solid var(--brand); background: #fff; color: var(--ink); font-size: .78rem; font-weight: 700; white-space: nowrap; }
-.acc-note + .acc-x { margin-left: 8px; }
+.acc-note { flex: none; font-size: .78rem; color: var(--muted); white-space: nowrap; }
+.acc-x { flex: none; display: inline-flex; flex-direction: row-reverse; align-items: center; gap: 5px; padding: 2px 0 2px 2px; color: var(--muted); font-size: .75rem; font-weight: 700; white-space: nowrap; }
 /* 開く／閉じるを文字と矢印で（ひと目で開け閉めできるとわかるように） */
 .acc-x::before { content: ''; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .2s; }
 .acc-x .acc-xc { display: none; }
-.acc[open] > .acc-h .acc-x { background: var(--brand); border-color: var(--brand); color: #fff; }
 .acc[open] > .acc-h .acc-x .acc-xo { display: none; }
 .acc[open] > .acc-h .acc-x .acc-xc { display: inline; }
 .acc[open] > .acc-h .acc-x::before { transform: translateY(2px) rotate(-135deg); }
-.acc:not([open]) > .acc-h { box-shadow: 0 2px 0 var(--soft2); }
-.acc-b { padding-top: 12px; }
+.acc-b { padding-top: 8px; }
 .acc-b > :first-child { margin-top: 0; }
 @media (prefers-reduced-motion: reduce) { .acc-x::before { transition: none; } }
 /* ハイライト：月ごとのまとまり（並び順の切りかえで order を使う） */
@@ -881,7 +880,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .glist a.gname:hover { text-decoration: underline; }
 .spot-by .spot-btn { padding-top: 2px; padding-bottom: 2px; }
 /* 開いているアコーディオンの見出しは、スクロール中も上のメニューの下に貼りつく（次の見出しが来たら入れ替わる） */
-.acc[open] > .acc-h { position: sticky; top: var(--stick, 0px); z-index: 5; box-shadow: 0 6px 10px -8px rgba(58, 50, 54, .3); }
+.acc[open] > .acc-h { position: sticky; top: var(--stick, 0px); z-index: 5; }
 /* ヘッダーの「J2 〇位」は Jリーグ公式のJ2順位表へのリンク */
 a.rank-link { color: inherit; text-decoration: none; }
 /* 順位が暫定のとき（同じ節のほかの試合が残っている） */
@@ -912,8 +911,9 @@ a.club-link, a.club-link:hover { color: inherit; text-decoration: none; }
 .cl-was { margin: 0; font-size: .78rem; color: var(--muted); }
 .climbs .cheer { margin: 0; }
 .rec { scroll-margin-top: calc(var(--stick, 56px) + 8px); }
-/* 上に貼りついている間の見出しは、角のない平らな帯にする（下を流れる中身が角のすき間から見えないように） */
-.acc[open] > .acc-h.stuck { border-radius: 0; border-color: transparent transparent var(--line); box-shadow: 0 -14px 0 0 #fff, 0 8px 10px -8px rgba(58, 50, 54, .3); }
+/* 上に貼りついている間の見出しは、白い帯＋下の線で区切る（下を流れる中身が見えないように） */
+.acc[open] > .acc-h.stuck { border-bottom: 1px solid var(--line); box-shadow: 0 -14px 0 0 #fff, 0 8px 10px -8px rgba(58, 50, 54, .3); }
+.acc[open] > .acc-h.stuck .acc-line { visibility: hidden; }
 /* 選手名 → Jリーグ公式の選手ページ（色はそのまま。カーソルを重ねると下線） */
 a.pl-link { color: inherit; text-decoration: none; }
 a.pl-link:hover { text-decoration: underline; text-underline-offset: 2px; }

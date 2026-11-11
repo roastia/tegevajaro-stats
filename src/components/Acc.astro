@@ -1,5 +1,6 @@
 ---
 // アコーディオン（開け閉めできるまとまり）。ページが長くならないよう、大項目ごとにたたむ
+// 見出しは枠なしの「題名＋右へ伸びる線」。枠は中の押せる項目だけに付けて、見出しと区別する
 // id を付けると、開け閉めを覚える（同じタブの間）。#id へのリンクで開く（src/scripts/site.js）
 import { icon as svg } from '../lib/util.js';
 interface Props { id: string; title: string; icon?: string; count?: string | number; open?: boolean; note?: string }
@@ -8,6 +9,7 @@ const { id, title, icon, count, open = true, note } = Astro.props;   // はじ�
 <details class="acc" id={id} open={open} data-acc>
   <summary class="acc-h">
     <span class="acc-t">{icon && <Fragment set:html={svg(icon)} />}<span>{title}</span>{count !== undefined && count !== '' && <span class="acc-n">{count}</span>}</span>
+    <span class="acc-line" aria-hidden="true"></span>
     {note && <span class="acc-note">{note}</span>}
     <span class="acc-x" aria-hidden="true"><span class="acc-xo">開く</span><span class="acc-xc">閉じる</span></span>
   </summary>
