@@ -143,31 +143,44 @@ function topicBody(item) {
   ];
 }
 
-// ランキング：1位（1人か2人）は大きく、名前の下に数字を大きく。2位から下は縫い目つきの白い当て布に並べる
+// ランキング：1位はいつも主役。人数や数字のあり・なしに関係なく、帯の上に白ふちの大きな名前と数字で出す。
+// 2位から下は、縫い目つきの白い当て布に並べる
 function rankBody(item) {
   const rows = (item.top5 || item.top || []).slice(0, 5);
   const firsts = rows.filter(r => r.rank === 1);
-  const hero = firsts.length === 1 ? firsts[0] : null;
-  const rest = hero ? rows.filter(r => r !== hero) : rows;
-  const out = [h('div', { display: 'flex', marginTop: 22, paddingRight: 190 }, wrapEl(`${item.label} 1位は…`, fitChunks(`${item.label} 1位は…`, 68, 40, W - PAD * 2 - 190), P.dark, 900))];
-  if (hero) {
-    out.push(h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 10, transform: 'rotate(-3deg)' },
-      h('div', { display: 'flex', alignItems: 'center', gap: 18 },
-        h('div', { display: 'flex', width: 84, height: 84, borderRadius: 84, backgroundColor: C.gold, alignItems: 'center', justifyContent: 'center', fontFamily: 'SairaNum', fontSize: 56, fontWeight: 900, color: P.dark, paddingTop: 2, boxShadow: '0 0 0 6px #FFFFFF' }, '1'),
-        h('div', { display: 'flex', textShadow: outline(5) }, nameEl(hero.name, fit(hero.name, W - PAD * 2 - 110, 84, 48), P.dark))),
-      hero.display && h('div', { display: 'flex', marginTop: 6 }, heroNum(hero.display, bigSize(hero.display, W - PAD * 2 - 60, 230, 90)))));
-  }
+  const rest = rows.filter(r => r.rank !== 1);
+  const n = firsts.length;
+  // 1位の数字：全員同じなら1つだけ大きく
+  const shared = firsts.every(r => r.display === firsts[0].display) ? firsts[0].display : '';
+  // 下に2位以下が多いときは、1位を少しだけ小さくして、ぜんぶ収める
+  const tight = rest.length >= 3 ? .86 : 1;
+  const nameMax = Math.round((n === 1 ? (shared ? 104 : 124) : n === 2 ? 84 : n === 3 ? 68 : 58) * tight);
+  const nameW = W - PAD * 2 - 40;
+  const badge = (size) => h('div', { display: 'flex', width: size, height: size, borderRadius: size, flex: 'none', backgroundColor: C.gold, alignItems: 'center', justifyContent: 'center',
+    fontFamily: 'SairaNum', fontSize: Math.round(size * .66), fontWeight: 900, color: P.dark, paddingTop: 2, boxShadow: '0 0 0 6px #FFFFFF, 6px 8px 0 6px rgba(120,20,45,.3)' }, '1');
+  const out = [
+    h('div', { display: 'flex', marginTop: 22, paddingRight: 190 }, wrapEl(`${item.label} 1位は…`, fitChunks(`${item.label} 1位は…`, 68, 40, W - PAD * 2 - 190), P.dark, 900)),
+    h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: rest.length ? 'none' : 1, marginTop: 12, transform: 'rotate(-3deg)', gap: n >= 4 ? 2 : 8 },
+      // 「1」の丸（1人のときは名前の上に大きく、何人かのときは「1位タイ」の札）
+      n === 1
+        ? badge(Math.round(96 * tight))
+        : h('div', { display: 'flex', alignItems: 'center', gap: 14 }, badge(72),
+            h('div', { display: 'flex', fontFamily: 'Zen', fontWeight: 900, fontSize: 44, color: '#FFFFFF', backgroundColor: P.dark, padding: '4px 20px', transform: 'rotate(2deg)' }, `${n}${item.big?.includes('＆') || firsts[0]?.name.includes('＆') ? '組' : '人'}が1位タイ！`)),
+      ...firsts.map(r => h('div', { display: 'flex', alignItems: 'baseline', gap: 18 },
+        h('div', { display: 'flex', textShadow: outline(n === 1 ? 7 : 5) }, nameEl(r.name, fit(r.name, shared ? nameW : nameW - 220, nameMax, 40), P.dark)),
+        !shared && r.display && numEl(r.display, Math.round(nameMax * .9), P.deep, P.deep))),
+      shared && h('div', { display: 'flex', marginTop: n === 1 ? 4 : 10 }, heroNum(shared, bigSize(shared, W - PAD * 2 - 60, Math.round((n === 1 ? 250 : 180) * tight), 90)))),
+  ];
   if (rest.length) {
-    const rowH = rest.length >= 5 ? 66 : 74;
-    out.push(h('div', { display: 'flex', flexDirection: 'column', marginTop: hero ? 40 : 26, padding: '14px 26px', backgroundColor: 'rgba(255,248,250,.93)', border: `3px dashed ${P.deep}`, borderRadius: 18, transform: 'rotate(-1deg)' },
+    const rowH = rest.length >= 4 ? 56 : 66;
+    out.push(h('div', { display: 'flex', flexDirection: 'column', marginTop: 'auto', padding: '10px 26px', backgroundColor: 'rgba(255,248,250,.93)', border: `3px dashed ${P.deep}`, borderRadius: 18, transform: 'rotate(-1deg)' },
       ...rest.map((r, i) => {
-        const first = r.rank === 1;
-        const vSize = first ? 58 : 50;
+        const vSize = 46;
         const vW = r.display ? Math.ceil(numWidth(r.display) * vSize) + 10 : 0;
         return h('div', { display: 'flex', alignItems: 'center', gap: 18, height: rowH, borderTop: i ? '2px dotted #E7A9B7' : 'none' },
-          h('div', { display: 'flex', width: 50, height: 50, borderRadius: 50, flex: 'none', alignItems: 'center', justifyContent: 'center', backgroundColor: first ? C.gold : '#FBE0E7', fontFamily: 'SairaNum', fontSize: 36, fontWeight: 900, color: P.dark, paddingTop: 2 }, String(r.rank)),
-          h('div', { display: 'flex', flex: 1, minWidth: 0 }, nameEl(r.name, fit(r.name, W - PAD * 2 - 130 - vW, first ? 46 : 42, 28), first ? P.deep : P.dark)),
-          r.display && h('div', { display: 'flex', flex: 'none' }, numEl(r.display, vSize, first ? P.deep : P.dark, '#8A6B74')));
+          h('div', { display: 'flex', width: 46, height: 46, borderRadius: 46, flex: 'none', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FBE0E7', fontFamily: 'SairaNum', fontSize: 34, fontWeight: 900, color: P.dark, paddingTop: 2 }, String(r.rank)),
+          h('div', { display: 'flex', flex: 1, minWidth: 0 }, nameEl(r.name, fit(r.name, W - PAD * 2 - 130 - vW, 40, 26), P.dark)),
+          r.display && h('div', { display: 'flex', flex: 'none' }, numEl(r.display, vSize, P.dark, '#8A6B74')));
       })));
   }
   return out;
@@ -183,8 +196,8 @@ export function shareTree(item, asOf = SITE.roundLabel) {
       img(iconUri(item.icon, P.deep), 44, 44),
       h('div', { display: 'flex', fontSize: 38, color: P.deep, fontWeight: 900 }, item.label)),
     ...(isRank ? rankBody(item) : topicBody(item)),
-    item.cheer && h('div', { display: 'flex', flex: 'none', alignItems: 'center', justifyContent: 'center', marginTop: 'auto', paddingTop: 16, marginBottom: 46 },
-      h('div', { display: 'flex', textShadow: outline(4, 'rgba(0,0,0,0)') }, wrapEl(item.cheer, Math.min(fitChunks(item.cheer, fit(item.cheer, 1500, 66, 40), 34), Math.floor((W - PAD * 2 - 100) * .95 / Math.max(1, ...chunks(item.cheer).map(len)))), P.deep, 900)),
+    item.cheer && h('div', { display: 'flex', flex: 'none', alignItems: 'center', justifyContent: 'center', marginTop: isRank ? 22 : 'auto', paddingTop: 16, marginBottom: 46 },
+      h('div', { display: 'flex', textShadow: outline(4, 'rgba(0,0,0,0)') }, wrapEl(item.cheer, Math.min(isRank ? fit(item.cheer, W - PAD * 2 - 90, 56, 34) : fitChunks(item.cheer, fit(item.cheer, 1500, 66, 40), 34), Math.floor((W - PAD * 2 - 100) * .95 / Math.max(1, ...chunks(item.cheer).map(len)))), P.deep, 900)),
       img(burst, 60, 60, { alignSelf: 'flex-start', marginLeft: -22, marginTop: -22 })),
   );
   const foot = h('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 150, padding: `0 ${PAD}px`, backgroundColor: '#FFFFFF', position: 'relative' },
