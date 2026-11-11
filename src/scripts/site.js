@@ -113,6 +113,7 @@ const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) 
 // 名前の前に背番号入りシャツのイラスト
 const jnoName = p => {
   const nm = h('span', 'nm');
+  if (p.mascot) { const ic = h('span', 'bmascot'); ic.innerHTML = icon('party'); nm.append(ic, h('span', null, p.name)); return nm; }
   const img = h('img', 'jersey jersey-sm on-color'); img.src = href(`chars/numbers-s/${p.no}.png`); img.alt = `背番号${p.no}`; img.width = 44; img.height = 44; img.decoding = 'async';
   nm.append(img, h('span', null, p.name));
   return nm;
@@ -120,12 +121,15 @@ const jnoName = p => {
 const bdayBtn = (birth, label) => { const b = h('button', 'bdbtn'); b.type = 'button'; b.dataset.bdayOpen = birth; b.innerHTML = icon('cake'); b.append(label); return b; };
 const postLink = (text, label, cls = 'bpost') => { const a = h('a', cls); a.href = xIntent(text, SITE.url + '/', ''); a.target = '_blank'; a.rel = 'noopener noreferrer'; a.innerHTML = `<span>${xLabel(label)}</span>`; return a; };
 
+// 呼び方と年齢：マスコットは「選手」を付けず、年齢も出さない
+const callName = p => p.mascot ? p.name : `${p.name}選手`;
+const ageText = (p, b, pre = '') => p.mascot ? '' : `${pre}${b.turning}歳`;
 const hbd = document.getElementById('hbd');
 if (hbd && today.length) {
-  const names = today.map(({ p }) => `${p.name}選手`).join('・');
+  const names = today.map(({ p }) => callName(p)).join('・');
   const cake = h('div', 'cake'); cake.innerHTML = icon('cake');
-  hbd.append(cake, h('div', 'msg', 'お誕生日おめでとう！'), h('div', 'who', today.map(({ p, b }) => `${p.name}選手（背番号${p.no}）　${b.turning}歳`).join('　／　')),
-    postLink(`今日は${names}の誕生日！${today.length === 1 ? `${today[0].b.turning}歳、` : ''}おめでとうございます🎂🎉 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`, 'お祝いをXでポスト'));
+  hbd.append(cake, h('div', 'msg', 'お誕生日おめでとう！'), h('div', 'who', today.map(({ p, b }) => p.mascot ? `${p.name}（テゲバの公式マスコット）` : `${p.name}選手（背番号${p.no}）　${b.turning}歳`).join('　／　')),
+    postLink(`今日は${names}の誕生日！${today.length === 1 && !today[0].p.mascot ? `${today[0].b.turning}歳、` : ''}おめでとうございます🎂🎉 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`, 'お祝いをXでポスト'));
   hbd.hidden = false;
   if (!reduced && !sessionStorageGet('confetti')) {
     // 紙吹雪の部品は、誕生日の当日だけ読み込む（ふだんのページを軽くするため）
@@ -149,11 +153,11 @@ for (const box of document.querySelectorAll('.bday[data-bday]')) {
   const row = h('div', 'row');
   for (const { p, b } of soon) {
     const c = h('div', 'bcard' + (b.days === 0 ? ' today' : ''));
-    if (b.days === 0) c.append(h('span', 'cd', 'TODAY'), jnoName(p), h('span', 'bg2', 'おめでとう！'), h('span', 'cd', `今日で${b.turning}歳`));
-    else c.append(h('span', 'cd', `あと${b.days}日`), jnoName(p), bdayBtn(p.birth, `${b.m}月${b.d}日で`), h('span', 'bg2', `${b.turning}歳`));
+    if (b.days === 0) c.append(h('span', 'cd', 'TODAY'), jnoName(p), h('span', 'bg2', 'おめでとう！'), h('span', 'cd', p.mascot ? '今日が誕生日' : `今日で${b.turning}歳`));
+    else c.append(h('span', 'cd', `あと${b.days}日`), jnoName(p), bdayBtn(p.birth, `${b.m}月${b.d}日${p.mascot ? '' : 'で'}`), h('span', 'bg2', p.mascot ? 'お誕生日' : `${b.turning}歳`));
     const text = b.days === 0
-      ? `今日${b.m}月${b.d}日は${p.name}選手の${b.turning}歳の誕生日！おめでとうございます🎂 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`
-      : `${b.m}月${b.d}日は${p.name}選手の${b.turning}歳の誕生日🎂 あと${b.days}日！ みんなでお祝いしよう\n${SITE.hashtags}`;
+      ? `今日${b.m}月${b.d}日は${callName(p)}の${ageText(p, b)}${p.mascot ? '' : 'の'}誕生日！おめでとうございます🎂 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`
+      : `${b.m}月${b.d}日は${callName(p)}の${ageText(p, b)}${p.mascot ? '' : 'の'}誕生日🎂 あと${b.days}日！ みんなでお祝いしよう\n${SITE.hashtags}`;
     c.append(postLink(text, b.days === 0 ? 'Xでお祝い' : 'Xでポスト'));
     row.append(c);
   }
@@ -186,16 +190,16 @@ function openBday(birth) {
   const t = h('div', 'ttl'); t.innerHTML = icon('cake'); t.append(`${m}月${d}日生まれ`);
   bdPop.append(close, t, h('div', 'k', 'テゲバの同じ誕生日'));
   const ul = h('ul');
-  same.forEach(p => { const b = bdayInfo(p.birth); ul.append(h('li', null, `${p.name}（背番号${p.no}・${p.pos}・${Number(p.birth.slice(0, 4))}年生まれ）${b && b.days === 0 ? '　今日が誕生日！' : ''}`)); });
+  same.forEach(p => { const b = bdayInfo(p.birth); ul.append(h('li', null, `${p.mascot ? `${p.name}（テゲバの公式マスコット）` : `${p.name}（背番号${p.no}・${p.pos}・${Number(p.birth.slice(0, 4))}年生まれ）`}${b && b.days === 0 ? '　今日が誕生日！' : ''}`)); });
   bdPop.append(ul);
-  if (same.length === 1) bdPop.append(h('p', 'note', `チームで${m}月${d}日生まれは${same[0].name}選手だけ！`));
+  if (same.length === 1) bdPop.append(h('p', 'note', `テゲバで${m}月${d}日生まれは${callName(same[0])}だけ！`));
   if (month.length) bdPop.append(h('div', 'k', `同じ${m}月生まれのチームメイト`), h('p', null, month.map(p => `${p.name}（${m}/${Number(p.birth.slice(8))}）`).join('、')));
   const wiki = h('a', 'wiki'); wiki.innerHTML = icon('star'); wiki.append(`${m}月${d}日生まれの有名人を見る`);
   wiki.href = `https://ja.wikipedia.org/wiki/${m}%E6%9C%88${d}%E6%97%A5#%E8%AA%95%E7%94%9F%E6%97%A5`; wiki.target = '_blank'; wiki.rel = 'noopener noreferrer';
   bdPop.append(h('div', 'k', '同じ誕生日の有名人'), wiki, h('span', 'wsrc', `Wikipedia「${m}月${d}日」の誕生日の一覧が開きます`), h('div', 'k', `あなたも${m}月${d}日生まれ？`));
-  const who = same.map(p => `${p.name}選手`).join('・');
+  const who = same.map(p => callName(p)).join('・');
   const a = h('a', 'postbtn'); a.target = '_blank'; a.rel = 'noopener noreferrer';
-  a.href = xIntent(`私も${who}と同じ${m}月${d}日生まれ！🎂\n同じ誕生日の選手を応援しよう！\n${SITE.hashtags}`, SITE.url + '/players/', '');
+  a.href = xIntent(`私も${who}と同じ${m}月${d}日生まれ！🎂\n同じ誕生日の${same.every(p => p.mascot) ? who : '選手'}を応援しよう！\n${SITE.hashtags}`, SITE.url + '/players/', '');
   const lb = h('span'), tail = h('span', 'nw'); tail.innerHTML = xLabel('をXでポスト'); lb.append(h('b', 'nw', '「同じ誕生日」'), tail); a.append(lb);
   bdPop.append(a);
   bdPop.showPopover();

@@ -35,7 +35,9 @@ const lite = d.matches.map(m => ({ round: m.round, opponent: m.opponent, gf: m.g
 const nx = nextMatch(fixtures, lite);
 const nxWhen = nx ? `${nx.tag}・${nx.when.replace(' キックオフ', '')}` : '';
 // 誕生日はブラウザ側で「今日」から数えるので、必要な項目だけ渡す
-const bdays = d.profiles.filter(p => p.birth).map(p => ({ no: p.no, name: p.name, pos: p.pos, birth: p.birth }));
+const bdays = [...d.profiles.filter(p => p.birth).map(p => ({ no: p.no, name: p.name, pos: p.pos, birth: p.birth })),
+  // マスコット（ジャーロくん）：年が無いので「0000-月-日」で渡し、ブラウザ側で年齢を出さない
+  ...(SITE.mascots || []).map(m => ({ name: m.name, birth: `0000-${m.birth}`, mascot: true }))];
 const nav = [
   ['', 'topics', '注目トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手'],
   ['goals/', 'goals', 'ハイライト'], ['schedule/', 'schedule', '日程'],

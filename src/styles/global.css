@@ -1092,3 +1092,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .chant-play:hover { background: var(--soft); }
 .chant-play:focus-visible { outline: 3px solid var(--brand); outline-offset: 1px; }
 .chant-play .ic { width: 1em; height: 1em; }
+
+/* 誕生日：マスコット（ジャーロくん）は背番号シャツの代わりにアイコン */
+.bmascot { display: inline-grid; place-items: center; flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--soft); color: var(--ink); }
+.bmascot .ic { width: 1.3rem; height: 1.3rem; }
