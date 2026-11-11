@@ -1096,3 +1096,5 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 /* 誕生日：マスコット（ジャーロくん）は背番号シャツの代わりにアイコン */
 .bmascot { display: inline-grid; place-items: center; flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--soft); color: var(--ink); }
 .bmascot .ic { width: 1.3rem; height: 1.3rem; }
+/* 誕生日当日の「お祝いをXでポスト」は真ん中に */
+.hbd > .bpost { align-self: center; justify-self: center; margin-inline: auto; }
