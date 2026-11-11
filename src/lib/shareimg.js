@@ -25,10 +25,21 @@ const loadFonts = () => fonts ||= [
 // 数字の入る文字：数字・英字は Saira、日本語は Zen（字ごとに足りない方へ回る）
 const NUM = 'SairaNum, Zen';
 // 大きな数字の文字の大きさ：Saira の数字・英字は細いので 0.46 字ぶん、日本語は 1 字ぶんで数え、1行に収める
-const bigSize = (s, width, max, min) => {
-  const n = [...String(s || '')].reduce((a, c) => a + (c.codePointAt(0) > 0xff ? 1 : .46), 0);
-  return Math.max(min, Math.min(max, Math.floor(width * .94 / Math.max(1, n))));
+// 数字を目立たせる：数字（と % ・ , . + など）は大きく、単位や漢字（勝・分・本・人など）は小さく。下の線でそろえる
+const UNIT = .5;   // 単位の大きさ（数字に対して）
+const NUM_RE = /([+＋−-]?\d[\d,.]*%?)/;
+const numParts = t => String(t).split(NUM_RE).filter(Boolean).map(p => ({ t: p, num: NUM_RE.test(p) && /\d/.test(p) }));
+// 「90分あたり5.1本」のような「〜あたり」の前は、条件なので小さいまま
+const numEl = (text, size, color, unitColor = color) => {
+  const m = String(text).match(/^(.*あたり)(.+)$/);
+  const pre = m ? [{ t: m[1], num: false }] : [];
+  const parts = [...pre, ...numParts(m ? m[2] : text)];
+  return h('div', { display: 'flex', alignItems: 'baseline', whiteSpace: 'nowrap', fontFamily: NUM, fontWeight: 900, color, lineHeight: 1 },
+    ...parts.map(p => h('div', { display: 'flex', fontSize: p.num ? size : Math.round(size * UNIT), color: p.num ? color : unitColor, marginLeft: p.num ? 0 : 2 }, p.t)));
 };
+// 大きな数字の文字の大きさ：数字は 0.46 字ぶん、単位（日本語）は UNIT 字ぶんで数え、1行に収める
+const numWidth = t => numParts(t).reduce((a, p) => a + [...p.t].reduce((b, c) => b + (p.num ? .46 : (c.codePointAt(0) > 0xff ? 1 : .46) * UNIT), 0), 0);
+const bigSize = (s, width, max, min) => Math.max(min, Math.min(max, Math.floor(width * .94 / Math.max(1, numWidth(s)))));
 const h = (type, style, ...children) => ({ type, props: { style, children: children.flat().filter(c => c !== null && c !== undefined && c !== false && c !== '') } });
 const img = (src, width, height, style = {}) => ({ type: 'img', props: { src, width, height, style } });
 const svgUri = s => 'data:image/svg+xml;base64,' + Buffer.from(s).toString('base64');
@@ -58,12 +69,12 @@ function topicBody(item) {
   // 見出し・大きな数字・補足は、上下の真ん中あたりに置く（下の余白が空きすぎないように）
   return [h('div', { display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center', paddingBottom: 20 },
     h('div', { display: 'flex', marginTop: 40 }, wrapEl(item.headline, fitChunks(item.headline, fit(item.headline, 1800, 60, 44), 34), C.fg, 900)),
-    h('div', { display: 'flex', marginTop: 16, fontFamily: NUM, fontSize: bigSize(big, W - PAD * 2, 300, 90), fontWeight: 900, color: C.ink, lineHeight: 1.05, whiteSpace: 'nowrap' }, big),
+    h('div', { display: 'flex', marginTop: 24, marginBottom: 8 }, numEl(big, bigSize(big, W - PAD * 2, 420, 110), C.ink)),
     item.sub && h('div', { display: 'flex', marginTop: 20 }, wrapEl(item.sub, fit(item.sub, 3400, 42, 32), C.fg)),
   )];
 }
 
-// ランキング：上位5行まで。1位は黄色の印で大きく。名前の下に数字
+// ランキング：上位5行まで。1位は黄色の印で大きく。数字は右に大きく
 function rankBody(item) {
   const rows = (item.top5 || item.top || []).slice(0, 5);
   const firsts = rows.filter(r => r.rank === 1).length;   // 1位が何人（何組）いるか。多いときは小さめに
@@ -72,14 +83,15 @@ function rankBody(item) {
     h('div', { display: 'flex', flexDirection: 'column', gap, marginTop: 36 },
     ...rows.map(r => {
       const first = r.rank === 1, big = first && firsts <= 2;
-      const size = big ? fit(r.name, W - PAD * 2 - 120, 72, 48) : fit(r.name, W - PAD * 2 - 110, first ? 52 : 48, 36);
+      const vSize = big ? 92 : 60;   // 数字の大きさ
+      const vW = r.display ? Math.ceil(numWidth(r.display) * vSize) + 8 : 0;
+      const size = big ? fit(r.name, W - PAD * 2 - 120 - vW, 68, 40) : fit(r.name, W - PAD * 2 - 100 - vW, first ? 50 : 46, 32);
       const badge = big ? 92 : 68;
       return h('div', { display: 'flex', alignItems: 'center', gap: 26 },
         h('div', { display: 'flex', alignItems: 'center', justifyContent: 'center', width: badge, height: badge, borderRadius: badge, flex: 'none',
           backgroundColor: first ? C.gold : '#FFFFFF', color: C.fg, fontFamily: 'SairaNum', fontSize: Math.round(badge * .62), fontWeight: 900, paddingTop: 2 }, String(r.rank)),
-        h('div', { display: 'flex', flexDirection: 'column' },
-          nameEl(r.name, size, first ? C.ink : C.fg),
-          r.display && h('div', { display: 'flex', fontFamily: NUM, fontWeight: 900, fontSize: big ? 44 : 32, color: first ? C.ink : C.muted, marginTop: 0, lineHeight: 1.15 }, String(r.display))));
+        h('div', { display: 'flex', flex: 1, minWidth: 0 }, nameEl(r.name, size, first ? C.ink : C.fg)),
+        r.display && h('div', { display: 'flex', flex: 'none', marginLeft: 'auto' }, numEl(r.display, vSize, first ? C.ink : C.fg, C.muted)));
     }))];
 }
 
