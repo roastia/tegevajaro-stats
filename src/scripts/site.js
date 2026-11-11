@@ -300,10 +300,10 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
   const btns = [...document.querySelectorAll('a.postimg[data-img]')];
   const touch = matchMedia('(pointer: coarse)').matches;
   let canFiles = false;
-  try { canFiles = touch && !!navigator.canShare && navigator.canShare({ files: [new File([''], 'x.png', { type: 'image/png' })] }); } catch { canFiles = false; }
+  try { canFiles = touch && !!navigator.canShare && navigator.canShare({ files: [new File([''], 'x.jpg', { type: 'image/jpeg' })] }); } catch { canFiles = false; }
   const blobs = new Map();
   const load = (a) => {
-    if (!blobs.has(a)) blobs.set(a, fetch(a.dataset.img).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(b => new File([b], a.dataset.file || 'tegesta.png', { type: 'image/png' })));
+    if (!blobs.has(a)) blobs.set(a, fetch(a.dataset.img).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(b => new File([b], a.dataset.file || 'tegesta.jpg', { type: 'image/jpeg' })));
     return blobs.get(a);
   };
   if (canFiles && 'IntersectionObserver' in window) {
@@ -326,7 +326,7 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
       }
       // PC：画像をダウンロード（リンクはそのまま X の投稿画面を開く）
       const d = document.createElement('a');
-      d.href = a.dataset.img; d.download = a.dataset.file || 'tegesta.png';
+      d.href = a.dataset.img; d.download = a.dataset.file || 'tegesta.jpg';
       document.body.append(d); d.click(); d.remove();
     });
   }

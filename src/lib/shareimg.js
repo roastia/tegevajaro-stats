@@ -120,8 +120,8 @@ function backdrop(bandY) {
 
 // 下に引く黄色の筆の線
 const underline = w => svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="26" viewBox="0 0 ${w} 26"><path d="M6 15 C ${w * .3} 6, ${w * .6} 20, ${w - 8} 10" stroke="${P.yellow}" stroke-width="11" fill="none" stroke-linecap="round"/></svg>`);
-// 応援のひとことの右の「ぱっ」
-const burst = svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 90 90"><g stroke="${P.yellow}" stroke-width="9" stroke-linecap="round"><line x1="12" y1="52" x2="42" y2="44"/><line x1="18" y1="22" x2="44" y2="36"/><line x1="44" y1="6" x2="54" y2="30"/></g></svg>`);
+// 応援のひとことの最後の文字の右上に付ける「ぱっ」（文字のほうから外へ広がる向き）
+const burst = svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 90 90"><g transform="translate(90 0) scale(-1 1)" stroke="${P.yellow}" stroke-width="9" stroke-linecap="round"><line x1="12" y1="52" x2="42" y2="44"/><line x1="18" y1="22" x2="44" y2="36"/><line x1="44" y1="6" x2="54" y2="30"/></g></svg>`);
 
 // 大きな数字（白ふちの黒い数字＋白ふちのピンクの単位）
 const heroNum = (text, size) => {
@@ -185,7 +185,7 @@ export function shareTree(item, asOf = SITE.roundLabel) {
     ...(isRank ? rankBody(item) : topicBody(item)),
     item.cheer && h('div', { display: 'flex', flex: 'none', alignItems: 'center', justifyContent: 'center', marginTop: 'auto', paddingTop: 16, marginBottom: 46 },
       h('div', { display: 'flex', textShadow: outline(4, 'rgba(0,0,0,0)') }, wrapEl(item.cheer, Math.min(fitChunks(item.cheer, fit(item.cheer, 1500, 66, 40), 34), Math.floor((W - PAD * 2 - 100) * .95 / Math.max(1, ...chunks(item.cheer).map(len)))), P.deep, 900)),
-      img(burst, 76, 76, { marginLeft: 6, marginTop: -40 })),
+      img(burst, 60, 60, { alignSelf: 'flex-start', marginLeft: -22, marginTop: -22 })),
   );
   const foot = h('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 150, padding: `0 ${PAD}px`, backgroundColor: '#FFFFFF', position: 'relative' },
     h('div', { display: 'flex', alignItems: 'center', gap: 22 },
@@ -199,25 +199,23 @@ export function shareTree(item, asOf = SITE.roundLabel) {
   return h('div', { width: W, height: H, display: 'flex', flexDirection: 'column', fontFamily: 'Zen', fontWeight: 700, position: 'relative', backgroundColor: P.base },
     img(svgUri(backdrop(bandY)), W, H, { position: 'absolute', left: 0, top: 0 }),
     // 布の目（全体に薄く重ねる）
-    h('div', { display: 'flex', position: 'absolute', left: 0, top: 0, width: W, height: H - 150, backgroundImage: `url(${fabricUri()})`, backgroundRepeat: 'repeat', backgroundSize: '96px 96px' }),
+    img(fabricUri(), W, H - 150, { position: 'absolute', left: 0, top: 0 }),
     // 右上の丸いワッペン（縫い目つき）にアイコン
     h('div', { display: 'flex', position: 'absolute', right: 64, top: 96, width: 156, height: 156, borderRadius: 156, backgroundColor: '#FBEFF2', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 0 rgba(120,20,45,.25)' },
       h('div', { display: 'flex', width: 136, height: 136, borderRadius: 136, border: `3px dashed ${P.deep}`, alignItems: 'center', justifyContent: 'center' }, img(iconUri(item.icon, P.deep), 78, 78))),
     body, foot);
 }
 
-export async function renderSharePng(item) {
+export async function renderShareJpg(item) {
   const svg = await satori(shareTree(item), { width: W, height: H, fonts: loadFonts() });
   const png = new Resvg(svg, { fitTo: { mode: 'width', value: W } }).render().asPng();
-  // 布の目があるとファイルが大きくなるので、256色の PNG にして軽くする（sharp は Astro が使っている部品。なければそのまま）
-  try {
-    const { default: sharp } = await import('sharp');
-    return await sharp(png).png({ palette: true, colors: 256, quality: 90, effort: 7, dither: .6 }).toBuffer();
-  } catch { return png; }
+  // 布の写真の質感を残したまま軽くするため JPEG にする（sharp は Astro が使っている部品）
+  const { default: sharp } = await import('sharp');
+  return await sharp(png).jpeg({ quality: 86, mozjpeg: true, chromaSubsampling: '4:4:4' }).toBuffer();
 }
 
-/** 画像のファイル名（/share/t-〇〇.png・/share/r-〇〇.png） */
-export const shareImgPath = item => `share/${item.kind}-${item.id}.png`;
+/** 画像のファイル名（/share/t-〇〇.jpg・/share/r-〇〇.jpg） */
+export const shareImgPath = item => `share/${item.kind}-${item.id}.jpg`;
 
 /** 画像でポストするときの短い文（見出し1行＋ハッシュタグ）。中身は画像にあるので、自分のコメントを書く余白を残す */
 export function shortPost(item) {

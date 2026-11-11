@@ -317,7 +317,7 @@ test('画像でポスト：短い文は X に収まり、自分のコメント�
     const n = xLength(flatPost(shortPost(it), ''), `${SITE.url}/ranking/#rank-${it.id}`);
     assert.ok(n <= 280 - 140, `${it.kind}-${it.id}: ${n}`);
     const p = shareImgPath(it);
-    assert.match(p, /^share\/[tr]-[\w-]+\.png$/, p);
+    assert.match(p, /^share\/[tr]-[\w-]+\.jpg$/, p);
     assert.ok(!paths.has(p), p); paths.add(p);
   }
 });
