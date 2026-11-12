@@ -39,7 +39,6 @@ const numEl = (text, size, color, unitColor = color) => {
 };
 // 大きな数字の文字の大きさ：数字は 0.53 字ぶん、単位（日本語）は UNIT 字ぶんで数え、1行に収める
 const numWidth = t => numParts(t).reduce((a, p) => a + [...p.t].reduce((b, c) => b + (p.num ? .53 : (c.codePointAt(0) > 0xff ? 1 : .53) * UNIT), 0), 0);
-const bigSize = (s, width, max, min) => Math.max(min, Math.min(max, Math.floor(width * .94 / Math.max(1, numWidth(s)))));
 const h = (type, style, ...children) => ({ type, props: { style, children: children.flat().filter(c => c !== null && c !== undefined && c !== false && c !== '') } });
 const img = (src, width, height, style = {}) => ({ type: 'img', props: { src, width, height, style } });
 const svgUri = s => 'data:image/svg+xml;base64,' + Buffer.from(s).toString('base64');
@@ -84,19 +83,44 @@ const underline = w => svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="${
 const burst = svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 90 90"><g transform="translate(90 0) scale(-1 1)" stroke="${P.yellow}" stroke-width="9" stroke-linecap="round"><line x1="12" y1="52" x2="42" y2="44"/><line x1="18" y1="22" x2="44" y2="36"/><line x1="44" y1="6" x2="54" y2="30"/></g></svg>`);
 
 // 大きな数字（白ふちの黒い数字＋白ふちのピンクの単位）
+// 数字は画像（src/assets/share/digits。本人が用意した字。白ふち・影つき、背景は透明）を並べる
+//   画像はどれも高さ 330px で、下の 30px は「,」のはみ出しぶん（数字の下の線は上から 300px）。値は横÷縦
+const DIGIT_FILE = { '.': 'dot', ',': 'comma', '%': 'percent', '+': 'plus', '＋': 'plus', '-': 'minus', '−': 'minus' };
+const DIGIT_RATIO = { 0: .6121, 1: .4273, 2: .6394, 3: .6333, 4: .6182, 5: .6061, 6: .597, 7: .5818, 8: .6152, 9: .597, dot: .3182, comma: .3606, percent: .7606, plus: .5939, minus: .6455 };
+const DIGIT_DESC = 30 / 330;
+const DIGIT_KERN = .07;   // 斜体なので、となりの字と少し重ねて詰める（高さに対して）
+const digitKey = c => DIGIT_FILE[c] ?? c;
+const digits = {};
+const digitUri = k => digits[k] ||= 'data:image/png;base64,' + fs.readFileSync(path.resolve(process.cwd(), `src/assets/share/digits/${k}.png`)).toString('base64');
+const heroUnit = size => Math.round(size * UNIT * .82);
+// 大きな数字の横幅（文字の大きさ 1 あたり）
+const heroWidth = t => {
+  const m = String(t).match(/^(.*あたり)(.+)$/);
+  const parts = [...(m ? [{ t: m[1], num: false }] : []), ...numParts(m ? m[2] : t)];
+  return parts.reduce((a, p) => a + (p.num
+    ? [...p.t].reduce((b, c) => b + (DIGIT_RATIO[digitKey(c)] ?? .6) - DIGIT_KERN, DIGIT_KERN)
+    : [...p.t].reduce((b, c) => b + (c.codePointAt(0) > 0xff ? 1 : .53) * UNIT * .82, 0) + .02), 0);
+};
+const heroSize = (s, width, max, min) => Math.max(min, Math.min(max, Math.floor(width * .96 / Math.max(.5, heroWidth(s)))));
 const heroNum = (text, size) => {
   const m = String(text).match(/^(.*あたり)(.+)$/);
   const parts = [...(m ? [{ t: m[1], num: false }] : []), ...numParts(m ? m[2] : text)];
-  return h('div', { display: 'flex', alignItems: 'baseline', whiteSpace: 'nowrap', fontWeight: 900, lineHeight: 1 },
-    ...parts.map(p => h('div', { display: 'flex', fontFamily: p.num ? 'Num' : 'Jp', fontSize: p.num ? size : Math.round(size * UNIT * .82),
-      color: p.num ? P.dark : P.deep, textShadow: outline(p.num ? Math.max(6, size / 26) : 5), marginLeft: p.num ? 0 : 10 }, p.t)));
+  const u = heroUnit(size);
+  return h('div', { display: 'flex', alignItems: 'flex-end', whiteSpace: 'nowrap', lineHeight: 1 },
+    ...parts.map(p => p.num
+      ? h('div', { display: 'flex', alignItems: 'flex-end' },
+          ...[...p.t].map((c, i) => { const k = digitKey(c); const w = Math.round((DIGIT_RATIO[k] ?? .6) * size);
+            return img(digitUri(k), w, size, { marginLeft: i ? -Math.round(size * DIGIT_KERN) : 0 }); }))
+      : h('div', { display: 'flex', fontFamily: 'Jp', fontWeight: 900, fontSize: u, color: P.deep, textShadow: outline(5),
+          // 数字の下の線にそろえる（画像の下の「,」のはみ出しぶんを上げる）。斜体の右下のすき間ぶん左へ寄せる
+          marginLeft: -Math.round(size * .03), marginBottom: Math.round(size * DIGIT_DESC) }, p.t)));
 };
 
 function topicBody(item) {
   const big = String(item.big || '');
   return [
     h('div', { display: 'flex', marginTop: 22, paddingRight: 190 }, wrapEl(item.headline, fitChunks(item.headline, fit(item.headline, 1500, 72, 48), 38, W - PAD * 2 - 190), P.dark, 900)),
-    h('div', { display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }, heroNum(big, bigSize(big, W - PAD * 2 - 40, 440, 120))),
+    h('div', { display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }, heroNum(big, heroSize(big, W - PAD * 2 - 40, 440, 120))),
     item.sub && h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', alignSelf: 'center', marginTop: 4 },
       // 背景の筆の線にかかっても読めるよう、白いふちを付ける
       h('div', { display: 'flex', justifyContent: 'center', textAlign: 'center', textShadow: outline(4, 'rgba(0,0,0,0)') }, wrapEl(item.sub, fitChunks(item.sub, fit(item.sub, 2600, 46, 32), 28), P.dark, 900)),
@@ -130,7 +154,7 @@ function rankBody(item) {
       ...firsts.map(r => h('div', { display: 'flex', alignItems: 'baseline', gap: 18 },
         h('div', { display: 'flex', textShadow: outline(n === 1 ? 7 : 5) }, nameEl(r.name, fit(r.name, shared ? nameW : nameW - 220, nameMax, 40), P.dark)),
         !shared && r.display && numEl(r.display, Math.round(nameMax * .9), P.deep, P.deep))),
-      shared && h('div', { display: 'flex', marginTop: n === 1 ? 4 : 10 }, heroNum(shared, bigSize(shared, W - PAD * 2 - 60, Math.round((n === 1 ? 250 : 180) * tight), 90)))),
+      shared && h('div', { display: 'flex', marginTop: n === 1 ? 4 : 10 }, heroNum(shared, heroSize(shared, W - PAD * 2 - 60, Math.round((n === 1 ? 250 : 180) * tight), 90)))),
   ];
   if (rest.length) {
     const rowH = rest.length >= 4 ? 56 : 66;
