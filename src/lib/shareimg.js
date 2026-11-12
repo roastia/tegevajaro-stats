@@ -64,12 +64,13 @@ const fitChunks = (text, size, min, width = W - PAD * 2) => Math.max(min, Math.m
 const wrapEl = (text, size, color, weight = 700) => h('div', { display: 'flex', flexWrap: 'wrap', fontSize: size, fontWeight: weight, color, lineHeight: 1.4 },
   ...chunks(text).map(p => h('div', { display: 'flex' }, p)));
 
-/* ---------- デザイン：ユニフォームの布（縫い目・当て布）＋太い筆の帯＋網点。数字は白ふちの黒で大きく ---------- */
+/* ---------- デザイン：背景はユニフォームの布の画像。数字は白ふちの黒で大きく ---------- */
 const P = { base: '#EFA9B8', panel: '#F8D0D8', deep: '#D2405F', dark: '#2E2629', patch: '#D9536F', stitch: '#FFF4F6', yellow: '#F2C14E' };
-let fabric;
-const fabricUri = () => fabric ||= 'data:image/png;base64,' + fs.readFileSync(path.resolve(process.cwd(), 'src/assets/share/fabric.png')).toString('base64');
-// 同じ見た目を毎回作る（ギザギザの形を決まった乱数で）
-const rnd = seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+// 背景：もらった布の画像（1080×1440。襟・丸いワッペン・筆の帯・網点・当て布・縫い目が描いてある）
+let bg;
+const bgUri = () => bg ||= 'data:image/jpeg;base64,' + fs.readFileSync(path.resolve(process.cwd(), 'src/assets/share/bg.jpg')).toString('base64');
+// 背景の丸いワッペンの中心と大きさ（アイコンをここに置く）
+const BADGE = { x: 915, y: 154, size: 96 };
 // 白いふち（文字のまわりを白で縁取る）＋右下の影
 const outline = (w, shadow = 'rgba(120,20,45,.35)') => {
   const s = [];
@@ -77,47 +78,6 @@ const outline = (w, shadow = 'rgba(120,20,45,.35)') => {
   s.push(`${w + 4}px ${w + 6}px 0 ${shadow}`);
   return s.join(', ');
 };
-// 背景（SVG 1枚）：外側の濃い布・中の明るい布と縫い目・襟・当て布・筆の帯・網点
-function backdrop(bandY) {
-  const r = rnd(11);
-  // 筆の帯：左下から右上へ。上下のふちをギザギザに、中にかすれの筋
-  const top = [], bot = [];
-  for (let x = -60; x <= W + 60; x += 24) {
-    const y = bandY - (x / W) * 330;
-    top.push(`${x},${(y - 150 + r() * 34).toFixed(0)}`);
-    bot.push(`${x},${(y + 150 - r() * 34).toFixed(0)}`);
-  }
-  const band = `<polygon points="${[...top, ...bot.reverse()].join(' ')}" fill="${P.deep}"/>`;
-  let streaks = '';
-  for (let i = 0; i < 9; i++) {
-    const x0 = r() * W, len = 120 + r() * 360, dy = (r() - .5) * 240, y0 = bandY - (x0 / W) * 330 + dy;
-    streaks += `<line x1="${x0.toFixed(0)}" y1="${y0.toFixed(0)}" x2="${(x0 + len).toFixed(0)}" y2="${(y0 - len * .305).toFixed(0)}" stroke="${P.base}" stroke-width="${(3 + r() * 7).toFixed(1)}" stroke-linecap="round" opacity=".55"/>`;
-  }
-  // 細い筆の帯（上にもう1本）
-  const t2 = [], b2 = [];
-  for (let x = 360; x <= W + 60; x += 22) { const y = bandY - 230 - ((x - 360) / W) * 330; t2.push(`${x},${(y - 34 + r() * 14).toFixed(0)}`); b2.push(`${x},${(y + 34 - r() * 14).toFixed(0)}`); }
-  const band2 = `<polygon points="${[...t2, ...b2.reverse()].join(' ')}" fill="${P.deep}" opacity=".9"/>`;
-  // 網点（右上、帯の上）
-  let dots = '';
-  for (let gy = 0; gy < 12; gy++) for (let gx = 0; gx < 18; gx++) {
-    const x = 640 + gx * 24 + (gy % 2) * 12, y = bandY - 420 + gy * 22 - (gx * 24) * .1;
-    const rr = Math.max(0, 7 - Math.hypot(gx - 15, gy - 3) * .55);
-    if (rr > .8) dots += `<circle cx="${x}" cy="${y.toFixed(0)}" r="${rr.toFixed(1)}" fill="#FFFFFF" opacity=".85"/>`;
-  }
-  // 当て布（縫い目つき）
-  const patch = (x, y, w, h2, rot) => `<g transform="rotate(${rot} ${x + w / 2} ${y + h2 / 2})"><rect x="${x}" y="${y}" width="${w}" height="${h2}" fill="${P.patch}"/><rect x="${x + 9}" y="${y + 9}" width="${w - 18}" height="${h2 - 18}" fill="none" stroke="${P.stitch}" stroke-width="3" stroke-dasharray="10 8"/></g>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-    <rect width="${W}" height="${H}" fill="${P.base}"/>
-    <polygon points="-20,40 640,-20 1100,250 1100,${H} -20,${H}" fill="${P.panel}"/>
-    <polyline points="-20,64 640,6 1100,276" fill="none" stroke="${P.stitch}" stroke-width="3" stroke-dasharray="12 9"/>
-    <polygon points="820,-10 1100,-10 1100,250 900,90" fill="#E4889C"/>
-    <polygon points="930,-10 1100,-10 1100,60 1000,40" fill="${P.deep}"/><polyline points="930,-10 1000,40 1100,60" fill="none" stroke="#FFFFFF" stroke-width="6"/>
-    <polyline points="830,-10 905,92 1100,246" fill="none" stroke="${P.stitch}" stroke-width="3" stroke-dasharray="12 9"/>
-    ${band2}${band}${streaks}${dots}
-    ${patch(-26, bandY - 330, 128, 170, -3)}${patch(1000, bandY + 330, 130, 170, 4)}
-  </svg>`;
-}
-
 // 下に引く黄色の筆の線
 const underline = w => svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="26" viewBox="0 0 ${w} 26"><path d="M6 15 C ${w * .3} 6, ${w * .6} 20, ${w - 8} 10" stroke="${P.yellow}" stroke-width="11" fill="none" stroke-linecap="round"/></svg>`);
 // 応援のひとことの最後の文字の右上に付ける「ぱっ」（文字のほうから外へ広がる向き）
@@ -138,7 +98,8 @@ function topicBody(item) {
     h('div', { display: 'flex', marginTop: 22, paddingRight: 190 }, wrapEl(item.headline, fitChunks(item.headline, fit(item.headline, 1500, 72, 48), 38, W - PAD * 2 - 190), P.dark, 900)),
     h('div', { display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10, transform: 'rotate(-3deg)' }, heroNum(big, bigSize(big, W - PAD * 2 - 40, 440, 120))),
     item.sub && h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', alignSelf: 'center', marginTop: 4 },
-      h('div', { display: 'flex', justifyContent: 'center', textAlign: 'center' }, wrapEl(item.sub, fitChunks(item.sub, fit(item.sub, 2600, 46, 32), 28), P.dark, 900)),
+      // 背景の筆の線にかかっても読めるよう、白いふちを付ける
+      h('div', { display: 'flex', justifyContent: 'center', textAlign: 'center', textShadow: outline(4, 'rgba(0,0,0,0)') }, wrapEl(item.sub, fitChunks(item.sub, fit(item.sub, 2600, 46, 32), 28), P.dark, 900)),
       img(underline(Math.min(W - PAD * 2, Math.round(len(item.sub) * 30))), Math.min(W - PAD * 2, Math.round(len(item.sub) * 30)), 26, { marginTop: -4 })),
   ];
 }
@@ -189,7 +150,6 @@ function rankBody(item) {
 export function shareTree(item, asOf = SITE.roundLabel) {
   const isRank = item.kind === 'r';
   const tag = isRank ? 'RANKING' : 'TOPIC';
-  const bandY = isRank ? 685 : 805;
   const body = h('div', { display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', padding: `${PAD}px ${PAD}px 0`, position: 'relative' },
     h('div', { display: 'flex', alignItems: 'center', gap: 16, paddingRight: 220, marginTop: 20 },
       h('div', { display: 'flex', fontFamily: 'SairaLabel', fontWeight: 900, fontSize: 40, letterSpacing: 3, color: '#FFFFFF', backgroundColor: P.deep, padding: '2px 18px 0', lineHeight: 1.2 }, tag),
@@ -210,12 +170,9 @@ export function shareTree(item, asOf = SITE.roundLabel) {
       h('div', { display: 'flex', fontWeight: 900, color: C.fg, fontSize: 28 }, `${item.upto ? `第${item.upto}節まで` : `${asOf}時点`}`),
       ...creditOf(item).map(t => h('div', { display: 'flex' }, t))));
   return h('div', { width: W, height: H, display: 'flex', flexDirection: 'column', fontFamily: 'Jp', fontWeight: 700, position: 'relative', backgroundColor: P.base },
-    img(svgUri(backdrop(bandY)), W, H, { position: 'absolute', left: 0, top: 0 }),
-    // 布の目（全体に薄く重ねる）
-    img(fabricUri(), W, H - 150, { position: 'absolute', left: 0, top: 0 }),
-    // 右上の丸いワッペン（縫い目つき）にアイコン
-    h('div', { display: 'flex', position: 'absolute', right: 64, top: 96, width: 156, height: 156, borderRadius: 156, backgroundColor: '#FBEFF2', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 0 rgba(120,20,45,.25)' },
-      h('div', { display: 'flex', width: 136, height: 136, borderRadius: 136, border: `3px dashed ${P.deep}`, alignItems: 'center', justifyContent: 'center' }, img(iconUri(item.icon, P.deep), 78, 78))),
+    img(bgUri(), W, H, { position: 'absolute', left: 0, top: 0 }),
+    // 背景の右上の丸いワッペンの中にアイコン
+    img(iconUri(item.icon, P.deep), BADGE.size, BADGE.size, { position: 'absolute', left: BADGE.x - BADGE.size / 2, top: BADGE.y - BADGE.size / 2 }),
     body, foot);
 }
 
