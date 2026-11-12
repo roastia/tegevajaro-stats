@@ -1,4 +1,4 @@
-// 「画像でポスト」用の画像（1080×1350・縦長 4:5）をビルド時に作る。注目トピック・ランキングの1件ずつ
+// 「画像でポスト」用の画像（1080×1440・縦長 3:4。X のスマホのタイムラインで切れずに出るいちばん縦長の形）をビルド時に作る。注目トピック・ランキングの1件ずつ
 // 中身はページのポスト用カードと同じ（見出し・大きな数字・補足・応援）。画像だけ広まっても出どころがわかるよう、
 // 下の帯に「テゲスタ！ テゲバのスタッツ・非公式サポーターサイト・時点・データ元」を入れる。写真・エンブレムは使わない
 import fs from 'node:fs';
@@ -8,7 +8,7 @@ import { Resvg } from '@resvg/resvg-js';
 import { SITE } from '../config/site.js';
 import { ICONS } from './meta.js';
 
-const W = 1080, H = 1350, PAD = 72;
+const W = 1080, H = 1440, PAD = 72;
 const C = { bg: '#FFF1F4', ink: '#C23F63', fg: '#3A3236', muted: '#7A6E73', line: '#F3D3DC', brand: '#F16682', gold: '#F5C451' };
 const FONT_DIR = path.resolve(process.cwd(), 'src/assets/fonts');
 let fonts;
@@ -189,7 +189,7 @@ function rankBody(item) {
 export function shareTree(item, asOf = SITE.roundLabel) {
   const isRank = item.kind === 'r';
   const tag = isRank ? 'RANKING' : 'TOPIC';
-  const bandY = isRank ? 640 : 760;
+  const bandY = isRank ? 685 : 805;
   const body = h('div', { display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', padding: `${PAD}px ${PAD}px 0`, position: 'relative' },
     h('div', { display: 'flex', alignItems: 'center', gap: 16, paddingRight: 220, marginTop: 20 },
       h('div', { display: 'flex', fontFamily: 'SairaLabel', fontWeight: 900, fontSize: 40, letterSpacing: 3, color: '#FFFFFF', backgroundColor: P.deep, padding: '2px 18px 0', lineHeight: 1.2 }, tag),
