@@ -96,7 +96,7 @@ function topicBody(item) {
   const big = String(item.big || '');
   return [
     h('div', { display: 'flex', marginTop: 22, paddingRight: 190 }, wrapEl(item.headline, fitChunks(item.headline, fit(item.headline, 1500, 72, 48), 38, W - PAD * 2 - 190), P.dark, 900)),
-    h('div', { display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10, transform: 'rotate(-3deg)' }, heroNum(big, bigSize(big, W - PAD * 2 - 40, 440, 120))),
+    h('div', { display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }, heroNum(big, bigSize(big, W - PAD * 2 - 40, 440, 120))),
     item.sub && h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', alignSelf: 'center', marginTop: 4 },
       // 背景の筆の線にかかっても読めるよう、白いふちを付ける
       h('div', { display: 'flex', justifyContent: 'center', textAlign: 'center', textShadow: outline(4, 'rgba(0,0,0,0)') }, wrapEl(item.sub, fitChunks(item.sub, fit(item.sub, 2600, 46, 32), 28), P.dark, 900)),
@@ -121,12 +121,12 @@ function rankBody(item) {
     fontFamily: 'Num', fontSize: Math.round(size * .66), fontWeight: 900, color: P.dark, paddingTop: 2, boxShadow: '0 0 0 6px #FFFFFF, 6px 8px 0 6px rgba(120,20,45,.3)' }, '1');
   const out = [
     h('div', { display: 'flex', marginTop: 22, paddingRight: 190 }, wrapEl(`${item.label} 1位は…`, fitChunks(`${item.label} 1位は…`, 68, 40, W - PAD * 2 - 190), P.dark, 900)),
-    h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: rest.length ? 'none' : 1, marginTop: 12, transform: 'rotate(-3deg)', gap: n >= 4 ? 2 : 8 },
+    h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: rest.length ? 'none' : 1, marginTop: 12, gap: n >= 4 ? 2 : 8 },
       // 「1」の丸（1人のときは名前の上に大きく、何人かのときは「1位タイ」の札）
       n === 1
         ? badge(Math.round(96 * tight))
         : h('div', { display: 'flex', alignItems: 'center', gap: 14 }, badge(72),
-            h('div', { display: 'flex', fontFamily: 'Jp', fontWeight: 900, fontSize: 44, color: '#FFFFFF', backgroundColor: P.dark, padding: '4px 20px', transform: 'rotate(2deg)' }, `${n}${item.big?.includes('＆') || firsts[0]?.name.includes('＆') ? '組' : '人'}が1位タイ！`)),
+            h('div', { display: 'flex', fontFamily: 'Jp', fontWeight: 900, fontSize: 44, color: '#FFFFFF', backgroundColor: P.dark, padding: '4px 20px' }, `${n}${item.big?.includes('＆') || firsts[0]?.name.includes('＆') ? '組' : '人'}が1位タイ！`)),
       ...firsts.map(r => h('div', { display: 'flex', alignItems: 'baseline', gap: 18 },
         h('div', { display: 'flex', textShadow: outline(n === 1 ? 7 : 5) }, nameEl(r.name, fit(r.name, shared ? nameW : nameW - 220, nameMax, 40), P.dark)),
         !shared && r.display && numEl(r.display, Math.round(nameMax * .9), P.deep, P.deep))),
@@ -134,7 +134,7 @@ function rankBody(item) {
   ];
   if (rest.length) {
     const rowH = rest.length >= 4 ? 56 : 66;
-    out.push(h('div', { display: 'flex', flexDirection: 'column', marginTop: 'auto', padding: '10px 26px', backgroundColor: 'rgba(255,248,250,.93)', border: `3px dashed ${P.deep}`, borderRadius: 18, transform: 'rotate(-1deg)' },
+    out.push(h('div', { display: 'flex', flexDirection: 'column', marginTop: 'auto', padding: '10px 26px', backgroundColor: 'rgba(255,248,250,.93)', border: `3px dashed ${P.deep}`, borderRadius: 18 },
       ...rest.map((r, i) => {
         const vSize = 46;
         const vW = r.display ? Math.ceil(numWidth(r.display) * vSize) + 10 : 0;
