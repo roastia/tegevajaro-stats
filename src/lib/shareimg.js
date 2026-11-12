@@ -13,18 +13,18 @@ const C = { bg: '#FFF1F4', ink: '#C23F63', fg: '#3A3236', muted: '#7A6E73', line
 const FONT_DIR = path.resolve(process.cwd(), 'src/assets/fonts');
 let fonts;
 // 字体（画像だけで使う。どれも SIL Open Font License）
-//   日本語：Zen Kaku Gothic New（Bold・Black）／数字：Saira Extra Condensed Black（スポーツ中継のスコア表示のような細長い数字）
+//   日本語：Noto Sans JP（Black。小さな文字は Bold）／数字：Anton（太く細長い、スポーツの見出しのような数字）
 //   英字ラベル（RANKING・TOPIC）：Saira Semi Condensed Black
 const ff = n => fs.readFileSync(path.join(FONT_DIR, n));
 const loadFonts = () => fonts ||= [
-  { name: 'Zen', data: ff('ZenKakuGothicNew-Bold.ttf'), weight: 700, style: 'normal' },
-  { name: 'Zen', data: ff('ZenKakuGothicNew-Black.ttf'), weight: 900, style: 'normal' },
-  { name: 'SairaNum', data: ff('SairaExtraCondensed-Black.ttf'), weight: 900, style: 'normal' },
+  { name: 'Jp', data: ff('NotoSansJP-Bold.subset.ttf'), weight: 700, style: 'normal' },
+  { name: 'Jp', data: ff('NotoSansJP-Black.subset.ttf'), weight: 900, style: 'normal' },
+  { name: 'Num', data: ff('Anton-Regular.ttf'), weight: 900, style: 'normal' },
   { name: 'SairaLabel', data: ff('SairaSemiCondensed-Black.ttf'), weight: 900, style: 'normal' },
 ];
-// 数字の入る文字：数字・英字は Saira、日本語は Zen（字ごとに足りない方へ回る）
-const NUM = 'SairaNum, Zen';
-// 大きな数字の文字の大きさ：Saira の数字・英字は細いので 0.46 字ぶん、日本語は 1 字ぶんで数え、1行に収める
+// 数字の入る文字：数字・英字は Anton、日本語は Noto Sans JP（字ごとに足りない方へ回る）
+const NUM = 'Num, Jp';
+// 大きな数字の文字の大きさ：Anton の数字・英字は細いので 0.53 字ぶん、日本語は 1 字ぶんで数え、1行に収める
 // 数字を目立たせる：数字（と % ・ , . + など）は大きく、単位や漢字（勝・分・本・人など）は小さく。下の線でそろえる
 const UNIT = .5;   // 単位の大きさ（数字に対して）
 const NUM_RE = /([+＋−-]?\d[\d,.]*%?)/;
@@ -37,8 +37,8 @@ const numEl = (text, size, color, unitColor = color) => {
   return h('div', { display: 'flex', alignItems: 'baseline', whiteSpace: 'nowrap', fontFamily: NUM, fontWeight: 900, color, lineHeight: 1 },
     ...parts.map(p => h('div', { display: 'flex', fontSize: p.num ? size : Math.round(size * UNIT), color: p.num ? color : unitColor, marginLeft: p.num ? 0 : 2 }, p.t)));
 };
-// 大きな数字の文字の大きさ：数字は 0.46 字ぶん、単位（日本語）は UNIT 字ぶんで数え、1行に収める
-const numWidth = t => numParts(t).reduce((a, p) => a + [...p.t].reduce((b, c) => b + (p.num ? .46 : (c.codePointAt(0) > 0xff ? 1 : .46) * UNIT), 0), 0);
+// 大きな数字の文字の大きさ：数字は 0.53 字ぶん、単位（日本語）は UNIT 字ぶんで数え、1行に収める
+const numWidth = t => numParts(t).reduce((a, p) => a + [...p.t].reduce((b, c) => b + (p.num ? .53 : (c.codePointAt(0) > 0xff ? 1 : .53) * UNIT), 0), 0);
 const bigSize = (s, width, max, min) => Math.max(min, Math.min(max, Math.floor(width * .94 / Math.max(1, numWidth(s)))));
 const h = (type, style, ...children) => ({ type, props: { style, children: children.flat().filter(c => c !== null && c !== undefined && c !== false && c !== '') } });
 const img = (src, width, height, style = {}) => ({ type: 'img', props: { src, width, height, style } });
@@ -128,7 +128,7 @@ const heroNum = (text, size) => {
   const m = String(text).match(/^(.*あたり)(.+)$/);
   const parts = [...(m ? [{ t: m[1], num: false }] : []), ...numParts(m ? m[2] : text)];
   return h('div', { display: 'flex', alignItems: 'baseline', whiteSpace: 'nowrap', fontWeight: 900, lineHeight: 1 },
-    ...parts.map(p => h('div', { display: 'flex', fontFamily: p.num ? 'SairaNum' : 'Zen', fontSize: p.num ? size : Math.round(size * UNIT * .82),
+    ...parts.map(p => h('div', { display: 'flex', fontFamily: p.num ? 'Num' : 'Jp', fontSize: p.num ? size : Math.round(size * UNIT * .82),
       color: p.num ? P.dark : P.deep, textShadow: outline(p.num ? Math.max(6, size / 26) : 5), marginLeft: p.num ? 0 : 10 }, p.t)));
 };
 
@@ -157,7 +157,7 @@ function rankBody(item) {
   const nameMax = Math.round((n === 1 ? (shared ? 104 : 124) : n === 2 ? 84 : n === 3 ? 68 : 58) * tight);
   const nameW = W - PAD * 2 - 40;
   const badge = (size) => h('div', { display: 'flex', width: size, height: size, borderRadius: size, flex: 'none', backgroundColor: C.gold, alignItems: 'center', justifyContent: 'center',
-    fontFamily: 'SairaNum', fontSize: Math.round(size * .66), fontWeight: 900, color: P.dark, paddingTop: 2, boxShadow: '0 0 0 6px #FFFFFF, 6px 8px 0 6px rgba(120,20,45,.3)' }, '1');
+    fontFamily: 'Num', fontSize: Math.round(size * .66), fontWeight: 900, color: P.dark, paddingTop: 2, boxShadow: '0 0 0 6px #FFFFFF, 6px 8px 0 6px rgba(120,20,45,.3)' }, '1');
   const out = [
     h('div', { display: 'flex', marginTop: 22, paddingRight: 190 }, wrapEl(`${item.label} 1位は…`, fitChunks(`${item.label} 1位は…`, 68, 40, W - PAD * 2 - 190), P.dark, 900)),
     h('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: rest.length ? 'none' : 1, marginTop: 12, transform: 'rotate(-3deg)', gap: n >= 4 ? 2 : 8 },
@@ -165,7 +165,7 @@ function rankBody(item) {
       n === 1
         ? badge(Math.round(96 * tight))
         : h('div', { display: 'flex', alignItems: 'center', gap: 14 }, badge(72),
-            h('div', { display: 'flex', fontFamily: 'Zen', fontWeight: 900, fontSize: 44, color: '#FFFFFF', backgroundColor: P.dark, padding: '4px 20px', transform: 'rotate(2deg)' }, `${n}${item.big?.includes('＆') || firsts[0]?.name.includes('＆') ? '組' : '人'}が1位タイ！`)),
+            h('div', { display: 'flex', fontFamily: 'Jp', fontWeight: 900, fontSize: 44, color: '#FFFFFF', backgroundColor: P.dark, padding: '4px 20px', transform: 'rotate(2deg)' }, `${n}${item.big?.includes('＆') || firsts[0]?.name.includes('＆') ? '組' : '人'}が1位タイ！`)),
       ...firsts.map(r => h('div', { display: 'flex', alignItems: 'baseline', gap: 18 },
         h('div', { display: 'flex', textShadow: outline(n === 1 ? 7 : 5) }, nameEl(r.name, fit(r.name, shared ? nameW : nameW - 220, nameMax, 40), P.dark)),
         !shared && r.display && numEl(r.display, Math.round(nameMax * .9), P.deep, P.deep))),
@@ -178,7 +178,7 @@ function rankBody(item) {
         const vSize = 46;
         const vW = r.display ? Math.ceil(numWidth(r.display) * vSize) + 10 : 0;
         return h('div', { display: 'flex', alignItems: 'center', gap: 18, height: rowH, borderTop: i ? '2px dotted #E7A9B7' : 'none' },
-          h('div', { display: 'flex', width: 46, height: 46, borderRadius: 46, flex: 'none', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FBE0E7', fontFamily: 'SairaNum', fontSize: 34, fontWeight: 900, color: P.dark, paddingTop: 2 }, String(r.rank)),
+          h('div', { display: 'flex', width: 46, height: 46, borderRadius: 46, flex: 'none', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FBE0E7', fontFamily: 'Num', fontSize: 34, fontWeight: 900, color: P.dark, paddingTop: 2 }, String(r.rank)),
           h('div', { display: 'flex', flex: 1, minWidth: 0 }, nameEl(r.name, fit(r.name, W - PAD * 2 - 130 - vW, 40, 26), P.dark)),
           r.display && h('div', { display: 'flex', flex: 'none' }, numEl(r.display, vSize, P.dark, '#8A6B74')));
       })));
@@ -209,7 +209,7 @@ export function shareTree(item, asOf = SITE.roundLabel) {
     h('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', fontSize: 22, fontWeight: 700, color: C.muted, lineHeight: 1.4 },
       h('div', { display: 'flex', fontWeight: 900, color: C.fg, fontSize: 28 }, `${item.upto ? `第${item.upto}節まで` : `${asOf}時点`}`),
       ...creditOf(item).map(t => h('div', { display: 'flex' }, t))));
-  return h('div', { width: W, height: H, display: 'flex', flexDirection: 'column', fontFamily: 'Zen', fontWeight: 700, position: 'relative', backgroundColor: P.base },
+  return h('div', { width: W, height: H, display: 'flex', flexDirection: 'column', fontFamily: 'Jp', fontWeight: 700, position: 'relative', backgroundColor: P.base },
     img(svgUri(backdrop(bandY)), W, H, { position: 'absolute', left: 0, top: 0 }),
     // 布の目（全体に薄く重ねる）
     img(fabricUri(), W, H - 150, { position: 'absolute', left: 0, top: 0 }),
