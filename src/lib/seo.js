@@ -93,7 +93,7 @@ export const linksLd = rows => ({ '@context': 'https://schema.org', '@type': 'It
 /** チャント（選手・チームのチャントの名前。歌詞は載せない） */
 export const chantsLd = rows => ({ '@context': 'https://schema.org', '@type': 'ItemList', name: `${SITE.team}のチャント（宮崎ブーゲンビリーバー作）`,
   itemListElement: rows.filter(r => ['player', 'staff', 'team', 'memorial'].includes(r.kind)).map((r, i) => ({ '@type': 'ListItem', position: i + 1, item: {
-    '@type': 'MusicComposition', name: r.kind === 'team' ? r.name : `${r.name}のチャント`, composer: { '@type': 'Organization', name: '宮崎ブーゲンビリーバー' },
+    '@type': 'MusicComposition', name: r.kind === 'team' ? r.name : `${r.name}のチャント`, ...(r.rec ? {} : { composer: { '@type': 'Organization', name: '宮崎ブーゲンビリーバー' } }),
     ...(r.youtube ? { url: siteUrl(r.youtube) } : {}),
   } })) });
 

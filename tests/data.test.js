@@ -293,7 +293,7 @@ test('検索・AI 向け：よくある質問はサイトの数字と合い、�
 test('チャント：歌詞の列はなく、音源は YouTube・歌詞カードは ブーゲンビリーバーの X、選手は今の選手', () => {
   const rows = readCsv('chants');
   assert.ok(rows.length > 0);
-  assert.deepEqual(Object.keys(rows[0]), ['id', 'kind', 'name', 'call', 'song', 'artist', 'youtube'], '列は決めたものだけ（歌詞は載せない）');
+  assert.deepEqual(Object.keys(rows[0]), ['id', 'kind', 'name', 'call', 'song', 'artist', 'youtube', 'rec'], '列は決めたものだけ（歌詞は載せない）');
   const kinds = new Set(['player', 'staff', 'team', 'memorial', 'movie', 'card']);
   const roster = new Set(readCsv('players').map(p => p.name.replace(/\s/g, '')));
   const ids = new Set();
@@ -303,6 +303,7 @@ test('チャント：歌詞の列はなく、音源は YouTube・歌詞カード
     assert.ok(r.name, r.id);
     if (r.kind === 'card') assert.match(r.youtube, /^https:\/\/x\.com\/Bougainbeliever\/status\/\d+$/, r.name);
     else if (r.youtube) assert.match(r.youtube, /^https:\/\/www\.youtube\.com\/watch\?v=[\w-]{11}(&t=\d+)?$/, r.name);
+    if (r.rec) assert.ok(r.kind === 'team' && r.youtube, `ほかの人の録音はチームチャントの音源だけ：${r.name}`);
     if (r.kind === 'player') { assert.ok(roster.has(r.name.replace(/\s/g, '')), `選手にいない：${r.name}`); assert.ok(r.call && r.youtube, r.name); }
   }
 });

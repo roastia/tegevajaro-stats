@@ -5,7 +5,7 @@ import Chant from '../components/Chant.astro';
 import { readCsv } from '../lib/data.js';
 import { siteUrl, playerUrl } from '../lib/util.js';
 import { chantsLd } from '../lib/seo.js';
-// チャント：src/data/chants.csv。チャントはすべて宮崎ブーゲンビリーバーが作ったもの（docs/chants.md）
+// チャント：src/data/chants.csv。宮崎ブーゲンビリーバーの歌詞カード・YouTube を正とする（docs/chants.md）。例外はひょっとこ（カードにない昔からのチャント）
 // 歌詞は載せない（ブーゲンビリーバーの歌詞カードへリンクする）。音源は YouTube へのリンクだけ（埋め込まない）
 const rows = readCsv('chants').filter(r => r.name);
 const of = k => rows.filter(r => r.kind === k);
@@ -27,7 +27,7 @@ const group = readCsv('links').filter(r => /ブーゲンビリーバー/.test(r.
     <h2 class="links-h">いっしょに歌おう！</h2>
     <p class="page-lead">テゲバジャーロ宮崎の選手チャント・チームチャントの一覧です。コールと原曲、音源へのリンクをまとめました。スタジアムで声を合わせる前に、ここで予習しておきましょう！</p>
     <p class="chant-credit">チャント：<b>宮崎ブーゲンビリーバー</b></p>
-    <p class="chant-credit-sub">チャントはすべて、ゴール裏で応援を先導している宮崎ブーゲンビリーバーが作ったものです。いつも熱い応援をありがとうございます！</p>
+    <p class="chant-credit-sub">チャントは、ゴール裏で応援を先導している宮崎ブーゲンビリーバーの歌詞カードにそってまとめています。いつも熱い応援をありがとうございます！</p>
     <ul class="chant-group">
       {group.map(g => <li><a class="btn-sub" href={g.url} target="_blank" rel="noopener noreferrer">{g.label}</a></li>)}
     </ul>
@@ -53,7 +53,7 @@ const group = readCsv('links').filter(r => /ブーゲンビリーバー/.test(r.
 
   <Acc id="chants-team" title="チームチャント" icon="flag" count={team.length}>
     <ul class="chant-list">
-      {team.map(r => <Chant name={r.name} call={r.call} song={r.song} artist={r.artist} youtube={r.youtube} />)}
+      {team.map(r => <Chant name={r.name} call={r.call} song={r.song} artist={r.artist} youtube={r.youtube} rec={r.rec} />)}
     </ul>
   </Acc>
 
@@ -78,5 +78,5 @@ const group = readCsv('links').filter(r => /ブーゲンビリーバー/.test(r.
     </section>
   </Acc>
 
-  <p class="note">コール・原曲・音源は、宮崎ブーゲンビリーバーの歌詞カード・紹介ポスト・YouTube をもとにまとめています。原曲がわからないチャントは、空けています。テゲスタ！は宮崎ブーゲンビリーバーとは別の、非公式のサイトです。</p>
+  <p class="note">コール・原曲・音源は、宮崎ブーゲンビリーバーの歌詞カード・紹介ポスト・YouTube をもとにまとめています。原曲がわからないチャントは、空けています。ひょっとこは歌詞カードにない昔からのチャントで、ブーゲンビリーバーの音源がないチャント（We are テゲバ・ひょっとこ）は TEGEmania channel の録音にリンクしています。テゲスタ！は宮崎ブーゲンビリーバーとは別の、非公式のサイトです。</p>
 </Base>
