@@ -40,10 +40,11 @@ const bdays = bdayPeople(d.profiles);
 // 今日の誕生日は、ビルドの日（日本時間）で先に HTML にしておく（ブラウザで日付が違うときだけ site.js が作り直す）
 const plUrls = Object.fromEntries(d.players.map(p => [p.name, playerUrl(p.jl_url)]).filter(([, u]) => u));
 const bdToday = bdayState(bdays).today;
+// 4つ目はスマホで使う短い名前（5列×2段に収めるため）
 const nav = [
-  ['', 'topics', '注目トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手'],
-  ['goals/', 'goals', 'ハイライト'], ['schedule/', 'schedule', '日程'],
-  ['chants/', 'chants', 'チャント'], ['links/', 'links', 'リンク'], ['spots/', 'spots', 'みやざき情報'],
+  ['', 'topics', '注目トピック', 'トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手'],
+  ['goals/', 'goals', 'ハイライト'], ['schedule/', 'schedule', '日程'], ['history/', 'history', '歴史'],
+  ['chants/', 'chants', 'チャント'], ['links/', 'links', 'リンク'], ['spots/', 'spots', 'みやざき情報', 'みやざき'],
 ];
 ---
 <!doctype html>
@@ -105,7 +106,7 @@ const nav = [
   <span class="navtop" aria-hidden="true"></span>
   <nav class="site-nav" aria-label="ページ">
     <ul>
-      {nav.map(([p, id, label]) => <li><a class={id === 'spots' ? 'nw nav-miya' : 'nw'} href={href(p)} data-astro-prefetch="viewport" aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
+      {nav.map(([p, id, label, short]) => <li><a class={id === 'spots' ? 'nw nav-miya' : 'nw'} href={href(p)} data-astro-prefetch="viewport" aria-current={current === id ? 'page' : undefined} aria-label={short ? label : undefined}>{short ? <><span class="nav-l">{label}</span><span class="nav-s" aria-hidden="true">{short}</span></> : label}</a></li>)}
     </ul>
   </nav>
   <div class="wrap">

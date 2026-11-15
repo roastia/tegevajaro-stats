@@ -1,0 +1,154 @@
+---
+import Base from '../layouts/Base.astro';
+import Acc from '../components/Acc.astro';
+import { SITE } from '../config/site.js';
+import { getData } from '../lib/data.js';
+import { loadHistory, record, scorers, headToHead, bests, COMP } from '../lib/clubhistory.js';
+import { clubUrl } from '../config/clubs.js';
+import { playerUrl } from '../lib/util.js';
+// 歴史：Jリーグに入った2021年からの全試合と、通算の記録
+const d = getData();
+const { matches, seasons } = loadHistory();
+const urlOf = new Map(d.players.map(p => [p.name, playerUrl(p.jl_url)]));
+const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}`; };
+const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
+const haWord = h => (h === 'H' ? 'ホーム' : 'アウェイ');
+const score = m => `${m.gf}-${m.ga}${m.pk ? `（PK ${m.pk[0]}-${m.pk[1]}）` : m.et ? '（延長）' : ''}`;
+const label = m => (COMP[m.comp].league ? `第${m.round}節` : `${COMP[m.comp].name} ${m.round}`);
+// シーズンごと（新しい順）。順位は history_seasons.csv、今季の順位は site.js
+const bySeason = seasons.map(s => {
+  const ms = matches.filter(m => m.season === s.season);
+  const lg = ms.filter(m => m.season === '2026特別' ? m.comp === 'j2j3' && /WEST-B/.test(m.round) : m.league);
+  const rank = s.season === '2026/27' ? String(SITE.rank) : s.rank;
+  return { ...s, rank, ms, rec: record(lg), top: scorers(lg)[0], cups: ms.filter(m => !lg.includes(m)) };
+}).reverse();
+// 年表：1行ずつ
+const timeline = [
+  { y: '2021', t: 'J3リーグに参入。1年目で3位' },
+  { y: '2025', t: 'J3リーグ4位からJ2昇格プレーオフへ。準決勝で鹿児島に2-0、決勝でFC大阪に4-0で勝ち、クラブ初のJ2昇格' },
+  { y: '2026', t: 'シーズン移行前の特別大会「百年構想リーグ」で地域リーグラウンド WEST-B 1位' },
+  { y: '2026/27', t: `J2リーグ1年目。${SITE.roundLabel}時点で${SITE.rank}位` },
+];
+// 順位の推移（リーグ戦）。縦が順位（上が1位）。リーグがちがう年は下に書く
+const chart = bySeason.filter(s => s.season !== '2026特別' && s.rank).reverse();
+// スマホでも字が小さくならないよう、横幅をせまめに描いて広げる
+const CW = 420, CH = 230, PL = 40, PR = 30, PT = 24, PB = 42;
+const maxTeams = Math.max(...chart.map(s => Number(s.teams)));
+const xOf = i => PL + (CW - PL - PR) * (chart.length === 1 ? .5 : i / (chart.length - 1));
+const yOf = r => PT + (CH - PT - PB) * ((Number(r) - 1) / (maxTeams - 1));
+const pts = chart.map((s, i) => ({ s, x: xOf(i), y: yOf(s.rank) }));
+// 通算の記録：リーグ戦だけ／すべての公式戦
+const scopes = [
+  { key: 'league', name: 'リーグ戦', ms: matches.filter(m => m.league) },
+  { key: 'all', name: 'すべての公式戦', ms: matches },
+].map(sc => ({ ...sc, rec: record(sc.ms), h2h: headToHead(sc.ms), top: scorers(sc.ms), best: bests(sc.ms) }));
+const first = matches[0];
+---
+<Base current="history" title="歴史・全試合の記録" description={`テゲバジャーロ宮崎の歴史。Jリーグに入った2021年からの全試合の結果・得点者と、シーズンごとの順位、相手ごとの対戦成績、通算得点ランキング（非公式）。${SITE.roundLabel}時点。`}>
+  <section class="card hs-intro">
+    <h2 class="hs-h">年表</h2>
+    <ol class="hs-tl">
+      {timeline.map(t => <li><span class="hs-y">{t.y}</span><span>{t.t}</span></li>)}
+    </ol>
+    <p class="note">2021年より前（九州リーグ・JFL）の年ごとの順位は、出典を確かめてから載せます。</p>
+  </section>
+
+  <Acc id="rank" title="順位の推移" icon="chartup" note="リーグ戦の最終順位">
+    <div class="card hs-chart">
+      <svg viewBox={`0 0 ${CW} ${CH}`} role="img" aria-label={chart.map(s => `${s.label}年 ${s.league} ${s.rank}位`).join('、')}>
+        {[1, 5, 10, 15, 20].filter(r => r <= maxTeams).map(r => <g class="hs-grid"><line x1={PL} x2={CW - PR} y1={yOf(r)} y2={yOf(r)} /><text x={PL - 6} y={yOf(r) + 4}>{r}</text></g>)}
+        <polyline class="hs-lineplot" points={pts.map(p => `${p.x},${p.y}`).join(' ')} />
+        {pts.map(p => (
+          <g class={`hs-pt${p.s.league === 'J2' ? ' j2' : ''}`}>
+            <circle cx={p.x} cy={p.y} r="6" />
+            <text class="hs-rk" x={p.x} y={p.y - 12}>{p.s.rank}位</text>
+            <text class="hs-yr" x={p.x} y={CH - 20}>{p.s.label}</text>
+            <text class="hs-lg" x={p.x} y={CH - 4}>{p.s.league}{p.s.season === '2026/27' ? '（途中）' : ''}</text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  </Acc>
+
+  <Acc id="seasons" title="シーズンごとの全試合" icon="calendar" count={bySeason.length}>
+    <div class="hs-seasons">
+      {bySeason.map((s, i) => (
+        <details class="card hs-season" open={i === 0}>
+          <summary class="hs-sum">
+            <span class="hs-sy">{s.label}</span>
+            <span class="hs-sl">{s.league}</span>
+            {s.rank && <span class="hs-sr">{s.rank}位{s.season === '2026/27' ? '（途中）' : ''}</span>}
+            <span class="hs-sw">{s.rec.w}勝{s.rec.d}分{s.rec.l}敗</span>
+          </summary>
+          <p class="hs-meta">勝ち点{s.rec.pts}・{s.rec.gf}得点{s.rec.ga}失点{s.top && <>・チーム得点王 {urlOf.get(s.top.name) ? <a href={urlOf.get(s.top.name)} target="_blank" rel="noopener noreferrer">{s.top.name}</a> : s.top.name}（{s.top.goals}点）</>}{s.note && <>・{s.note}</>}</p>
+          <ul class="hs-list">
+            {s.ms.map(m => (
+              <li class="hs-row">
+                <span class="hs-d">{md(m.date)}</span>
+                <span class="hs-c">{label(m)}</span>
+                <span class="hs-o">{clubUrl(m.opponent) ? <a class="club-link" href={clubUrl(m.opponent)} target="_blank" rel="noopener noreferrer">{m.opponent}</a> : m.opponent}<small>（{haWord(m.ha)}）</small></span>
+                <a class={`lu-res hs-res ${resCls[m.result]}`} href={m.url} target="_blank" rel="noopener noreferrer" aria-label={`${m.opponent}戦 ${score(m)}（Jリーグ公式の試合ページ）`}>{score(m)}</a>
+                {m.goals.length > 0 && <span class="hs-g">{m.goals.map(g => `${g.og ? 'オウンゴール' : g.scorer}${g.minute}'`).join('・')}</span>}
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))}
+    </div>
+  </Acc>
+
+  <Acc id="records" title="通算の記録" icon="trophy">
+    <div class="controls hs-scope">
+      <div class="seg" id="hsScope" role="group" aria-label="数える試合">
+        {scopes.map((sc, i) => <button type="button" data-scope={sc.key} aria-pressed={i === 0 ? 'true' : 'false'}>{sc.name}</button>)}
+      </div>
+    </div>
+    {scopes.map((sc, i) => (
+      <div class="hs-scopebox" data-scope={sc.key} hidden={i !== 0}>
+        <p class="hs-total card"><b>{sc.rec.p}</b>試合　<b>{sc.rec.w}</b>勝<b>{sc.rec.d}</b>分<b>{sc.rec.l}</b>敗　{sc.rec.gf}得点・{sc.rec.ga}失点<span class="note">（{first.date.slice(0, 4)}年〜{SITE.roundLabel}{sc.key === 'all' ? '。PK戦は引き分けで数える' : ''}）</span></p>
+        <div class="grid hs-best">
+          {sc.best.map(b => (
+            <div class="card hs-bcard">
+              <span class="hs-bl">{b.label}</span>
+              <b class="hs-bv">{b.value}</b>
+              <span class="hs-bm">{b.m ? `${b.m.date.slice(0, 4)}年 ${label(b.m)} ${b.m.opponent}戦（${haWord(b.m.ha)}） ${b.m.gf}-${b.m.ga}${b.ties > 1 ? `など${b.ties}試合` : ''}` : `${b.range[0].date.slice(0, 4)}年${md(b.range[0].date)}〜${b.range[1].date.slice(0, 4) !== b.range[0].date.slice(0, 4) ? b.range[1].date.slice(0, 4) + '年' : ''}${md(b.range[1].date)}`}</span>
+            </div>
+          ))}
+        </div>
+        <h3 class="hs-h3">通算得点ランキング</h3>
+        <ol class="card hs-scorers">
+          {sc.top.slice(0, 10).map((p, j) => <li><span class="hs-n">{sc.top.findIndex(x => x.goals === p.goals) + 1}</span>{urlOf.get(p.name) ? <a href={urlOf.get(p.name)} target="_blank" rel="noopener noreferrer">{p.name}</a> : <span>{p.name}</span>}<b>{p.goals}点</b></li>)}
+        </ol>
+        <h3 class="hs-h3">相手ごとの対戦成績</h3>
+        <input class="hs-search" type="search" placeholder="クラブ名で探す" aria-label="対戦相手を探す" data-scope={sc.key} />
+        <ul class="card hs-h2h">
+          {sc.h2h.map(h => (
+            <li data-name={h.opp}>
+              <span class="hs-ho">{clubUrl(h.opp) ? <a class="club-link" href={clubUrl(h.opp)} target="_blank" rel="noopener noreferrer">{h.opp}</a> : h.opp}</span>
+              <span class="hs-hp">{h.p}試合</span>
+              <span class="hs-hr">{h.w}勝{h.d}分{h.l}敗</span>
+              <span class="hs-hg">{h.gf}-{h.ga}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </Acc>
+  <p class="note hs-src">試合の結果・得点者・観客数は<a href="https://www.jleague.jp/club/miyazaki/day/" target="_blank" rel="noopener noreferrer">Jリーグ公式サイト</a>、シーズンの順位は<a href="https://www.football-lab.jp/myzk/season/" target="_blank" rel="noopener noreferrer">Football LAB</a>から。天皇杯は2026年からの分だけ載せています（それより前は確かめ中）。</p>
+</Base>
+<script>
+  // 通算の記録：リーグ戦だけ／すべての公式戦 を切り替える
+  const seg = document.getElementById('hsScope');
+  seg?.addEventListener('click', e => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-scope]'); if (!b) return;
+    seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    document.querySelectorAll<HTMLElement>('.hs-scopebox').forEach(x => { x.hidden = x.dataset.scope !== b.dataset.scope; });
+  });
+  // 対戦相手を打つそばから絞り込む
+  for (const inp of document.querySelectorAll<HTMLInputElement>('.hs-search')) {
+    inp.addEventListener('input', () => {
+      const q = inp.value.normalize('NFKC').trim().toLowerCase();
+      inp.nextElementSibling?.querySelectorAll<HTMLElement>('li[data-name]').forEach(li => { li.hidden = !!q && !li.dataset.name!.normalize('NFKC').toLowerCase().includes(q); });
+    });
+  }
+</script>
