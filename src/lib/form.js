@@ -9,11 +9,13 @@ export function formSummary(matches) {
   const gf = last.reduce((s, m) => s + Number(m.gf), 0), ga = last.reduce((s, m) => s + Number(m.ga), 0);
   const back = ok => { let c = 0; for (let i = ms.length - 1; i >= 0 && ok(ms[i]); i--) c++; return c; };
   const winRun = back(m => m.result === '勝'), unbeaten = back(m => m.result !== '負');
-  const title = w === last.length ? `${w}連勝！止まらない！` : l === 0 ? '直近5試合 負けなし！' : w >= 3 ? `直近5試合で${w}勝！` : '直近5試合';
+  // 5試合すべて勝ちのときは、5試合より前からの連勝も数えた本当の連勝数を出す（6連勝中なのに「5連勝」と出さない）
+  const allWin = last.length > 0 && w === last.length;
+  const title = allWin ? `${winRun}連勝！止まらない！` : l === 0 ? '直近5試合 負けなし！' : w >= 3 ? `直近5試合で${w}勝！` : '直近5試合';
   // 画面の見出し（上に「直近5試合」のラベルがあるので、ここではくり返さない）
-  const show = w === last.length ? `${w}連勝！止まらない！` : l === 0 ? '負けなし！' : w >= 3 ? `${w}勝！` : `${w}勝${d}分${l}敗`;
+  const show = allWin ? `${winRun}連勝！止まらない！` : l === 0 ? '負けなし！' : w >= 3 ? `${w}勝！` : `${w}勝${d}分${l}敗`;
   const badges = [];
-  if (winRun >= 2) badges.push(`${winRun}連勝中`);
+  if (winRun >= 2 && !allWin) badges.push(`${winRun}連勝中`);
   if (unbeaten >= 3) badges.push(`${unbeaten}試合負けなし`);
   const cheer = winRun >= 2 ? 'この勢いで次も勝ち点3を！' : unbeaten >= 3 ? '負けない強さで、次は勝ち切ろう！' : '次こそ勝ち点3を！みんなで後押ししよう！';
   const range = last.length ? `第${last[0].round}節〜第${last.at(-1).round}節` : '';

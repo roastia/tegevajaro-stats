@@ -12,13 +12,15 @@ const champs = rows.filter(r => r._rank === 1);
 const climbed = champs.some(r => r._new || r._move > 0);
 const vals = rows.map(r => r.value), lo = Math.min(...vals), hi = Math.max(...vals);
 const width = v => Math.round(meta.asc ? (hi === lo ? 100 : 25 + 75 * (hi - v) / (hi - lo)) : (hi > 0 ? Math.max(4, v / hi * 100) : 4));
+// 「1つ」「9つ」のように数える（10からは「つ」を付けない：「10下がった」）
+const steps = n => n < 10 ? `${n}つ` : `${n}`;
 // 1行ぶん：メインの数字だけ見せ、内訳はタップで開く（ranking.astro のスクリプト）
 const row = r => {
   const [main, det] = meta.hideValue ? ['', ''] : splitDisp(r.display);
   // 前の節からの順位の動き（↑2・↓1・NEW）。同じ順位なら何も出さない
   const mv = r._new ? { cls: 'mv new', txt: 'NEW', lb: '前の節はランク外' }
-    : r._move > 0 ? { cls: 'mv up', txt: `↑${r._move}`, lb: `前の節から${r._move}つ上がった` }
-    : r._move < 0 ? { cls: 'mv down', txt: `↓${-r._move}`, lb: `前の節から${-r._move}つ下がった` } : null;
+    : r._move > 0 ? { cls: 'mv up', txt: `↑${r._move}`, lb: `前の節から${steps(r._move)}上がった` }
+    : r._move < 0 ? { cls: 'mv down', txt: `↓${-r._move}`, lb: `前の節から${steps(-r._move)}下がった` } : null;
   return { ...r, main, det, mv, cls: [r._rank === 1 ? 'r1' : '', det ? 'has-det' : ''].filter(Boolean).join(' '), w: width(r.value) };
 };
 const top = rows.filter(r => r._rank <= 5).slice(0, 5).map(row);
