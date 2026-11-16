@@ -2,7 +2,7 @@
 // 「どの試合で数えるか」（シーズン×大会の種類）を選ぶと、ブラウザがこの関数で作り直す
 import { categoryOf, CATEGORY_SEASON } from '../config/categories.js';
 import { clubKana } from '../config/clubkana.js';
-import { postText, xIntent, xLabel, X_MARK } from './util.js';
+import { postText, xIntent, xLabel } from './util.js';
 const catCls = c => ({ J1: 'j1', J2: 'j2', J3: 'j3', JFL: 'jfl' }[c] || 'ot');
 export const COMP = {
   j3: { name: 'J3リーグ', league: true },
@@ -82,7 +82,7 @@ export const TILT = { up: '勝ち越し', even: '五分', down: '負け越し' }
 const link = (url, text, cls = '') => url ? `<a${cls ? ` class="${cls}"` : ''} href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text)}</a>` : `<span>${esc(text)}</span>`;
 /* Xでポスト：大きいボタン（PostBox と同じ見た目）と、行ごとの小さい丸ボタン。asOf は「第〇節時点」（過去のシーズンは ''） */
 export const postBtn = (what, text, url, asOf) => `<div class="post"><a class="postbtn" href="${esc(xIntent(text, url, asOf))}" target="_blank" rel="noopener noreferrer"><span><b class="nw">「${esc(what)}」</b><span class="nw">${xLabel('をXでポスト')}</span></span></a></div>`;
-export const xMini = (label, text, url, asOf) => `<a class="hs-x" href="${esc(xIntent(text, url, asOf))}" target="_blank" rel="noopener noreferrer" aria-label="${esc(label)}をXでポスト" title="${esc(label)}をXでポスト">${X_MARK}</a>`;
+export const xMini = (label, text, url, asOf) => `<a class="hs-x" href="${esc(xIntent(text, url, asOf))}" target="_blank" rel="noopener noreferrer" aria-label="${esc(label)}をXでポスト" title="${esc(label)}をXでポスト"><span>${xLabel('Xでポスト')}</span></a>`;
 const rangeText = (a, b) => `${a.date.slice(0, 4)}年${md(a.date)}〜${b.date.slice(0, 4) !== a.date.slice(0, 4) ? b.date.slice(0, 4) + '年' : ''}${md(b.date)}`;
 
 /** 得点ランキング：上から順に。1位は金の札（1行）、2・3位は1行ずつのカード、4位から下は棒グラフつきの列 */

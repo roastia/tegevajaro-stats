@@ -5,7 +5,7 @@ import { SITE } from '../config/site.js';
 import { getData } from '../lib/data.js';
 import { loadHistory, record, scorers, COMP } from '../lib/clubhistory.js';
 import { renderRecords, pickKind, recPost, kingWord } from '../lib/hsrecords.js';
-import { playerUrl, postText, xLength, flatPost, xIntent, X_MARK } from '../lib/util.js';
+import { playerUrl, postText, xLength, flatPost, xIntent, xLabel } from '../lib/util.js';
 import PostBox from '../components/PostBox.astro';
 // 歴史：Jリーグに入った2021年からの全試合と、通算の記録
 const d = getData();
@@ -114,7 +114,7 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
                 <span class="hs-c">{label(m)}</span>
                 <span class="hs-o"><a class="club-link" href={m.oppUrl} target="_blank" rel="noopener noreferrer">{m.oppFull}</a><small>（{haWord(m.ha)}）</small></span>
                 <a class={`lu-res hs-res ${resCls[m.result]}`} href={m.url} target="_blank" rel="noopener noreferrer" aria-label={`${m.oppFull}戦 ${score(m)} ${chipWord[m.result]}（Jリーグ公式の試合ページ）`}>{score(m)} {chipWord[m.result]}</a>
-                <a class="hs-x" href={xIntent(matchPost(m), `${SITE.url}/history/#${seasonId(s)}`, '')} target="_blank" rel="noopener noreferrer" aria-label={`${m.oppFull}戦をXでポスト`} title={`${m.oppFull}戦をXでポスト`} set:html={X_MARK} />
+                <a class="hs-x" href={xIntent(matchPost(m), `${SITE.url}/history/#${seasonId(s)}`, '')} target="_blank" rel="noopener noreferrer" aria-label={`${m.oppFull}戦をXでポスト`} title={`${m.oppFull}戦をXでポスト`} set:html={`<span>${xLabel('Xでポスト')}</span>`} />
                 {m.goals.length > 0 && <span class="hs-g">{m.goals.map(g => `${g.og ? 'オウンゴール' : g.scorer}${g.minute}'`).join('・')}</span>}
               </li>
             ))}
