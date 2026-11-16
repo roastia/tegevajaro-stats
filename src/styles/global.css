@@ -1125,7 +1125,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-sw { margin-left: auto; font-size: .85rem; color: var(--muted); }
 .hs-meta { margin: 0; padding: 0 14px 8px; font-size: .85rem; color: var(--muted); }
 .hs-list { list-style: none; margin: 0; padding: 0 14px 12px; }
-.hs-row { display: grid; grid-template-columns: 3.2em minmax(4.5em, auto) 1fr auto; align-items: baseline; gap: 2px 10px; padding: 6px 0; border-top: 1px dotted var(--line); font-size: .88rem; }
+.hs-row { display: grid; grid-template-columns: 3.2em minmax(4.5em, auto) 1fr auto 1.9rem; align-items: baseline; gap: 2px 10px; padding: 6px 0; border-top: 1px dotted var(--line); font-size: .88rem; }
 .hs-d { color: var(--muted); }
 .hs-c { color: var(--muted); font-size: .8rem; }
 .hs-o small { color: var(--muted); }
@@ -1135,7 +1135,15 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-total { padding: 12px 14px; margin: 0 0 14px; font-size: .95rem; }
 .hs-total .note { display: block; margin-top: 2px; }
 .hs-best { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 14px; }
-.hs-bcard { padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.hs-bcard { position: relative; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.hs-bcard .hs-x { position: absolute; top: 10px; right: 10px; }
+.hs-bcard .hs-bl { padding-right: 2.2rem; }
+/* 行ごとの小さい「Xでポスト」（黒い丸に X） */
+.hs-x { display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: #0F1419; color: #fff; text-decoration: none; flex: none; align-self: center; }
+.hs-x .xm { width: .85rem; height: .85rem; }
+.hs-x:hover { background: var(--brand-deep); }
+.hs-x:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+#records .post { margin: 10px 0 14px; }
 .hs-bl { font-size: .8rem; color: var(--muted); }
 .hs-bv { font-size: 1.4rem; color: var(--ink); }
 .hs-bm { font-size: .8rem; }
@@ -1146,7 +1154,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-scorers b { margin-left: auto; }
 .hs-n { width: 1.6em; color: var(--muted); font-weight: 700; }
 .hs-h2h { list-style: none; margin: 0 0 14px; padding: 8px 14px; }
-.hs-h2h li { display: grid; grid-template-columns: 4.8em minmax(0, 14em) 3.2em 1fr 3.6em 6.4em 7.6em; align-items: center; gap: 8px; padding: 5px 0; font-size: .88rem; }
+.hs-h2h li { display: grid; grid-template-columns: 4.8em minmax(0, 14em) 3.2em 1fr 3.6em 6.4em 7.6em 1.9rem; align-items: center; gap: 8px; padding: 5px 0; font-size: .88rem; }
 /* 線は、見えている行の2行目から（絞り込んでも先頭に線が残らない） */
 .hs-h2h li:not([hidden]) ~ li { border-top: 1px dotted var(--line); }
 .hs-hp, .hs-hg { color: var(--muted); text-align: right; }
@@ -1184,7 +1192,8 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
   .hs-ho { grid-column: 2 / 4; font-weight: 700; }
   .hs-cat { grid-column: 4; }
   .hs-hp { grid-column: 1; text-align: left; }
-  .hs-hg { grid-column: 3 / -1; }
+  .hs-hg { grid-column: 3; }
+  .hs-h2h .hs-x { grid-row: 2; grid-column: 4; justify-self: center; }
 }
 /* 対戦成績：勝ち越し（ピンクの塗り）・五分（淡いピンク）・負け越し（グレーの枠）の札と、絞り込み */
 .hs-h2h-note { margin: -4px 0 10px; }
@@ -1206,6 +1215,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 /* スマホ：1行目に日付・相手・スコア、2行目に節や大会名（百年構想リーグ 3-4位決定戦など長い名前でも相手チーム名が細くならない）、3行目に得点者 */
 @media (max-width: 480px) {
   .hs-row { grid-template-columns: 3.2em minmax(0, 1fr) auto; }
+  .hs-row .hs-x { grid-row: 2; grid-column: 3; justify-self: end; }
   .hs-d { grid-row: 1; grid-column: 1; }
   .hs-o { grid-row: 1; grid-column: 2; }
   .hs-res { grid-row: 1; grid-column: 3; }

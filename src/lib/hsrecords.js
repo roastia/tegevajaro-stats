@@ -2,7 +2,7 @@
 // 「どの試合で数えるか」（シーズン×大会の種類）を選ぶと、ブラウザがこの関数で作り直す
 import { categoryOf, CATEGORY_SEASON } from '../config/categories.js';
 import { clubKana } from '../config/clubkana.js';
-import { postText } from './util.js';
+import { postText, xIntent, xLabel, X_MARK } from './util.js';
 const catCls = c => ({ J1: 'j1', J2: 'j2', J3: 'j3', JFL: 'jfl' }[c] || 'ot');
 export const COMP = {
   j3: { name: 'J3リーグ', league: true },
@@ -74,11 +74,15 @@ export function bests(ms) {
 /* ---------- 表示（HTML の文字列） ---------- */
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}`; };
+const ymd = s => { const [y, m, dd] = s.split('-').map(Number); return `${y}年${m}月${dd}日`; };
 const haWord = h => (h === 'H' ? 'ホーム' : 'アウェイ');
 export const matchLabel = m => (COMP[m.comp].league ? `第${m.round}節` : `${COMP[m.comp].name} ${m.round}`);
 export const tilt = h => (h.w > h.l ? 'up' : h.w < h.l ? 'down' : 'even');
 export const TILT = { up: '勝ち越し', even: '五分', down: '負け越し' };
 const link = (url, text, cls = '') => url ? `<a${cls ? ` class="${cls}"` : ''} href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text)}</a>` : `<span>${esc(text)}</span>`;
+/* Xでポスト：大きいボタン（PostBox と同じ見た目）と、行ごとの小さい丸ボタン。asOf は「第〇節時点」（過去のシーズンは ''） */
+export const postBtn = (what, text, url, asOf) => `<div class="post"><a class="postbtn" href="${esc(xIntent(text, url, asOf))}" target="_blank" rel="noopener noreferrer"><span><b class="nw">「${esc(what)}」</b><span class="nw">${xLabel('をXでポスト')}</span></span></a></div>`;
+export const xMini = (label, text, url, asOf) => `<a class="hs-x" href="${esc(xIntent(text, url, asOf))}" target="_blank" rel="noopener noreferrer" aria-label="${esc(label)}をXでポスト" title="${esc(label)}をXでポスト">${X_MARK}</a>`;
 const rangeText = (a, b) => `${a.date.slice(0, 4)}年${md(a.date)}〜${b.date.slice(0, 4) !== a.date.slice(0, 4) ? b.date.slice(0, 4) + '年' : ''}${md(b.date)}`;
 
 /** 得点ランキング：上から順に。1位は金の札（1行）、2・3位は1行ずつのカード、4位から下は棒グラフつきの列 */
@@ -94,24 +98,36 @@ function renderScorers(top, playerUrl) {
 }
 
 /** 選んだ試合の記録（成績・最多記録・得点ランキング・相手ごとの対戦成績）を HTML にする。playerUrl は 選手名→Jリーグ公式のページ */
-export function renderRecords(ms, { playerUrl = {}, note = '' } = {}) {
+export function renderRecords(ms, { playerUrl = {}, note = '', kind = 'all', seasonLabel = '', asOf, url = '' } = {}) {
   if (!ms.length) return '<p class="card hs-total hs-empty">この組み合わせの試合はありません。</p>';
   const rec = record(ms), top = scorers(ms), h2h = headToHead(ms), best = bests(ms);
+  // ポストの「どの範囲の記録か」：2025シーズン・リーグ戦（J3・J2）／公式戦通算（2021年から）など
+  const kw = { all: '公式戦', league: 'J3・J2リーグ戦', other: 'リーグ戦以外の公式戦' }[kind] || '公式戦';
+  const scope = seasonLabel ? `${seasonLabel}の${kw}` : `2021年からの${kw}通算`;
+  const T = 'テゲバジャーロ宮崎の';
+  const rp = recPost(ms, { kind, seasonLabel });
+  const bestText = b => postText(`${T}${scope}の「${b.label}」は${b.value}！`, b.m
+    ? `${ymd(b.m.date)} ${matchLabel(b.m)} ${b.m.oppFull}戦（${haWord(b.m.ha)}）${b.m.gf}-${b.m.ga}${b.ties > 1 ? `など${b.ties}試合` : ''}`
+    : rangeText(b.range[0], b.range[1]), '');
+  const r5 = top.slice(0, 5).map(p => `${top.findIndex(x => x.goals === p.goals) + 1}位 ${p.name} ${p.goals}ゴール`).join('／');
+  const h2hText = h => postText(`テゲバジャーロ宮崎と${h.full}の対戦成績（${scope}）`, `${h.p}試合${h.w}勝${h.d}分${h.l}敗・${h.gf}得点${h.ga}失点で${TILT[tilt(h)]}`, '');
   const span = `${ms[0].date.slice(0, 4)}年${md(ms[0].date)}〜${ms.at(-1).date.slice(0, 4)}年${md(ms.at(-1).date)}`;
   const cnt = k => h2h.filter(h => tilt(h) === k).length;
   return `<p class="hs-total card"><b>${rec.p}</b>試合　<b>${rec.w}</b>勝<b>${rec.d}</b>分<b>${rec.l}</b>敗　${rec.gf}得点・${rec.ga}失点<span class="note">（${span}${note}）</span></p>
-<div class="grid hs-best">${best.map(b => `<div class="card hs-bcard"><span class="hs-bl">${esc(b.label)}</span><b class="hs-bv">${esc(b.value)}</b><span class="hs-bm">${esc(b.m
+${postBtn(rp.what, rp.text, url, asOf)}
+<div class="grid hs-best">${best.map(b => `<div class="card hs-bcard">${xMini(b.label, bestText(b), url, asOf)}<span class="hs-bl">${esc(b.label)}</span><b class="hs-bv">${esc(b.value)}</b><span class="hs-bm">${esc(b.m
     ? `${b.m.date.slice(0, 4)}年 ${matchLabel(b.m)} ${b.m.oppFull}戦（${haWord(b.m.ha)}） ${b.m.gf}-${b.m.ga}${b.ties > 1 ? `など${b.ties}試合` : ''}`
     : rangeText(b.range[0], b.range[1]))}</span></div>`).join('')}</div>
 <h3 class="hs-h3">得点ランキング</h3>
 ${renderScorers(top, playerUrl)}
+${top.length ? postBtn(`${seasonLabel ? seasonLabel + 'の' : '通算'}得点ランキング`, postText(`${T}${scope}の得点ランキング`, r5, ''), url, asOf) : ''}
 <h3 class="hs-h3">相手ごとの対戦成績</h3>
 <p class="note hs-h2h-note">勝ちが負けより多い相手は「勝ち越し」、少ない相手は「負け越し」、同じ数なら「五分」。得点・失点は、その相手との試合での宮崎の合計です。クラブ名の横は、その相手の${CATEGORY_SEASON}シーズンのカテゴリ（J1・J2・J3・JFLなど）です。</p>
 <div class="hs-h2h-tools"><div class="seg hs-tilt" role="group" aria-label="対戦成績で絞り込む">${[['', 'すべて', h2h.length], ['up', '勝ち越し', cnt('up')], ['even', '五分', cnt('even')], ['down', '負け越し', cnt('down')]]
     .map(([k, name, n], i) => `<button type="button" data-tilt="${k}" aria-pressed="${i === 0}">${name}<span class="hs-tn">${n}</span></button>`).join('')}</div>
 <input class="hs-search" type="search" placeholder="クラブ名・よみ・ローマ字で検索" aria-label="対戦相手をクラブ名で検索（漢字・ひらがな・ローマ字）">
 <label class="hs-sortl">並び順 <select class="hs-sort" aria-label="対戦成績の並び順"><option value="p">試合数</option><option value="w">勝ち</option><option value="d">引き分け</option><option value="l">負け</option><option value="gf">得点</option><option value="ga">失点</option></select></label></div>
-<ul class="card hs-h2h">${h2h.map(h => `<li data-name="${esc(`${h.full} ${h.opp} ${h.full.normalize('NFKC').toLowerCase()}`)}" data-kana="${esc(clubKana(h.full))}" data-tilt="${tilt(h)}" data-p="${h.p}" data-w="${h.w}" data-d="${h.d}" data-l="${h.l}" data-gf="${h.gf}" data-ga="${h.ga}"><span class="hs-tag ${tilt(h)}">${TILT[tilt(h)]}</span><span class="hs-ho">${link(h.url, h.full, 'club-link')}</span><span class="hs-cat c-${catCls(categoryOf(h.full))}">${categoryOf(h.full) || '－'}</span><span class="hs-hp">${h.p}試合</span><span class="hs-hr">${h.w}勝${h.d}分${h.l}敗</span><span class="hs-hg">${h.gf}得点 ${h.ga}失点</span></li>`).join('')}</ul>`;
+<ul class="card hs-h2h">${h2h.map(h => `<li data-name="${esc(`${h.full} ${h.opp} ${h.full.normalize('NFKC').toLowerCase()}`)}" data-kana="${esc(clubKana(h.full))}" data-tilt="${tilt(h)}" data-p="${h.p}" data-w="${h.w}" data-d="${h.d}" data-l="${h.l}" data-gf="${h.gf}" data-ga="${h.ga}"><span class="hs-tag ${tilt(h)}">${TILT[tilt(h)]}</span><span class="hs-ho">${link(h.url, h.full, 'club-link')}</span><span class="hs-cat c-${catCls(categoryOf(h.full))}">${categoryOf(h.full) || '－'}</span><span class="hs-hp">${h.p}試合</span><span class="hs-hr">${h.w}勝${h.d}分${h.l}敗</span><span class="hs-hg">${h.gf}得点 ${h.ga}失点</span>${xMini(`${h.full}との対戦成績`, h2hText(h), url, asOf)}</li>`).join('')}</ul>`;
 }
 
 /** 種類で試合を選ぶ（league：J3・J2のリーグ戦、other：それ以外、all：すべて） */
