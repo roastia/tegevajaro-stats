@@ -1111,7 +1111,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 
 /* ---------- 歴史（history.astro） ---------- */
 .hs-intro { padding: 14px 16px; margin: 14px 0; }
-.hs-h { font-size: 1.05rem; margin: 0 0 8px; }
+.hs-h { font-size: 1.15rem; margin: 0 0 8px; color: var(--ink); }
 .hs-tl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .hs-tl li { display: grid; grid-template-columns: 5.4em 1fr; gap: 8px; font-size: .92rem; }
 .hs-y { font-weight: 700; color: var(--ink); white-space: nowrap; }
