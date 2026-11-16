@@ -77,6 +77,21 @@ export const TILT = { up: '勝ち越し', even: '五分', down: '負け越し' }
 const link = (url, text, cls = '') => url ? `<a${cls ? ` class="${cls}"` : ''} href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text)}</a>` : `<span>${esc(text)}</span>`;
 const rangeText = (a, b) => `${a.date.slice(0, 4)}年${md(a.date)}〜${b.date.slice(0, 4) !== a.date.slice(0, 4) ? b.date.slice(0, 4) + '年' : ''}${md(b.date)}`;
 
+/** 得点ランキング：1位は大きな金の札で主役に、2・3位は表彰台のカード、4位から下は棒グラフつきの列 */
+function renderScorers(top, playerUrl) {
+  if (!top.length) return '<p class="note">得点はありません。</p>';
+  const rank = p => top.findIndex(x => x.goals === p.goals) + 1;
+  const max = top[0].goals;
+  const nm = p => link(playerUrl[p.name], p.name, 'pl-link');
+  const list = top.slice(0, 10).map(p => ({ ...p, r: rank(p) }));
+  const kings = list.filter(p => p.r === 1), podium = list.filter(p => p.r === 2 || p.r === 3), rest = list.filter(p => p.r > 3);
+  return `<div class="hs-sc">
+<div class="hs-king card">${kings.map(p => `<div class="hs-king-p"><span class="hs-king-rk" aria-label="1位">1</span><span class="hs-king-nm">${nm(p)}</span><span class="hs-king-v">${p.goals}<small>ゴール</small></span></div>`).join('')}<span class="hs-king-t">${kings.length > 1 ? `${kings.length}人が1位タイ！` : '得点王'}</span></div>
+${podium.length ? `<div class="hs-podium">${podium.map(p => `<div class="card hs-pod r${p.r}"><span class="hs-pod-rk">${p.r}<small>位</small></span><span class="hs-pod-nm">${nm(p)}</span><span class="hs-pod-v">${p.goals}<small>ゴール</small></span></div>`).join('')}</div>` : ''}
+${rest.length ? `<ol class="card hs-rest">${rest.map(p => `<li><span class="bar w${Math.max(4, Math.round(p.goals / max * 100))}"></span><span class="hs-n">${p.r}</span><span class="hs-rest-nm">${nm(p)}</span><b>${p.goals}<small>ゴール</small></b></li>`).join('')}</ol>` : ''}
+</div>`;
+}
+
 /** 選んだ試合の記録（成績・最多記録・得点ランキング・相手ごとの対戦成績）を HTML にする。playerUrl は 選手名→Jリーグ公式のページ */
 export function renderRecords(ms, { playerUrl = {}, note = '' } = {}) {
   if (!ms.length) return '<p class="card hs-total hs-empty">この組み合わせの試合はありません。</p>';
@@ -88,7 +103,7 @@ export function renderRecords(ms, { playerUrl = {}, note = '' } = {}) {
     ? `${b.m.date.slice(0, 4)}年 ${matchLabel(b.m)} ${b.m.oppFull}戦（${haWord(b.m.ha)}） ${b.m.gf}-${b.m.ga}${b.ties > 1 ? `など${b.ties}試合` : ''}`
     : rangeText(b.range[0], b.range[1]))}</span></div>`).join('')}</div>
 <h3 class="hs-h3">得点ランキング</h3>
-${top.length ? `<ol class="card hs-scorers">${top.slice(0, 10).map(p => `<li><span class="hs-n">${top.findIndex(x => x.goals === p.goals) + 1}</span>${link(playerUrl[p.name], p.name)}<b>${p.goals}点</b></li>`).join('')}</ol>` : '<p class="note">得点はありません。</p>'}
+${renderScorers(top, playerUrl)}
 <h3 class="hs-h3">相手ごとの対戦成績</h3>
 <p class="note hs-h2h-note">勝ちが負けより多い相手は「勝ち越し」、少ない相手は「負け越し」、同じ数なら「五分」。得点・失点は、その相手との試合での宮崎の合計です。</p>
 <div class="hs-h2h-tools"><div class="seg hs-tilt" role="group" aria-label="対戦成績で絞り込む">${[['', 'すべて', h2h.length], ['up', '勝ち越し', cnt('up')], ['even', '五分', cnt('even')], ['down', '負け越し', cnt('down')]]

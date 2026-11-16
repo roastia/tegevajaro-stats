@@ -1185,3 +1185,26 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-scope select { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--fg); }
 .hs-kindnote { margin: 0 0 14px; }
 .hs-empty { color: var(--muted); }
+
+/* 歴史：得点ランキング（1位は金の札で大きく、2・3位は表彰台、4位から下は棒グラフ） */
+.hs-sc { display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px; }
+.hs-king { position: relative; padding: 18px 16px 14px; text-align: center; background: linear-gradient(160deg, var(--gold-soft, #FFF6DC), var(--panel) 70%); border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); }
+.hs-king-p { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.hs-king-p + .hs-king-p { margin-top: 12px; padding-top: 12px; border-top: 1px dotted color-mix(in srgb, var(--gold) 45%, var(--line)); }
+.hs-king-rk { display: inline-flex; align-items: center; justify-content: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--gold); color: #fff; font-size: 1.4rem; font-weight: 900; box-shadow: 0 0 0 4px #fff, 0 0 0 5px color-mix(in srgb, var(--gold) 55%, transparent); }
+.hs-king-nm { font-size: 1.5rem; font-weight: 900; margin-top: 6px; }
+.hs-king-v { font-size: 3.2rem; font-weight: 900; line-height: 1; color: var(--ink); letter-spacing: -.02em; }
+.hs-king-v small, .hs-pod-v small, .hs-rest b small { font-size: .45em; margin-left: 2px; font-weight: 700; }
+.hs-king-t { display: inline-block; margin-top: 8px; padding: 1px 12px; border-radius: 999px; background: var(--gold); color: #fff; font-size: .8rem; font-weight: 700; }
+.hs-podium { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; }
+.hs-pod { padding: 12px 14px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.hs-pod-rk { font-size: 1.3rem; font-weight: 900; color: var(--ink); line-height: 1; }
+.hs-pod-rk small { font-size: .6em; margin-left: 1px; }
+.hs-pod-nm { font-size: 1.05rem; font-weight: 800; }
+.hs-pod-v { font-size: 2rem; font-weight: 900; line-height: 1.1; color: var(--ink); }
+.hs-rest { list-style: none; margin: 0; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+.hs-rest li { position: relative; isolation: isolate; display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; }
+.hs-rest li .bar { position: absolute; inset: 0 auto 0 0; width: calc(var(--w, 0) * 1%); z-index: -1; border-radius: 8px; background: var(--soft2, color-mix(in srgb, var(--brand) 18%, transparent)); }
+.hs-rest li .hs-n { width: 1.6em; text-align: center; }
+.hs-rest-nm { font-weight: 700; }
+.hs-rest b { margin-left: auto; font-size: 1.1rem; color: var(--ink); }
