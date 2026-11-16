@@ -83,7 +83,7 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
             {s.rank && <span class="hs-sr">{s.rank}位{s.season === '2026/27' ? '（途中）' : ''}</span>}
             <span class="hs-sw">{s.rec.w}勝{s.rec.d}分{s.rec.l}敗</span>
           </summary>
-          <p class="hs-meta">勝ち点{s.rec.pts}・{s.rec.gf}得点{s.rec.ga}失点{s.top && <>・チーム得点王 {urlOf.get(s.top.name) ? <a href={urlOf.get(s.top.name)} target="_blank" rel="noopener noreferrer">{s.top.name}</a> : s.top.name}（{s.top.goals}点）</>}{s.note && <>・{s.note}</>}</p>
+          <p class="hs-meta">勝ち点{s.rec.pts}・{s.rec.gf}得点{s.rec.ga}失点{s.top && <>・チーム得点王 {urlOf.get(s.top.name) ? <a class="pl-link" href={urlOf.get(s.top.name)} target="_blank" rel="noopener noreferrer">{s.top.name}</a> : s.top.name}（{s.top.goals}点）</>}{s.note && <>・{s.note}</>}</p>
           {s.table.length > 0 && (
             <details class="hs-stand">
               <summary>最終順位表（{s.table.length}チーム）</summary>
