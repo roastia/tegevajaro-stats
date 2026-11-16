@@ -1158,15 +1158,24 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-n { width: 1.6em; color: var(--muted); font-weight: 700; }
 .hs-search { width: 100%; max-width: 320px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; margin-bottom: 10px; background: var(--panel); color: var(--fg); }
 .hs-h2h { list-style: none; margin: 0 0 14px; padding: 8px 14px; }
-.hs-h2h li { display: grid; grid-template-columns: 4.8em 1fr 3.6em 6.4em 7.6em; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px dotted var(--line); font-size: .88rem; }
+.hs-h2h li { display: grid; grid-template-columns: 4.8em minmax(0, 14em) 3.2em 1fr 3.6em 6.4em 7.6em; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px dotted var(--line); font-size: .88rem; }
 .hs-h2h li:first-child { border-top: 0; }
 .hs-hp, .hs-hg { color: var(--muted); text-align: right; }
+.hs-hp { grid-column: 5; }
 .hs-src { margin-top: 14px; }
+/* 対戦成績：相手のいまのカテゴリ（J1・J2・J3・JFL…）。幅をそろえて1列に */
+.hs-cat { text-align: center; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+.hs-cat.c-j1 { color: var(--ink); }
+.hs-cat.c-j2 { color: var(--fg); }
+.hs-cat.c-j3 { color: var(--fg); font-weight: 600; }
+.hs-cat.c-jfl, .hs-cat.c-ot { color: var(--muted); font-weight: 600; }
 /* スマホ：1行目に札と正式名、2行目に成績（札の列と成績の列をそろえる） */
 @media (max-width: 480px) {
-  .hs-h2h li { grid-template-columns: 4.8em 6.4em 1fr; row-gap: 2px; }
-  .hs-ho { grid-column: 2 / -1; font-weight: 700; }
+  .hs-h2h li { grid-template-columns: 4.8em 6.4em 1fr 3.2em; row-gap: 2px; }
+  .hs-ho { grid-column: 2 / 4; font-weight: 700; }
+  .hs-cat { grid-column: 4; }
   .hs-hp { grid-column: 1; text-align: left; }
+  .hs-hg { grid-column: 3 / -1; }
 }
 /* 対戦成績：勝ち越し（ピンクの塗り）・五分（淡いピンク）・負け越し（グレーの枠）の札と、絞り込み */
 .hs-h2h-note { margin: -4px 0 10px; }
