@@ -43,6 +43,9 @@ const scopes = [
   { key: 'all', name: 'すべての公式戦', ms: matches },
 ].map(sc => ({ ...sc, rec: record(sc.ms), h2h: headToHead(sc.ms), top: scorers(sc.ms), best: bests(sc.ms) }));
 const first = matches[0];
+// 相手ごとの勝ち越し・五分・負け越し
+const tilt = h => (h.w > h.l ? 'up' : h.w < h.l ? 'down' : 'even');
+const TILT = { up: '勝ち越し', even: '五分', down: '負け越し' };
 ---
 <Base current="history" title="歴史・全試合の記録" description={`テゲバジャーロ宮崎の歴史。Jリーグに入った2021年からの全試合の結果・得点者と、シーズンごとの順位、相手ごとの対戦成績、通算得点ランキング（非公式）。${SITE.roundLabel}時点。`}>
   <section class="card hs-intro">
@@ -120,14 +123,21 @@ const first = matches[0];
           {sc.top.slice(0, 10).map((p, j) => <li><span class="hs-n">{sc.top.findIndex(x => x.goals === p.goals) + 1}</span>{urlOf.get(p.name) ? <a href={urlOf.get(p.name)} target="_blank" rel="noopener noreferrer">{p.name}</a> : <span>{p.name}</span>}<b>{p.goals}点</b></li>)}
         </ol>
         <h3 class="hs-h3">相手ごとの対戦成績</h3>
-        <input class="hs-search" type="search" placeholder="クラブ名で探す" aria-label="対戦相手を探す" data-scope={sc.key} />
+        <p class="note hs-h2h-note">勝ちが負けより多い相手は「勝ち越し」、少ない相手は「負け越し」、同じ数なら「五分」。得点・失点は、その相手との試合での宮崎の合計です。</p>
+        <div class="hs-h2h-tools">
+          <div class="seg hs-tilt" role="group" aria-label="対戦成績で絞り込む">
+            {[['', 'すべて', sc.h2h.length], ['up', '勝ち越し', sc.h2h.filter(h => tilt(h) === 'up').length], ['even', '五分', sc.h2h.filter(h => tilt(h) === 'even').length], ['down', '負け越し', sc.h2h.filter(h => tilt(h) === 'down').length]]
+              .map(([k, name, n], i) => <button type="button" data-tilt={k} aria-pressed={i === 0 ? 'true' : 'false'}>{name}<span class="hs-tn">{n}</span></button>)}
+          </div>
+          <input class="hs-search" type="search" placeholder="クラブ名で探す" aria-label="対戦相手を探す" />
+        </div>
         <ul class="card hs-h2h">
           {sc.h2h.map(h => (
-            <li data-name={`${h.full} ${h.opp}`}>
-              <span class="hs-ho"><a class="club-link" href={h.url} target="_blank" rel="noopener noreferrer">{h.full}</a></span>
+            <li data-name={`${h.full} ${h.opp}`} data-tilt={tilt(h)}>
+              <span class="hs-ho"><a class="club-link" href={h.url} target="_blank" rel="noopener noreferrer">{h.full}</a><span class={`hs-tag ${tilt(h)}`}>{TILT[tilt(h)]}</span></span>
               <span class="hs-hp">{h.p}試合</span>
               <span class="hs-hr">{h.w}勝{h.d}分{h.l}敗</span>
-              <span class="hs-hg">{h.gf}-{h.ga}</span>
+              <span class="hs-hg">{h.gf}得点 {h.ga}失点</span>
             </li>
           ))}
         </ul>
@@ -144,11 +154,22 @@ const first = matches[0];
     seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     document.querySelectorAll<HTMLElement>('.hs-scopebox').forEach(x => { x.hidden = x.dataset.scope !== b.dataset.scope; });
   });
-  // 対戦相手を打つそばから絞り込む
-  for (const inp of document.querySelectorAll<HTMLInputElement>('.hs-search')) {
-    inp.addEventListener('input', () => {
+  // 対戦相手を打つそばから絞り込む＋勝ち越し・五分・負け越しで絞り込む
+  for (const box of document.querySelectorAll<HTMLElement>('.hs-scopebox')) {
+    const inp = box.querySelector<HTMLInputElement>('.hs-search')!, tseg = box.querySelector<HTMLElement>('.hs-tilt')!;
+    let t = '';
+    const apply = () => {
       const q = inp.value.normalize('NFKC').trim().toLowerCase();
-      inp.nextElementSibling?.querySelectorAll<HTMLElement>('li[data-name]').forEach(li => { li.hidden = !!q && !li.dataset.name!.normalize('NFKC').toLowerCase().includes(q); });
+      box.querySelectorAll<HTMLElement>('.hs-h2h li[data-name]').forEach(li => {
+        li.hidden = (!!q && !li.dataset.name!.normalize('NFKC').toLowerCase().includes(q)) || (!!t && li.dataset.tilt !== t);
+      });
+    };
+    inp.addEventListener('input', apply);
+    tseg.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-tilt]'); if (!b) return;
+      t = b.dataset.tilt || '';
+      tseg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      apply();
     });
   }
 </script>
