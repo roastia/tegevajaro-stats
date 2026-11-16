@@ -77,7 +77,7 @@ export const TILT = { up: '勝ち越し', even: '五分', down: '負け越し' }
 const link = (url, text, cls = '') => url ? `<a${cls ? ` class="${cls}"` : ''} href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text)}</a>` : `<span>${esc(text)}</span>`;
 const rangeText = (a, b) => `${a.date.slice(0, 4)}年${md(a.date)}〜${b.date.slice(0, 4) !== a.date.slice(0, 4) ? b.date.slice(0, 4) + '年' : ''}${md(b.date)}`;
 
-/** 得点ランキング：1位は大きな金の札で主役に、2・3位は表彰台のカード、4位から下は棒グラフつきの列 */
+/** 得点ランキング：上から順に。1位は金の札（1行）、2・3位は1行ずつのカード、4位から下は棒グラフつきの列 */
 function renderScorers(top, playerUrl) {
   if (!top.length) return '<p class="note">得点はありません。</p>';
   const rank = p => top.findIndex(x => x.goals === p.goals) + 1;
@@ -86,8 +86,8 @@ function renderScorers(top, playerUrl) {
   const list = top.slice(0, 10).map(p => ({ ...p, r: rank(p) }));
   const kings = list.filter(p => p.r === 1), podium = list.filter(p => p.r === 2 || p.r === 3), rest = list.filter(p => p.r > 3);
   return `<div class="hs-sc">
-<div class="hs-king card">${kings.map(p => `<div class="hs-king-p"><span class="hs-king-rk" aria-label="1位">1</span><span class="hs-king-nm">${nm(p)}</span><span class="hs-king-v">${p.goals}<small>ゴール</small></span></div>`).join('')}<span class="hs-king-t">${kings.length > 1 ? `${kings.length}人が1位タイ！` : '得点王'}</span></div>
-${podium.length ? `<div class="hs-podium">${podium.map(p => `<div class="card hs-pod r${p.r}"><span class="hs-pod-rk">${p.r}<small>位</small></span><span class="hs-pod-nm">${nm(p)}</span><span class="hs-pod-v">${p.goals}<small>ゴール</small></span></div>`).join('')}</div>` : ''}
+<div class="hs-king card">${kings.map(p => `<div class="hs-king-p"><span class="hs-king-rk" aria-label="1位">1</span><span class="hs-king-nm">${nm(p)}<span class="hs-king-t">${kings.length > 1 ? '1位タイ' : '得点王'}</span></span><span class="hs-king-v">${p.goals}<small>ゴール</small></span></div>`).join('')}</div>
+${podium.map(p => `<div class="card hs-pod r${p.r}"><span class="hs-pod-rk">${p.r}</span><span class="hs-pod-nm">${nm(p)}</span><span class="hs-pod-v">${p.goals}<small>ゴール</small></span></div>`).join('')}
 ${rest.length ? `<ol class="card hs-rest">${rest.map(p => `<li><span class="bar w${Math.max(4, Math.round(p.goals / max * 100))}"></span><span class="hs-n">${p.r}</span><span class="hs-rest-nm">${nm(p)}</span><b>${p.goals}<small>ゴール</small></b></li>`).join('')}</ol>` : ''}
 </div>`;
 }
@@ -108,8 +108,9 @@ ${renderScorers(top, playerUrl)}
 <p class="note hs-h2h-note">勝ちが負けより多い相手は「勝ち越し」、少ない相手は「負け越し」、同じ数なら「五分」。得点・失点は、その相手との試合での宮崎の合計です。</p>
 <div class="hs-h2h-tools"><div class="seg hs-tilt" role="group" aria-label="対戦成績で絞り込む">${[['', 'すべて', h2h.length], ['up', '勝ち越し', cnt('up')], ['even', '五分', cnt('even')], ['down', '負け越し', cnt('down')]]
     .map(([k, name, n], i) => `<button type="button" data-tilt="${k}" aria-pressed="${i === 0}">${name}<span class="hs-tn">${n}</span></button>`).join('')}</div>
-<input class="hs-search" type="search" placeholder="クラブ名で探す" aria-label="対戦相手を探す"></div>
-<ul class="card hs-h2h">${h2h.map(h => `<li data-name="${esc(`${h.full} ${h.opp}`)}" data-tilt="${tilt(h)}"><span class="hs-ho">${link(h.url, h.full, 'club-link')}<span class="hs-tag ${tilt(h)}">${TILT[tilt(h)]}</span></span><span class="hs-hp">${h.p}試合</span><span class="hs-hr">${h.w}勝${h.d}分${h.l}敗</span><span class="hs-hg">${h.gf}得点 ${h.ga}失点</span></li>`).join('')}</ul>`;
+<input class="hs-search" type="search" placeholder="クラブ名で探す" aria-label="対戦相手を探す">
+<label class="hs-sortl">並び順 <select class="hs-sort" aria-label="対戦成績の並び順"><option value="p">試合数</option><option value="w">勝ち</option><option value="d">引き分け</option><option value="l">負け</option><option value="gf">得点</option><option value="ga">失点</option></select></label></div>
+<ul class="card hs-h2h">${h2h.map(h => `<li data-name="${esc(`${h.full} ${h.opp}`)}" data-tilt="${tilt(h)}" data-p="${h.p}" data-w="${h.w}" data-d="${h.d}" data-l="${h.l}" data-gf="${h.gf}" data-ga="${h.ga}"><span class="hs-ho">${link(h.url, h.full, 'club-link')}<span class="hs-tag ${tilt(h)}">${TILT[tilt(h)]}</span></span><span class="hs-hp">${h.p}試合</span><span class="hs-hr">${h.w}勝${h.d}分${h.l}敗</span><span class="hs-hg">${h.gf}得点 ${h.ga}失点</span></li>`).join('')}</ul>`;
 }
 
 /** 種類で試合を選ぶ（league：J3・J2のリーグ戦、other：それ以外、all：すべて） */

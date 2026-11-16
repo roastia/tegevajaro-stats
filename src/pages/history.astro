@@ -149,6 +149,14 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
     b.parentElement!.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     apply();
   });
+  // 対戦成績の並び順（多い順。同じ数なら試合数の多い順のまま）
+  box.addEventListener('change', e => {
+    const sel = e.target as HTMLSelectElement; if (!sel.matches('.hs-sort')) return;
+    const ul = box.querySelector<HTMLElement>('.hs-h2h')!, k = sel.value;
+    const lis = [...ul.querySelectorAll<HTMLElement>('li[data-name]')];
+    lis.forEach((li, i) => { if (!li.dataset.i) li.dataset.i = String(i); });
+    lis.sort((a, b) => Number(b.dataset[k]) - Number(a.dataset[k]) || Number(a.dataset.i) - Number(b.dataset.i)).forEach(li => ul.append(li));
+  });
   // 作りなおしたら、絞り込みは「すべて」に戻す
   new MutationObserver(() => { tilt = ''; }).observe(box, { childList: true });
 </script>
