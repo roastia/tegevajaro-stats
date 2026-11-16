@@ -4,8 +4,9 @@ import Acc from '../components/Acc.astro';
 import { SITE } from '../config/site.js';
 import { getData } from '../lib/data.js';
 import { loadHistory, record, scorers, COMP } from '../lib/clubhistory.js';
-import { renderRecords, pickKind } from '../lib/hsrecords.js';
-import { playerUrl } from '../lib/util.js';
+import { renderRecords, pickKind, recPost, kingWord } from '../lib/hsrecords.js';
+import { playerUrl, postText, xLength, flatPost } from '../lib/util.js';
+import PostBox from '../components/PostBox.astro';
 // 歴史：Jリーグに入った2021年からの全試合と、通算の記録
 const d = getData();
 const { matches, seasons } = loadHistory();
@@ -23,6 +24,24 @@ const bySeason = seasons.map(s => {
   // 試合は新しい順（上がいちばん新しい）
   return { ...s, rank, ms: [...ms].reverse(), rec: record(lg), top: scorers(lg)[0], cups: ms.filter(m => !lg.includes(m)) };
 }).reverse();
+// Xでポスト：シーズンごと・通算。得点王が同点のときは全員の名前を書く。4位までのシーズンは「！」
+const kings = ms => { const sc = scorers(ms); return sc.filter(x => x.goals === sc[0]?.goals); };
+const kingText = ms => { const k = kings(ms); return k.length ? kingWord(k) : ''; };
+const seasonId = s => `s-${s.season === '2026特別' ? '2026-special' : s.season.replace('/', '-')}`;
+const seasonName = s => (s.season === '2026特別' ? '2026 百年構想リーグ（WEST-B）' : `${s.label}シーズン（${s.league}）`);
+const current = s => s.season === '2026/27';
+const seasonPost = s => {
+  const lg = s.ms.filter(m => s.season === '2026特別' ? m.comp === 'j2j3' && /WEST-B/.test(m.round) : m.league);
+  const k = kingText(lg);
+  const head = `テゲバジャーロ宮崎の${seasonName(s)}は${s.rank}位${!current(s) && Number(s.rank) <= 4 ? '！' : ''}`;
+  const sub = `${s.season === '2026特別' ? 'グループ' : 'リーグ戦'}${s.rec.w}勝${s.rec.d}分${s.rec.l}敗・${s.rec.gf}得点${s.rec.ga}失点${k ? `、チーム得点王は${k}` : ''}`;
+  return postText(head, sub, s.season === '2026/27' ? '' : s.note && s.note !== 'シーズン移行前の特別大会' ? s.note : '');
+};
+const rp = recPost(matches);
+// 通算のポストは長いもの（全シーズンのすべて）だけ確かめる。シーズンを選んだときも同じ形で短くなる
+// ポスト文が長すぎないか（X は280。URLは23）
+for (const [t, asOf] of [...bySeason.map(s => [seasonPost(s), current(s) ? SITE.roundLabel : '']), [rp.text, SITE.roundLabel]])
+  if (xLength(flatPost(t, asOf), 'u') > 280) throw new Error(`歴史のポスト文が長すぎます：${t}`);
 // 年表：1行ずつ
 const timeline = [
   { y: '2021', t: 'J3リーグに参入。1年目で3位' },
@@ -59,7 +78,7 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
     </div>
     <div class="hs-seasons" id="hsSeasons">
       {bySeason.map((s, i) => (
-        <details class="card hs-season" open={i === 0}>
+        <details class="card hs-season" id={seasonId(s)} open={i === 0}>
           <summary class="hs-sum">
             <span class="hs-sy">{s.label}</span>
             <span class="hs-sl">{s.league}</span>
@@ -100,6 +119,7 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
             ))}
           </ul>
           <p class="hs-none" hidden>このシーズンには、この種類の試合はありません。</p>
+          <PostBox what={s.season === '2026特別' ? '2026 百年構想リーグ' : `${s.label}シーズン`} text={seasonPost(s)} url={`${SITE.url}/history/#${seasonId(s)}`} asOf={current(s) ? undefined : ''} />
         </details>
       ))}
     </div>
@@ -117,20 +137,30 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
     </div>
     <p class="note hs-kindnote">通算の記録は、リーグ戦（J3・J2）だけでなく、リーグ戦以外の公式戦（J2昇格プレーオフ・百年構想リーグ・天皇杯・ルヴァンカップ）も含めて数えています。シーズンや種類を選ぶと、その試合だけで数えなおします。PK戦で決まった試合は引き分けで数えます。</p>
     <div id="hsRec" class="hs-scopebox" aria-live="polite" set:html={firstHtml}></div>
+    <div id="hsPost"><PostBox what={rp.what} text={rp.text} url={`${SITE.url}/history/#records`} /></div>
     <script type="application/json" id="hsData" set:html={hsJson}></script>
   </Acc>
   <p class="note hs-src">試合の結果・得点者・観客数は<a href="https://www.jleague.jp/club/miyazaki/day/" target="_blank" rel="noopener noreferrer">Jリーグ公式サイト</a>、シーズンの最終順位表と対戦相手のいまのカテゴリは<a href="https://data.j-league.or.jp/SFRT01/" target="_blank" rel="noopener noreferrer">Jリーグ公式データサイト</a>から。天皇杯は、本大会に出た2023・2024・2026年の試合です。天皇杯の「ホーム／アウェイ」は、Jリーグ公式の表記に合わせています（宮崎で行った試合でも、相手のホーム扱いのことがあります）。</p>
 </Base>
 <script>
   // 通算の記録：シーズン × 種類で数えなおす（hsrecords.js をブラウザでも使う）
-  import { renderRecords, pickKind } from '../lib/hsrecords.js';
+  import { renderRecords, pickKind, recPost } from '../lib/hsrecords.js';
   import { nameKeys, matchName } from '../lib/namesearch.js';
+  import { xIntent } from '../lib/util.js';
+  import { SITE } from '../config/site.js';
   const data = JSON.parse(document.getElementById('hsData')!.textContent || '{}');
   const box = document.getElementById('hsRec')!, sel = document.getElementById('hsSeason') as HTMLSelectElement, kseg = document.getElementById('hsKind')!;
   let kind = 'all';
   const draw = () => {
     const ms = data.m.filter((m: any) => !sel.value || m.season === sel.value);
     box.innerHTML = renderRecords(pickKind(ms, kind), { playerUrl: data.p });
+    // Xでポストも、選んだシーズン × 種類の成績に（過去のシーズンは「第〇節時点」を付けない）
+    const label = sel.value ? sel.selectedOptions[0].textContent!.replace(/^(\d{4}(?:\/\d{2})?)$/, '$1シーズン') : '';
+    const p = recPost(pickKind(ms, kind), { kind, seasonLabel: label });
+    const a = document.querySelector<HTMLAnchorElement>('#hsPost .postbtn')!;
+    a.href = xIntent(p.text, `${SITE.url}/history/#records`, !sel.value || sel.value === '2026/27' ? SITE.roundLabel : '');
+    a.querySelector('b')!.textContent = `「${p.what}」`;
+    document.getElementById('hsPost')!.hidden = !ms.length || !pickKind(ms, kind).length;
   };
   sel.addEventListener('change', draw);
   kseg.addEventListener('click', e => {

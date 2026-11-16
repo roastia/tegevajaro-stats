@@ -2,6 +2,7 @@
 // 「どの試合で数えるか」（シーズン×大会の種類）を選ぶと、ブラウザがこの関数で作り直す
 import { categoryOf, CATEGORY_SEASON } from '../config/categories.js';
 import { clubKana } from '../config/clubkana.js';
+import { postText } from './util.js';
 const catCls = c => ({ J1: 'j1', J2: 'j2', J3: 'j3', JFL: 'jfl' }[c] || 'ot');
 export const COMP = {
   j3: { name: 'J3リーグ', league: true },
@@ -118,3 +119,15 @@ ${renderScorers(top, playerUrl)}
 
 /** 種類で試合を選ぶ（league：J3・J2のリーグ戦、other：それ以外、all：すべて） */
 export const pickKind = (ms, kind) => kind === 'league' ? ms.filter(m => m.league) : kind === 'other' ? ms.filter(m => !m.league) : ms;
+
+// 通算の記録の「Xでポスト」：選んだシーズン × 種類の成績と得点王（同点は全員）。ページの表示と同じ数え方
+// 得点王の書き方：同点は3人まで名前を書き、4人以上なら人数だけ
+export const kingWord = k => (k.length > 3 ? `${k.length}人（各${k[0].goals}点）` : `${k.map(x => x.name).join('・')}（${k[0].goals}点）`);
+const KIND_WORD = { all: '公式戦', league: 'リーグ戦（J3・J2）', other: 'リーグ戦以外の公式戦' };
+export function recPost(ms, { kind = 'all', seasonLabel = '' } = {}) {
+  const r = record(ms), sc = scorers(ms), k = sc.filter(x => x.goals === sc[0]?.goals);
+  const kw = KIND_WORD[kind] || KIND_WORD.all;
+  const head = seasonLabel ? `テゲバジャーロ宮崎の${seasonLabel}・${kw}の成績` : `テゲバジャーロ宮崎の${kw}通算成績（Jリーグ入りの2021年から）`;
+  const sub = `${r.p}試合${r.w}勝${r.d}分${r.l}敗・${r.gf}得点${r.ga}失点${k.length ? `、${seasonLabel ? 'チーム' : '通算'}得点王は${kingWord(k)}` : ''}`;
+  return { what: seasonLabel ? `${seasonLabel}・${kw}の成績` : `${kw}の通算成績`, text: postText(head, sub, '') };
+}

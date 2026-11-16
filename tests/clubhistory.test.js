@@ -62,3 +62,13 @@ test('対戦相手：どのクラブにも、よみ（検索用）といまの�
   for (const q of ['鹿児島', 'かごしま', 'カゴシマ', 'kagoshima', 'fc']) assert.ok(matchName(k, q), q);
   assert.ok(!matchName(k, 'くまもと'));
 });
+
+test('歴史のポスト：選んだ範囲の成績と得点王（同点4人以上は人数）', async () => {
+  const { recPost, pickKind } = await import('../src/lib/hsrecords.js');
+  const all = recPost(matches);
+  assert.match(all.text, /公式戦通算成績/);
+  assert.match(all.text, new RegExp(`${matches.length}試合`));
+  const o25 = recPost(pickKind(matches.filter(m => m.season === '2025'), 'other'), { kind: 'other', seasonLabel: '2025シーズン' });
+  assert.match(o25.text, /2025シーズン・リーグ戦以外の公式戦の成績。?\n?3試合2勝0分1敗/);
+  assert.match(o25.text, /得点王は5人（各1点）/);
+});

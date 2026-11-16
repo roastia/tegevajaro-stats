@@ -1212,6 +1212,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
   .hs-c { grid-row: 2; grid-column: 2 / -1; }
   .hs-g { grid-row: 3; }
 }
+.hs-season > .post { padding: 4px 14px 14px; }
 .hs-none { margin: 0; padding: 0 14px 12px; font-size: .85rem; color: var(--muted); }
 .hs-row[hidden] { display: none; }
 
