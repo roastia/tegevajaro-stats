@@ -52,7 +52,12 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
   </section>
 
   <Acc id="seasons" title="シーズンごとの全試合" icon="calendar" count={bySeason.length}>
-    <div class="hs-seasons">
+    <div class="controls hs-scope">
+      <div class="seg" id="hsMKind" role="group" aria-label="表示する試合の種類">
+        {KINDS.map(([k, name], i) => <button type="button" data-kind={k} aria-pressed={i === 0 ? 'true' : 'false'}>{name}</button>)}
+      </div>
+    </div>
+    <div class="hs-seasons" id="hsSeasons">
       {bySeason.map((s, i) => (
         <details class="card hs-season" open={i === 0}>
           <summary class="hs-sum">
@@ -85,7 +90,7 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
           )}
           <ul class="hs-list">
             {s.ms.map(m => (
-              <li class="hs-row">
+              <li class="hs-row" data-lg={m.league ? '1' : '0'}>
                 <span class="hs-d">{md(m.date)}</span>
                 <span class="hs-c">{label(m)}</span>
                 <span class="hs-o"><a class="club-link" href={m.oppUrl} target="_blank" rel="noopener noreferrer">{m.oppFull}</a><small>（{haWord(m.ha)}）</small></span>
@@ -94,6 +99,7 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
               </li>
             ))}
           </ul>
+          <p class="hs-none" hidden>このシーズンには、この種類の試合はありません。</p>
         </details>
       ))}
     </div>
@@ -133,6 +139,23 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
     kseg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     draw();
   });
+  // シーズンごとの全試合：すべて・リーグ戦（J3・J2）・リーグ戦以外で絞り込む
+  {
+    const mseg = document.getElementById('hsMKind')!, wrap = document.getElementById('hsSeasons')!;
+    mseg.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-kind]'); if (!b) return;
+      const k = b.dataset.kind;
+      mseg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      wrap.querySelectorAll<HTMLElement>('.hs-season').forEach(sec => {
+        let n = 0;
+        sec.querySelectorAll<HTMLElement>('.hs-row').forEach(li => {
+          const show = k === 'all' || (k === 'league') === (li.dataset.lg === '1');
+          li.hidden = !show; if (show) n++;
+        });
+        sec.querySelector<HTMLElement>('.hs-none')!.hidden = n > 0;
+      });
+    });
+  }
   // 対戦成績：打つそばから絞り込む＋勝ち越し・五分・負け越しで絞り込む（中身を作りなおしても効くよう、箱で受ける）
   let tilt = '';
   const apply = () => {

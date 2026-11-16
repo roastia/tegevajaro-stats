@@ -1203,6 +1203,8 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-scope select { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--fg); }
 .hs-kindnote { margin: 0 0 14px; }
 .hs-empty { color: var(--muted); }
+.hs-none { margin: 0; padding: 0 14px 12px; font-size: .85rem; color: var(--muted); }
+.hs-row[hidden] { display: none; }
 
 /* 歴史：得点ランキング（上から順に。1位は金の札、2・3位は1行のカード、4位から下は棒グラフ。どれも1行でコンパクトに） */
 .hs-sc { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
