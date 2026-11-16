@@ -1203,6 +1203,15 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-scope select { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--fg); }
 .hs-kindnote { margin: 0 0 14px; }
 .hs-empty { color: var(--muted); }
+/* スマホ：1行目に日付・相手・スコア、2行目に節や大会名（百年構想リーグ 3-4位決定戦など長い名前でも相手チーム名が細くならない）、3行目に得点者 */
+@media (max-width: 480px) {
+  .hs-row { grid-template-columns: 3.2em minmax(0, 1fr) auto; }
+  .hs-d { grid-row: 1; grid-column: 1; }
+  .hs-o { grid-row: 1; grid-column: 2; }
+  .hs-res { grid-row: 1; grid-column: 3; }
+  .hs-c { grid-row: 2; grid-column: 2 / -1; }
+  .hs-g { grid-row: 3; }
+}
 .hs-none { margin: 0; padding: 0 14px 12px; font-size: .85rem; color: var(--muted); }
 .hs-row[hidden] { display: none; }
 
