@@ -30,14 +30,9 @@ const timeline = [
   { y: '2026', t: 'シーズン移行前の特別大会「百年構想リーグ」で地域リーグラウンド WEST-B 1位。プレーオフラウンドを経て最終3位' },
   { y: '2026/27', t: `J2リーグ1年目。${SITE.roundLabel}時点で${SITE.rank}位` },
 ];
-// 順位の推移（リーグ戦）。縦が順位（上が1位）。リーグがちがう年は下に書く
-const chart = bySeason.filter(s => s.season !== '2026特別' && s.rank).reverse();
-// スマホでも字が小さくならないよう、横幅をせまめに描いて広げる
-const CW = 420, CH = 230, PL = 40, PR = 30, PT = 24, PB = 42;
-const maxTeams = Math.max(...chart.map(s => Number(s.teams)));
-const xOf = i => PL + (CW - PL - PR) * (chart.length === 1 ? .5 : i / (chart.length - 1));
-const yOf = r => PT + (CH - PT - PB) * ((Number(r) - 1) / (maxTeams - 1));
-const pts = chart.map((s, i) => ({ s, x: xOf(i), y: yOf(s.rank) }));
+// 最終順位表のチーム名から、クラブ公式サイトへ（試合データの正式名とリンクを使う）
+const clubUrlOf = new Map(matches.map(m => [m.oppFull.normalize('NFKC'), m.oppUrl]));
+const gd = n => (n > 0 ? `+${n}` : String(n));
 // 通算の記録：どの試合で数えるか（シーズン × 種類）を選ぶ。はじめは全シーズンのすべての公式戦（リーグ戦以外も含める）
 // ブラウザで選びなおせるよう、試合の要点を JSON にしてページに入れる（計算と表示は hsrecords.js を共用）
 const playerUrls = Object.fromEntries([...urlOf].filter(([, u]) => u));
@@ -47,7 +42,7 @@ const hsJson = JSON.stringify({ m: slim, p: playerUrls }).replace(/</g, '\\u003c
 const KINDS = [['all', 'すべて'], ['league', 'リーグ戦（J3・J2）'], ['other', 'リーグ戦以外']];
 const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrls });
 ---
-<Base current="history" title="歴史・全試合の記録" description={`テゲバジャーロ宮崎の歴史。Jリーグに入った2021年からの全試合の結果・得点者と、シーズンごとの順位、相手ごとの対戦成績、通算得点ランキング（非公式）。${SITE.roundLabel}時点。`}>
+<Base current="history" title="歴史・全試合の記録" description={`テゲバジャーロ宮崎の歴史。Jリーグに入った2021年からの全試合の結果・得点者と、シーズンごとの最終順位表、相手ごとの対戦成績、通算得点ランキング（非公式）。${SITE.roundLabel}時点。`}>
   <section class="card hs-intro">
     <h2 class="hs-h">年表</h2>
     <ol class="hs-tl">
@@ -55,23 +50,6 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
     </ol>
     <p class="note">2021年より前（九州リーグ・JFL）の年ごとの順位は、出典を確かめてから載せます。</p>
   </section>
-
-  <Acc id="rank" title="順位の推移" icon="chartup" note="リーグ戦の最終順位">
-    <div class="card hs-chart">
-      <svg viewBox={`0 0 ${CW} ${CH}`} role="img" aria-label={chart.map(s => `${s.label}年 ${s.league} ${s.rank}位`).join('、')}>
-        {[1, 5, 10, 15, 20].filter(r => r <= maxTeams).map(r => <g class="hs-grid"><line x1={PL} x2={CW - PR} y1={yOf(r)} y2={yOf(r)} /><text x={PL - 6} y={yOf(r) + 4}>{r}</text></g>)}
-        <polyline class="hs-lineplot" points={pts.map(p => `${p.x},${p.y}`).join(' ')} />
-        {pts.map(p => (
-          <g class={`hs-pt${p.s.league === 'J2' ? ' j2' : ''}`}>
-            <circle cx={p.x} cy={p.y} r="6" />
-            <text class="hs-rk" x={p.x} y={p.y - 12}>{p.s.rank}位</text>
-            <text class="hs-yr" x={p.x} y={CH - 20}>{p.s.label}</text>
-            <text class="hs-lg" x={p.x} y={CH - 4}>{p.s.league}{p.s.season === '2026/27' ? '（途中）' : ''}</text>
-          </g>
-        ))}
-      </svg>
-    </div>
-  </Acc>
 
   <Acc id="seasons" title="シーズンごとの全試合" icon="calendar" count={bySeason.length}>
     <div class="hs-seasons">
@@ -84,6 +62,27 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
             <span class="hs-sw">{s.rec.w}勝{s.rec.d}分{s.rec.l}敗</span>
           </summary>
           <p class="hs-meta">勝ち点{s.rec.pts}・{s.rec.gf}得点{s.rec.ga}失点{s.top && <>・チーム得点王 {urlOf.get(s.top.name) ? <a href={urlOf.get(s.top.name)} target="_blank" rel="noopener noreferrer">{s.top.name}</a> : s.top.name}（{s.top.goals}点）</>}{s.note && <>・{s.note}</>}</p>
+          {s.table.length > 0 && (
+            <details class="hs-stand">
+              <summary>最終順位表（{s.table.length}チーム）</summary>
+              <div class="hs-stw">
+                <table class={`hs-st${s.season === '2026特別' ? ' pk' : ''}`}>
+                  <thead><tr><th>順位</th><th class="t">チーム</th><th>勝点</th><th class="x">試合</th><th>勝</th>{s.season === '2026特別' ? <><th>PK勝</th><th>PK負</th></> : <th>分</th>}<th>敗</th><th class="x">得点</th><th class="x">失点</th><th>差</th></tr></thead>
+                  <tbody>
+                    {s.table.map(r => (
+                      <tr class={/宮崎/.test(r.team) ? 'me' : undefined}>
+                        <td>{r.rank}</td>
+                        <td class="t">{clubUrlOf.get(r.team) ? <a class="club-link" href={clubUrlOf.get(r.team)} target="_blank" rel="noopener noreferrer">{r.team}</a> : r.team}{r.note && <small class="hs-stn">{r.note}</small>}</td>
+                        <td><b>{r.pts}</b></td><td class="x">{r.p}</td><td>{r.w}</td>{s.season === '2026特別' ? <><td>{r.pkw}</td><td>{r.pkl}</td></> : <td>{r.d}</td>}<td>{r.l}</td>
+                        <td class="x">{r.gf}</td><td class="x">{r.ga}</td><td>{gd(r.gf - r.ga)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {s.season === '2026特別' && <p class="note">百年構想リーグは引き分けがなく、90分で決まらないときはPK戦。勝点は90分の勝ち3・PK勝ち2・PK負け1です。</p>}
+            </details>
+          )}
           <ul class="hs-list">
             {s.ms.map(m => (
               <li class="hs-row">
@@ -114,7 +113,7 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
     <div id="hsRec" class="hs-scopebox" aria-live="polite" set:html={firstHtml}></div>
     <script type="application/json" id="hsData" set:html={hsJson}></script>
   </Acc>
-  <p class="note hs-src">試合の結果・得点者・観客数は<a href="https://www.jleague.jp/club/miyazaki/day/" target="_blank" rel="noopener noreferrer">Jリーグ公式サイト</a>、シーズンの順位は<a href="https://www.football-lab.jp/myzk/season/" target="_blank" rel="noopener noreferrer">Football LAB</a>から。天皇杯は、本大会に出た2023・2024・2026年の試合です。天皇杯の「ホーム／アウェイ」は、Jリーグ公式の表記に合わせています（宮崎で行った試合でも、相手のホーム扱いのことがあります）。</p>
+  <p class="note hs-src">試合の結果・得点者・観客数は<a href="https://www.jleague.jp/club/miyazaki/day/" target="_blank" rel="noopener noreferrer">Jリーグ公式サイト</a>、シーズンの最終順位表と対戦相手のいまのカテゴリは<a href="https://data.j-league.or.jp/SFRT01/" target="_blank" rel="noopener noreferrer">Jリーグ公式データサイト</a>から。天皇杯は、本大会に出た2023・2024・2026年の試合です。天皇杯の「ホーム／アウェイ」は、Jリーグ公式の表記に合わせています（宮崎で行った試合でも、相手のホーム扱いのことがあります）。</p>
 </Base>
 <script>
   // 通算の記録：シーズン × 種類で数えなおす（hsrecords.js をブラウザでも使う）

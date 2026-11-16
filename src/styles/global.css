@@ -1115,17 +1115,6 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-tl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .hs-tl li { display: grid; grid-template-columns: 4.6em 1fr; gap: 8px; font-size: .92rem; }
 .hs-y { font-weight: 700; color: var(--ink); }
-.hs-chart { padding: 10px 8px 4px; }
-.hs-chart svg { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; }
-.hs-grid line { stroke: var(--line); stroke-width: 1; }
-.hs-grid text { fill: var(--muted); font-size: 12px; text-anchor: end; }
-.hs-lineplot { fill: none; stroke: var(--brand); stroke-width: 3; stroke-linejoin: round; }
-.hs-pt circle { fill: #fff; stroke: var(--brand); stroke-width: 3; }
-.hs-pt.j2 circle { fill: var(--brand); }
-.hs-pt text { text-anchor: middle; }
-.hs-rk { font-size: 15px; font-weight: 700; fill: var(--fg); }
-.hs-yr { font-size: 13px; font-weight: 700; fill: var(--fg); }
-.hs-lg { font-size: 12px; fill: var(--muted); }
 .hs-seasons { display: flex; flex-direction: column; gap: 14px; }
 .hs-season { padding: 0; }
 .hs-sum { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 12px 14px; }
@@ -1169,6 +1158,26 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-cat.c-j2 { color: var(--fg); }
 .hs-cat.c-j3 { color: var(--fg); font-weight: 600; }
 .hs-cat.c-jfl, .hs-cat.c-ot { color: var(--muted); font-weight: 600; }
+/* シーズンの最終順位表（シーズンの中で開く。枠は重ねない） */
+.hs-stand { padding: 0 14px 10px; }
+.hs-stand > summary { list-style: none; cursor: pointer; display: inline-block; font-size: .85rem; font-weight: 700; color: var(--ink); padding: 4px 0; }
+.hs-stand > summary::-webkit-details-marker { display: none; }
+.hs-stand > summary::after { content: ' を見る'; font-weight: 400; color: var(--muted); }
+.hs-stand[open] > summary::after { content: ' を閉じる'; }
+.hs-stand .note { margin: 6px 0 0; }
+.hs-stw { overflow-x: auto; }
+.hs-st { width: 100%; border-collapse: collapse; font-size: .82rem; font-variant-numeric: tabular-nums; }
+.hs-st th, .hs-st td { padding: 5px 6px; text-align: right; white-space: nowrap; border-top: 1px dotted var(--line); }
+.hs-st th { font-size: .75rem; font-weight: 600; color: var(--muted); border-top: 0; }
+.hs-st th:first-child, .hs-st td:first-child { text-align: center; width: 2.4em; }
+.hs-st .t { text-align: left; white-space: normal; }
+.hs-st tr.me td { background: var(--tint); font-weight: 700; }
+.hs-stn { display: inline-block; margin-left: 6px; font-size: .7rem; font-weight: 600; color: var(--muted); }
+@media (max-width: 480px) {
+  .hs-st .x { display: none; }
+  .hs-stn { display: block; margin-left: 0; }
+  .hs-st th, .hs-st td { padding: 5px 4px; }
+}
 /* スマホ：1行目に札と正式名、2行目に成績（札の列と成績の列をそろえる） */
 @media (max-width: 480px) {
   .hs-h2h li { grid-template-columns: 4.8em 6.4em 1fr 3.2em; row-gap: 2px; }

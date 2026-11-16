@@ -35,6 +35,8 @@ export function loadHistory() {
   }));
   const matches = [...past, ...now].map(m => ({ ...m, result: resultOf(m), league: COMP[m.comp].league }))
     .sort((a, b) => a.date.localeCompare(b.date));
-  const seasons = readCsv('history_seasons');
+  // シーズンごとの最終順位表（Jリーグ公式データサイト）。数字は数に
+  const standings = readCsv('history_standings').map(r => ({ ...r, ...Object.fromEntries(['rank', 'pts', 'p', 'w', 'd', 'l', 'gf', 'ga', 'pkw', 'pkl'].map(k => [k, Number(r[k] || 0)])) }));
+  const seasons = readCsv('history_seasons').map(s => ({ ...s, table: standings.filter(r => r.season === s.season) }));
   return { matches, seasons };
 }
