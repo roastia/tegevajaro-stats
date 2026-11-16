@@ -88,12 +88,9 @@ function renderScorers(top, playerUrl) {
   const max = top[0].goals;
   const nm = p => link(playerUrl[p.name], p.name, 'pl-link');
   const list = top.slice(0, 10).map(p => ({ ...p, r: rank(p) }));
-  const kings = list.filter(p => p.r === 1), podium = list.filter(p => p.r === 2 || p.r === 3), rest = list.filter(p => p.r > 3);
-  return `<div class="hs-sc">
-<div class="hs-king card">${kings.map(p => `<div class="hs-king-p"><span class="hs-king-rk" aria-label="1位">1</span><span class="hs-king-nm">${nm(p)}<span class="hs-king-t">${kings.length > 1 ? '1位タイ' : '得点王'}</span></span><span class="hs-king-v">${p.goals}<small>ゴール</small></span></div>`).join('')}</div>
-${podium.map(p => `<div class="card hs-pod r${p.r}"><span class="hs-pod-rk">${p.r}</span><span class="hs-pod-nm">${nm(p)}</span><span class="hs-pod-v">${p.goals}<small>ゴール</small></span></div>`).join('')}
-${rest.length ? `<ol class="card hs-rest">${rest.map(p => `<li><span class="bar w${Math.max(4, Math.round(p.goals / max * 100))}"></span><span class="hs-n">${p.r}</span><span class="hs-rest-nm">${nm(p)}</span><b>${p.goals}<small>ゴール</small></b></li>`).join('')}</ol>` : ''}
-</div>`;
+  const kings = list.filter(p => p.r === 1).length;
+  // 1位から10位まで同じ枠に、同じ棒グラフで。1位は金、2・3位はピンクの丸で目立たせる
+  return `<ol class="card hs-rest">${list.map(p => `<li class="${p.r <= 3 ? `r${p.r}` : ''}"><span class="bar w${Math.max(4, Math.round(p.goals / max * 100))}"></span><span class="hs-n" aria-label="${p.r}位">${p.r}</span><span class="hs-rest-nm">${nm(p)}${p.r === 1 ? `<span class="hs-king-t">${kings > 1 ? '1位タイ' : '得点王'}</span>` : ''}</span><b>${p.goals}<small>ゴール</small></b></li>`).join('')}</ol>`;
 }
 
 /** 選んだ試合の記録（成績・最多記録・得点ランキング・相手ごとの対戦成績）を HTML にする。playerUrl は 選手名→Jリーグ公式のページ */

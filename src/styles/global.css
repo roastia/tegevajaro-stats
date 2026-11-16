@@ -1217,23 +1217,22 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-row[hidden] { display: none; }
 
 /* 歴史：得点ランキング（上から順に。1位は金の札、2・3位は1行のカード、4位から下は棒グラフ。どれも1行でコンパクトに） */
-.hs-sc { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-.hs-king { padding: 10px 14px; background: linear-gradient(100deg, var(--gold-soft, #FFF6DC), var(--panel) 75%); border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); }
-.hs-king-p { display: flex; align-items: center; gap: 12px; }
-.hs-king-p + .hs-king-p { margin-top: 8px; padding-top: 8px; border-top: 1px dotted color-mix(in srgb, var(--gold) 45%, var(--line)); }
-.hs-king-rk { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 2.1rem; height: 2.1rem; border-radius: 50%; background: var(--gold); color: #fff; font-size: 1.15rem; font-weight: 900; }
-.hs-king-nm { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 1.2rem; font-weight: 900; min-width: 0; }
 .hs-king-t { padding: 0 9px; border-radius: 999px; background: var(--gold); color: #fff; font-size: .72rem; font-weight: 700; line-height: 1.6; }
-.hs-king-v { margin-left: auto; flex: none; font-size: 2.2rem; font-weight: 900; line-height: 1; color: var(--ink); letter-spacing: -.02em; }
-.hs-king-v small, .hs-pod-v small, .hs-rest b small { font-size: .45em; margin-left: 2px; font-weight: 700; }
-.hs-pod { padding: 8px 14px; display: flex; align-items: center; gap: 12px; }
-.hs-pod-rk { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--soft2, var(--tint)); color: var(--ink); font-weight: 900; }
-.hs-pod-nm { font-size: 1.05rem; font-weight: 800; min-width: 0; }
-.hs-pod-v { margin-left: auto; flex: none; font-size: 1.6rem; font-weight: 900; line-height: 1; color: var(--ink); }
-.hs-rest { list-style: none; margin: 0; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; }
+.hs-rest b small { font-size: .45em; margin-left: 2px; font-weight: 700; }
+.hs-rest { list-style: none; margin: 0 0 14px; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; }
 .hs-rest li { position: relative; isolation: isolate; display: flex; align-items: center; gap: 10px; padding: 4px 8px; border-radius: 8px; }
 .hs-rest li .bar { position: absolute; inset: 0 auto 0 0; width: calc(var(--w, 0) * 1%); z-index: -1; border-radius: 8px; background: var(--soft2, color-mix(in srgb, var(--brand) 18%, transparent)); }
-.hs-rest li .hs-n { width: 1.8rem; text-align: center; }
+.hs-rest li .hs-n { flex: none; width: 1.8rem; height: 1.8rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 800; }
+.hs-rest-nm { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-width: 0; }
+/* 1〜3位：丸を塗って少し大きく。1位は金（棒も金） */
+.hs-rest li.r1, .hs-rest li.r2, .hs-rest li.r3 { padding: 6px 8px; }
+.hs-rest li.r1 .hs-n { background: var(--gold); color: #fff; }
+.hs-rest li.r2 .hs-n, .hs-rest li.r3 .hs-n { background: var(--brand); color: #fff; }
+.hs-rest li.r1 .bar { background: var(--gold-soft, #FFF6DC); }
+.hs-rest li.r1 .hs-rest-nm { font-size: 1.1rem; font-weight: 900; }
+.hs-rest li.r1 b { font-size: 1.5rem; }
+.hs-rest li.r2 .hs-rest-nm, .hs-rest li.r3 .hs-rest-nm { font-size: 1.02rem; font-weight: 800; }
+.hs-rest li.r2 b, .hs-rest li.r3 b { font-size: 1.3rem; }
 .hs-rest-nm { font-weight: 700; }
 .hs-rest b { margin-left: auto; font-size: 1.1rem; color: var(--ink); }
 .hs-sortl { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem; color: var(--muted); }
