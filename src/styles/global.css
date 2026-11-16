@@ -1168,10 +1168,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-cat.c-jfl, .hs-cat.c-ot { color: var(--muted); font-weight: 600; }
 /* シーズンの最終順位表（シーズンの中で開く。枠は重ねない） */
 .hs-stand { padding: 0 14px 10px; }
-.hs-stand > summary { list-style: none; cursor: pointer; display: inline-block; font-size: .85rem; font-weight: 700; color: var(--ink); padding: 4px 0; }
-.hs-stand > summary::-webkit-details-marker { display: none; }
-.hs-stand > summary::after { content: ' を見る'; font-weight: 400; color: var(--muted); }
-.hs-stand[open] > summary::after { content: ' を閉じる'; }
+.hs-stand > summary { cursor: pointer; font-size: .8rem; color: var(--ink); margin: 4px 0; }
 .hs-stand .note { margin: 6px 0 0; }
 .hs-stw { overflow-x: auto; }
 .hs-st { width: 100%; border-collapse: collapse; font-size: .82rem; font-variant-numeric: tabular-nums; }
