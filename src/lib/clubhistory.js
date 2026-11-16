@@ -3,6 +3,9 @@
 // 今のシーズン（2026/27）のリーグ戦は matches.csv・goals.csv から、毎節の更新でそのまま増える
 // PK戦で決まった試合は引き分けとして数える（スコアの横に PK を書く）
 import { readCsv } from './data.js';
+import { CLUB_LIST } from '../config/clubs.js';
+// 今季の相手（略称）→ 正式名・公式サイト
+const CUR = new Map(CLUB_LIST.map(([s, f, u]) => [s, { full: f, url: u }]));
 
 export const COMP = {
   j3: { name: 'J3リーグ', league: true },
@@ -26,12 +29,14 @@ export function loadHistory() {
   }
   const past = hm.map(m => ({
     id: m.id, season: m.season, comp: m.comp, round: m.round, date: m.date, ha: m.ha, opponent: m.opponent,
+    oppFull: m.opponent_full, oppUrl: m.opponent_url,
     gf: n(m.gf), ga: n(m.ga), pk: m.pk_for !== '' ? [n(m.pk_for), n(m.pk_against)] : null, et: m.et === '1',
     venue: m.venue, att: m.attendance === '' ? null : n(m.attendance), url: `https://www.jleague.jp/match/${m.id}/`,
     goals: goalsOf.get(m.id) || [],
   }));
   const now = cur.map(m => ({
     id: `j2/now/${m.round}`, season: '2026/27', comp: 'j2', round: m.round, date: m.date, ha: m.ha, opponent: m.opponent,
+    oppFull: CUR.get(m.opponent)?.full || m.opponent, oppUrl: CUR.get(m.opponent)?.url || '',
     gf: n(m.gf), ga: n(m.ga), pk: null, et: false, venue: m.venue, att: m.attendance === '' ? null : n(m.attendance), url: m.match_url,
     goals: cg.filter(g => String(g.round) === String(m.round)).map(g => ({ minute: String(g.minute), scorer: g.scorer, og: /オウン/.test(g.scorer) })),
   }));
@@ -59,7 +64,8 @@ export function scorers(ms) {
 export function headToHead(ms) {
   const by = new Map();
   for (const m of ms) { const l = by.get(m.opponent) || []; l.push(m); by.set(m.opponent, l); }
-  return [...by].map(([opp, list]) => ({ opp, ...record(list), last: list.at(-1) }))
+  // 名前とリンクは、いちばん新しい対戦のときの正式名
+  return [...by].map(([opp, list]) => ({ opp, full: list.at(-1).oppFull, url: list.at(-1).oppUrl, ...record(list), last: list.at(-1) }))
     .sort((a, b) => b.p - a.p || b.pts / b.p - a.pts / a.p || a.opp.localeCompare(b.opp, 'ja'));
 }
 

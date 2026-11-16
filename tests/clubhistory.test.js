@@ -42,3 +42,10 @@ test('カップ戦・プレーオフの試合数と勝敗', () => {
     assert.deepEqual([r.p, r.w, r.d, r.l], v, c);
   }
 });
+
+test('相手チームは、すべて正式名と https のリンクがある', () => {
+  for (const m of matches) {
+    assert.ok(m.oppFull, `${m.id} の相手の正式名`);
+    assert.match(m.oppUrl, /^https:\/\//, `${m.id} の相手のリンク`);
+  }
+});

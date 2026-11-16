@@ -1162,3 +1162,9 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-h2h li:first-child { border-top: 0; }
 .hs-hp, .hs-hg { color: var(--muted); text-align: right; }
 .hs-src { margin-top: 14px; }
+/* スマホ：対戦成績はクラブの正式名を1行目に、成績を2行目に（長い名前が途中で折れないように） */
+@media (max-width: 480px) {
+  .hs-h2h li { grid-template-columns: 3.6em 6.4em 1fr; row-gap: 0; }
+  .hs-ho { grid-column: 1 / -1; font-weight: 700; }
+  .hs-hp { text-align: left; }
+}

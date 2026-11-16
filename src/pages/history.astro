@@ -4,7 +4,6 @@ import Acc from '../components/Acc.astro';
 import { SITE } from '../config/site.js';
 import { getData } from '../lib/data.js';
 import { loadHistory, record, scorers, headToHead, bests, COMP } from '../lib/clubhistory.js';
-import { clubUrl } from '../config/clubs.js';
 import { playerUrl } from '../lib/util.js';
 // 歴史：Jリーグに入った2021年からの全試合と、通算の記録
 const d = getData();
@@ -87,8 +86,8 @@ const first = matches[0];
               <li class="hs-row">
                 <span class="hs-d">{md(m.date)}</span>
                 <span class="hs-c">{label(m)}</span>
-                <span class="hs-o">{clubUrl(m.opponent) ? <a class="club-link" href={clubUrl(m.opponent)} target="_blank" rel="noopener noreferrer">{m.opponent}</a> : m.opponent}<small>（{haWord(m.ha)}）</small></span>
-                <a class={`lu-res hs-res ${resCls[m.result]}`} href={m.url} target="_blank" rel="noopener noreferrer" aria-label={`${m.opponent}戦 ${score(m)}（Jリーグ公式の試合ページ）`}>{score(m)}</a>
+                <span class="hs-o"><a class="club-link" href={m.oppUrl} target="_blank" rel="noopener noreferrer">{m.oppFull}</a><small>（{haWord(m.ha)}）</small></span>
+                <a class={`lu-res hs-res ${resCls[m.result]}`} href={m.url} target="_blank" rel="noopener noreferrer" aria-label={`${m.oppFull}戦 ${score(m)}（Jリーグ公式の試合ページ）`}>{score(m)}</a>
                 {m.goals.length > 0 && <span class="hs-g">{m.goals.map(g => `${g.og ? 'オウンゴール' : g.scorer}${g.minute}'`).join('・')}</span>}
               </li>
             ))}
@@ -112,7 +111,7 @@ const first = matches[0];
             <div class="card hs-bcard">
               <span class="hs-bl">{b.label}</span>
               <b class="hs-bv">{b.value}</b>
-              <span class="hs-bm">{b.m ? `${b.m.date.slice(0, 4)}年 ${label(b.m)} ${b.m.opponent}戦（${haWord(b.m.ha)}） ${b.m.gf}-${b.m.ga}${b.ties > 1 ? `など${b.ties}試合` : ''}` : `${b.range[0].date.slice(0, 4)}年${md(b.range[0].date)}〜${b.range[1].date.slice(0, 4) !== b.range[0].date.slice(0, 4) ? b.range[1].date.slice(0, 4) + '年' : ''}${md(b.range[1].date)}`}</span>
+              <span class="hs-bm">{b.m ? `${b.m.date.slice(0, 4)}年 ${label(b.m)} ${b.m.oppFull}戦（${haWord(b.m.ha)}） ${b.m.gf}-${b.m.ga}${b.ties > 1 ? `など${b.ties}試合` : ''}` : `${b.range[0].date.slice(0, 4)}年${md(b.range[0].date)}〜${b.range[1].date.slice(0, 4) !== b.range[0].date.slice(0, 4) ? b.range[1].date.slice(0, 4) + '年' : ''}${md(b.range[1].date)}`}</span>
             </div>
           ))}
         </div>
@@ -124,8 +123,8 @@ const first = matches[0];
         <input class="hs-search" type="search" placeholder="クラブ名で探す" aria-label="対戦相手を探す" data-scope={sc.key} />
         <ul class="card hs-h2h">
           {sc.h2h.map(h => (
-            <li data-name={h.opp}>
-              <span class="hs-ho">{clubUrl(h.opp) ? <a class="club-link" href={clubUrl(h.opp)} target="_blank" rel="noopener noreferrer">{h.opp}</a> : h.opp}</span>
+            <li data-name={`${h.full} ${h.opp}`}>
+              <span class="hs-ho"><a class="club-link" href={h.url} target="_blank" rel="noopener noreferrer">{h.full}</a></span>
               <span class="hs-hp">{h.p}試合</span>
               <span class="hs-hr">{h.w}勝{h.d}分{h.l}敗</span>
               <span class="hs-hg">{h.gf}-{h.ga}</span>
