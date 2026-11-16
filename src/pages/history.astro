@@ -67,14 +67,6 @@ const recUrl = `${SITE.url}/history/#records`;
 const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrls, url: recUrl, asOf: SITE.roundLabel });
 ---
 <Base current="history" title="歴史・全試合の記録" description={`テゲバジャーロ宮崎の歴史。Jリーグに入った2021年からの全試合の結果・得点者と、シーズンごとの最終順位表、相手ごとの対戦成績、通算得点ランキング（非公式）。${SITE.roundLabel}時点。`}>
-  <section class="card hs-intro">
-    <h2 class="hs-h">年表</h2>
-    <ol class="hs-tl">
-      {timeline.map(t => <li><span class="hs-y">{t.y}</span><span>{t.t}</span></li>)}
-    </ol>
-    <p class="note">2021年より前（九州リーグ・JFL）の年ごとの順位は、出典を確かめてから載せます。</p>
-    <PostBox what="テゲバジャーロ宮崎の歩み" text={timelinePost} url={`${SITE.url}/history/`} asOf="" />
-  </section>
 
   <Acc id="seasons" title="シーズンごとの全試合" icon="calendar" count={bySeason.length}>
     <div class="controls hs-scope">
@@ -146,6 +138,14 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
     <div id="hsRec" class="hs-scopebox" aria-live="polite" set:html={firstHtml}></div>
     <script type="application/json" id="hsData" set:html={hsJson}></script>
   </Acc>
+  <section class="card hs-intro">
+    <h2 class="hs-h">年表</h2>
+    <ol class="hs-tl">
+      {timeline.map(t => <li><span class="hs-y">{t.y}</span><span>{t.t}</span></li>)}
+    </ol>
+    <p class="note">2021年より前（九州リーグ・JFL）の年ごとの順位は、出典を確かめてから載せます。</p>
+    <PostBox what="テゲバジャーロ宮崎の歩み" text={timelinePost} url={`${SITE.url}/history/`} asOf="" />
+  </section>
   <p class="note hs-src">試合の結果・得点者・観客数は<a href="https://www.jleague.jp/club/miyazaki/day/" target="_blank" rel="noopener noreferrer">Jリーグ公式サイト</a>、シーズンの最終順位表と対戦相手のいまのカテゴリは<a href="https://data.j-league.or.jp/SFRT01/" target="_blank" rel="noopener noreferrer">Jリーグ公式データサイト</a>から。天皇杯は、本大会に出た2023・2024・2026年の試合です。天皇杯の「ホーム／アウェイ」は、Jリーグ公式の表記に合わせています（宮崎で行った試合でも、相手のホーム扱いのことがあります）。</p>
 </Base>
 <script>
