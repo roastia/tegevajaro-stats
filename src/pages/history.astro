@@ -20,7 +20,8 @@ const bySeason = seasons.map(s => {
   const ms = matches.filter(m => m.season === s.season);
   const lg = ms.filter(m => m.season === '2026特別' ? m.comp === 'j2j3' && /WEST-B/.test(m.round) : m.league);
   const rank = s.season === '2026/27' ? String(SITE.rank) : s.rank;
-  return { ...s, rank, ms, rec: record(lg), top: scorers(lg)[0], cups: ms.filter(m => !lg.includes(m)) };
+  // 試合は新しい順（上がいちばん新しい）
+  return { ...s, rank, ms: [...ms].reverse(), rec: record(lg), top: scorers(lg)[0], cups: ms.filter(m => !lg.includes(m)) };
 }).reverse();
 // 年表：1行ずつ
 const timeline = [
