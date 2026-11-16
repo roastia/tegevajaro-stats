@@ -26,7 +26,7 @@ const bySeason = seasons.map(s => {
 const timeline = [
   { y: '2021', t: 'J3リーグに参入。1年目で3位' },
   { y: '2025', t: 'J3リーグ4位からJ2昇格プレーオフへ。準決勝で鹿児島に2-0、決勝でFC大阪に4-0で勝ち、クラブ初のJ2昇格' },
-  { y: '2026', t: 'シーズン移行前の特別大会「百年構想リーグ」で地域リーグラウンド WEST-B 1位' },
+  { y: '2026', t: 'シーズン移行前の特別大会「百年構想リーグ」で地域リーグラウンド WEST-B 1位。プレーオフラウンドを経て最終3位' },
   { y: '2026/27', t: `J2リーグ1年目。${SITE.roundLabel}時点で${SITE.rank}位` },
 ];
 // 順位の推移（リーグ戦）。縦が順位（上が1位）。リーグがちがう年は下に書く
@@ -134,7 +134,7 @@ const first = matches[0];
       </div>
     ))}
   </Acc>
-  <p class="note hs-src">試合の結果・得点者・観客数は<a href="https://www.jleague.jp/club/miyazaki/day/" target="_blank" rel="noopener noreferrer">Jリーグ公式サイト</a>、シーズンの順位は<a href="https://www.football-lab.jp/myzk/season/" target="_blank" rel="noopener noreferrer">Football LAB</a>から。天皇杯は2026年からの分だけ載せています（それより前は確かめ中）。</p>
+  <p class="note hs-src">試合の結果・得点者・観客数は<a href="https://www.jleague.jp/club/miyazaki/day/" target="_blank" rel="noopener noreferrer">Jリーグ公式サイト</a>、シーズンの順位は<a href="https://www.football-lab.jp/myzk/season/" target="_blank" rel="noopener noreferrer">Football LAB</a>から。天皇杯は、本大会に出た2023・2024・2026年の試合です。天皇杯の「ホーム／アウェイ」は、Jリーグ公式の表記に合わせています（宮崎で行った試合でも、相手のホーム扱いのことがあります）。</p>
 </Base>
 <script>
   // 通算の記録：リーグ戦だけ／すべての公式戦 を切り替える

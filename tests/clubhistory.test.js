@@ -33,3 +33,12 @@ test('シーズンの表に、試合のあるシーズンがすべてある', ()
   const have = new Set(seasons.map(s => s.season));
   for (const s of new Set(matches.map(m => m.season))) assert.ok(have.has(s), `history_seasons.csv に ${s} がない`);
 });
+
+// カップ戦・プレーオフ（Jリーグ公式の試合ページと、JFA・Goal・ゲキサカ・サッカーキングの記事で確かめた試合数と勝敗）
+test('カップ戦・プレーオフの試合数と勝敗', () => {
+  const want = { emperor: [7, 4, 0, 3], leaguecup: [3, 0, 0, 3], j2playoff: [2, 2, 0, 0] };
+  for (const [c, v] of Object.entries(want)) {
+    const r = record(matches.filter(m => m.comp === c));
+    assert.deepEqual([r.p, r.w, r.d, r.l], v, c);
+  }
+});
