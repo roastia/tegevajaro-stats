@@ -118,6 +118,7 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
 <script>
   // 通算の記録：シーズン × 種類で数えなおす（hsrecords.js をブラウザでも使う）
   import { renderRecords, pickKind } from '../lib/hsrecords.js';
+  import { nameKeys, matchName } from '../lib/namesearch.js';
   const data = JSON.parse(document.getElementById('hsData')!.textContent || '{}');
   const box = document.getElementById('hsRec')!, sel = document.getElementById('hsSeason') as HTMLSelectElement, kseg = document.getElementById('hsKind')!;
   let kind = 'all';
@@ -136,9 +137,11 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
   let tilt = '';
   const apply = () => {
     const inp = box.querySelector<HTMLInputElement>('.hs-search');
-    const q = (inp?.value || '').normalize('NFKC').trim().toLowerCase();
+    const q = (inp?.value || '').trim();
+    // 選手名鑑と同じ探し方（漢字・ひらがな・カタカナ・ローマ字。打つそばから絞り込む）
     box.querySelectorAll<HTMLElement>('.hs-h2h li[data-name]').forEach(li => {
-      li.hidden = (!!q && !li.dataset.name!.normalize('NFKC').toLowerCase().includes(q)) || (!!tilt && li.dataset.tilt !== tilt);
+      const keys = nameKeys({ name: li.dataset.name, kana: li.dataset.kana });
+      li.hidden = (!!q && !matchName(keys, q)) || (!!tilt && li.dataset.tilt !== tilt);
     });
   };
   box.addEventListener('input', e => { if ((e.target as HTMLElement).matches('.hs-search')) apply(); });

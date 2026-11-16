@@ -49,3 +49,16 @@ test('相手チームは、すべて正式名と https のリンクがある', (
     assert.match(m.oppUrl, /^https:\/\//, `${m.id} の相手のリンク`);
   }
 });
+
+test('対戦相手：どのクラブにも、よみ（検索用）といまのカテゴリがある', async () => {
+  const { clubKana } = await import('../src/config/clubkana.js');
+  const { categoryOf } = await import('../src/config/categories.js');
+  const { nameKeys, matchName } = await import('../src/lib/namesearch.js');
+  for (const full of new Set(matches.map(m => m.oppFull))) {
+    assert.ok(clubKana(full), `${full} のよみがない`);
+    assert.ok(categoryOf(full), `${full} のカテゴリがない`);
+  }
+  const k = nameKeys({ name: '鹿児島ユナイテッドFC 鹿児島 鹿児島ユナイテッドfc', kana: clubKana('鹿児島ユナイテッドFC') });
+  for (const q of ['鹿児島', 'かごしま', 'カゴシマ', 'kagoshima', 'fc']) assert.ok(matchName(k, q), q);
+  assert.ok(!matchName(k, 'くまもと'));
+});

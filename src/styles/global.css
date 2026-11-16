@@ -1145,10 +1145,10 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-scorers li:first-child { border-top: 0; }
 .hs-scorers b { margin-left: auto; }
 .hs-n { width: 1.6em; color: var(--muted); font-weight: 700; }
-.hs-search { width: 100%; max-width: 320px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; margin-bottom: 10px; background: var(--panel); color: var(--fg); }
 .hs-h2h { list-style: none; margin: 0 0 14px; padding: 8px 14px; }
-.hs-h2h li { display: grid; grid-template-columns: 4.8em minmax(0, 14em) 3.2em 1fr 3.6em 6.4em 7.6em; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px dotted var(--line); font-size: .88rem; }
-.hs-h2h li:first-child { border-top: 0; }
+.hs-h2h li { display: grid; grid-template-columns: 4.8em minmax(0, 14em) 3.2em 1fr 3.6em 6.4em 7.6em; align-items: center; gap: 8px; padding: 5px 0; font-size: .88rem; }
+/* 線は、見えている行の2行目から（絞り込んでも先頭に線が残らない） */
+.hs-h2h li:not([hidden]) ~ li { border-top: 1px dotted var(--line); }
 .hs-hp, .hs-hg { color: var(--muted); text-align: right; }
 .hs-hp { grid-column: 5; }
 .hs-src { margin-top: 14px; }
@@ -1189,7 +1189,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 /* 対戦成績：勝ち越し（ピンクの塗り）・五分（淡いピンク）・負け越し（グレーの枠）の札と、絞り込み */
 .hs-h2h-note { margin: -4px 0 10px; }
 .hs-h2h-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
-.hs-h2h-tools .hs-search { margin-bottom: 0; flex: 1 1 200px; }
+.hs-h2h-tools .hs-search { flex: 1 1 200px; max-width: 320px; }
 .hs-tn { margin-left: 4px; font-size: .75rem; opacity: .8; }
 .hs-ho { min-width: 0; }
 .hs-tag { font-size: .72rem; font-weight: 700; padding: 0 4px; text-align: center; justify-self: stretch; border-radius: 999px; line-height: 1.6; white-space: nowrap; border: 1px solid transparent; }
