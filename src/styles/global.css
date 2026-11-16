@@ -1113,8 +1113,8 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-intro { padding: 14px 16px; margin: 14px 0; }
 .hs-h { font-size: 1.05rem; margin: 0 0 8px; }
 .hs-tl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.hs-tl li { display: grid; grid-template-columns: 4.6em 1fr; gap: 8px; font-size: .92rem; }
-.hs-y { font-weight: 700; color: var(--ink); }
+.hs-tl li { display: grid; grid-template-columns: 5.4em 1fr; gap: 8px; font-size: .92rem; }
+.hs-y { font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hs-seasons { display: flex; flex-direction: column; gap: 14px; }
 .hs-season { padding: 0; }
 .hs-sum { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 12px 14px; }
