@@ -1209,7 +1209,6 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-h2h li[data-tilt='down'] .hs-hr { color: var(--muted); }
 
 .hs-scope { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 6px; }
-.hs-scope select { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--fg); }
 .hs-kindnote { margin: 0 0 14px; }
 .hs-empty { color: var(--muted); }
 /* スマホ：1行目に日付・相手・スコア、2行目に節や大会名（百年構想リーグ 3-4位決定戦など長い名前でも相手チーム名が細くならない）、3行目に得点者 */
@@ -1246,4 +1245,3 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-rest-nm { font-weight: 700; }
 .hs-rest b { margin-left: auto; font-size: 1.1rem; color: var(--ink); }
 .hs-sortl { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem; color: var(--muted); }
-.hs-sort { font: inherit; color: var(--fg); padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
