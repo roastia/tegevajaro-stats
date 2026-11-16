@@ -110,7 +110,7 @@ ${renderScorers(top, playerUrl)}
     .map(([k, name, n], i) => `<button type="button" data-tilt="${k}" aria-pressed="${i === 0}">${name}<span class="hs-tn">${n}</span></button>`).join('')}</div>
 <input class="hs-search" type="search" placeholder="クラブ名で探す" aria-label="対戦相手を探す">
 <label class="hs-sortl">並び順 <select class="hs-sort" aria-label="対戦成績の並び順"><option value="p">試合数</option><option value="w">勝ち</option><option value="d">引き分け</option><option value="l">負け</option><option value="gf">得点</option><option value="ga">失点</option></select></label></div>
-<ul class="card hs-h2h">${h2h.map(h => `<li data-name="${esc(`${h.full} ${h.opp}`)}" data-tilt="${tilt(h)}" data-p="${h.p}" data-w="${h.w}" data-d="${h.d}" data-l="${h.l}" data-gf="${h.gf}" data-ga="${h.ga}"><span class="hs-ho">${link(h.url, h.full, 'club-link')}<span class="hs-tag ${tilt(h)}">${TILT[tilt(h)]}</span></span><span class="hs-hp">${h.p}試合</span><span class="hs-hr">${h.w}勝${h.d}分${h.l}敗</span><span class="hs-hg">${h.gf}得点 ${h.ga}失点</span></li>`).join('')}</ul>`;
+<ul class="card hs-h2h">${h2h.map(h => `<li data-name="${esc(`${h.full} ${h.opp}`)}" data-tilt="${tilt(h)}" data-p="${h.p}" data-w="${h.w}" data-d="${h.d}" data-l="${h.l}" data-gf="${h.gf}" data-ga="${h.ga}"><span class="hs-tag ${tilt(h)}">${TILT[tilt(h)]}</span><span class="hs-ho">${link(h.url, h.full, 'club-link')}</span><span class="hs-hp">${h.p}試合</span><span class="hs-hr">${h.w}勝${h.d}分${h.l}敗</span><span class="hs-hg">${h.gf}得点 ${h.ga}失点</span></li>`).join('')}</ul>`;
 }
 
 /** 種類で試合を選ぶ（league：J3・J2のリーグ戦、other：それ以外、all：すべて） */
