@@ -1138,8 +1138,8 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-bcard { position: relative; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
 .hs-bcard .hs-x { position: absolute; top: 10px; right: 10px; }
 .hs-bcard .hs-bl { padding-right: 2.2rem; }
-/* 行ごとの小さい「Xでポスト」（黒い丸に X） */
-.hs-x { display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: #0F1419; color: #fff; text-decoration: none; flex: none; align-self: center; }
+/* 行ごとの小さい「Xでポスト」（誕生日のポストボタンと同じピンクの丸に白い X） */
+.hs-x { display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--brand); color: #fff; text-decoration: none; flex: none; align-self: center; }
 .hs-x .xm { width: .85rem; height: .85rem; }
 .hs-x:hover { background: var(--brand-deep); }
 .hs-x:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
