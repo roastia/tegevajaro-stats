@@ -3,7 +3,8 @@ import Base from '../layouts/Base.astro';
 import Acc from '../components/Acc.astro';
 import { SITE } from '../config/site.js';
 import { getData } from '../lib/data.js';
-import { loadHistory, record, scorers, headToHead, bests, COMP } from '../lib/clubhistory.js';
+import { loadHistory, record, scorers, COMP } from '../lib/clubhistory.js';
+import { renderRecords, pickKind } from '../lib/hsrecords.js';
 import { playerUrl } from '../lib/util.js';
 // 歴史：Jリーグに入った2021年からの全試合と、通算の記録
 const d = getData();
@@ -37,15 +38,14 @@ const maxTeams = Math.max(...chart.map(s => Number(s.teams)));
 const xOf = i => PL + (CW - PL - PR) * (chart.length === 1 ? .5 : i / (chart.length - 1));
 const yOf = r => PT + (CH - PT - PB) * ((Number(r) - 1) / (maxTeams - 1));
 const pts = chart.map((s, i) => ({ s, x: xOf(i), y: yOf(s.rank) }));
-// 通算の記録：リーグ戦だけ／すべての公式戦
-const scopes = [
-  { key: 'league', name: 'リーグ戦', ms: matches.filter(m => m.league) },
-  { key: 'all', name: 'すべての公式戦', ms: matches },
-].map(sc => ({ ...sc, rec: record(sc.ms), h2h: headToHead(sc.ms), top: scorers(sc.ms), best: bests(sc.ms) }));
-const first = matches[0];
-// 相手ごとの勝ち越し・五分・負け越し
-const tilt = h => (h.w > h.l ? 'up' : h.w < h.l ? 'down' : 'even');
-const TILT = { up: '勝ち越し', even: '五分', down: '負け越し' };
+// 通算の記録：どの試合で数えるか（シーズン × 種類）を選ぶ。はじめは全シーズンのすべての公式戦（リーグ戦以外も含める）
+// ブラウザで選びなおせるよう、試合の要点を JSON にしてページに入れる（計算と表示は hsrecords.js を共用）
+const playerUrls = Object.fromEntries([...urlOf].filter(([, u]) => u));
+const slim = matches.map(m => ({ date: m.date, season: m.season, comp: m.comp, round: m.round, ha: m.ha, opponent: m.opponent, oppFull: m.oppFull, oppUrl: m.oppUrl,
+  gf: m.gf, ga: m.ga, att: m.att, result: m.result, league: m.league, goals: m.goals.map(g => ({ scorer: g.og ? '' : g.scorer, og: g.og })) }));
+const hsJson = JSON.stringify({ m: slim, p: playerUrls }).replace(/</g, '\\u003c');
+const KINDS = [['all', 'すべて'], ['league', 'リーグ戦（J3・J2）'], ['other', 'リーグ戦以外']];
+const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrls });
 ---
 <Base current="history" title="歴史・全試合の記録" description={`テゲバジャーロ宮崎の歴史。Jリーグに入った2021年からの全試合の結果・得点者と、シーズンごとの順位、相手ごとの対戦成績、通算得点ランキング（非公式）。${SITE.roundLabel}時点。`}>
   <section class="card hs-intro">
@@ -102,74 +102,53 @@ const TILT = { up: '勝ち越し', even: '五分', down: '負け越し' };
 
   <Acc id="records" title="通算の記録" icon="trophy">
     <div class="controls hs-scope">
-      <div class="seg" id="hsScope" role="group" aria-label="数える試合">
-        {scopes.map((sc, i) => <button type="button" data-scope={sc.key} aria-pressed={i === 0 ? 'true' : 'false'}>{sc.name}</button>)}
+      <select id="hsSeason" aria-label="シーズン">
+        <option value="">全シーズン（2021年〜）</option>
+        {bySeason.map(x => <option value={x.season}>{x.season === '2026特別' ? '2026 百年構想リーグ' : x.label}</option>)}
+      </select>
+      <div class="seg" id="hsKind" role="group" aria-label="数える試合の種類">
+        {KINDS.map(([k, name], i) => <button type="button" data-kind={k} aria-pressed={i === 0 ? 'true' : 'false'}>{name}</button>)}
       </div>
     </div>
-    {scopes.map((sc, i) => (
-      <div class="hs-scopebox" data-scope={sc.key} hidden={i !== 0}>
-        <p class="hs-total card"><b>{sc.rec.p}</b>試合　<b>{sc.rec.w}</b>勝<b>{sc.rec.d}</b>分<b>{sc.rec.l}</b>敗　{sc.rec.gf}得点・{sc.rec.ga}失点<span class="note">（{first.date.slice(0, 4)}年〜{SITE.roundLabel}{sc.key === 'all' ? '。PK戦は引き分けで数える' : ''}）</span></p>
-        <div class="grid hs-best">
-          {sc.best.map(b => (
-            <div class="card hs-bcard">
-              <span class="hs-bl">{b.label}</span>
-              <b class="hs-bv">{b.value}</b>
-              <span class="hs-bm">{b.m ? `${b.m.date.slice(0, 4)}年 ${label(b.m)} ${b.m.oppFull}戦（${haWord(b.m.ha)}） ${b.m.gf}-${b.m.ga}${b.ties > 1 ? `など${b.ties}試合` : ''}` : `${b.range[0].date.slice(0, 4)}年${md(b.range[0].date)}〜${b.range[1].date.slice(0, 4) !== b.range[0].date.slice(0, 4) ? b.range[1].date.slice(0, 4) + '年' : ''}${md(b.range[1].date)}`}</span>
-            </div>
-          ))}
-        </div>
-        <h3 class="hs-h3">通算得点ランキング</h3>
-        <ol class="card hs-scorers">
-          {sc.top.slice(0, 10).map((p, j) => <li><span class="hs-n">{sc.top.findIndex(x => x.goals === p.goals) + 1}</span>{urlOf.get(p.name) ? <a href={urlOf.get(p.name)} target="_blank" rel="noopener noreferrer">{p.name}</a> : <span>{p.name}</span>}<b>{p.goals}点</b></li>)}
-        </ol>
-        <h3 class="hs-h3">相手ごとの対戦成績</h3>
-        <p class="note hs-h2h-note">勝ちが負けより多い相手は「勝ち越し」、少ない相手は「負け越し」、同じ数なら「五分」。得点・失点は、その相手との試合での宮崎の合計です。</p>
-        <div class="hs-h2h-tools">
-          <div class="seg hs-tilt" role="group" aria-label="対戦成績で絞り込む">
-            {[['', 'すべて', sc.h2h.length], ['up', '勝ち越し', sc.h2h.filter(h => tilt(h) === 'up').length], ['even', '五分', sc.h2h.filter(h => tilt(h) === 'even').length], ['down', '負け越し', sc.h2h.filter(h => tilt(h) === 'down').length]]
-              .map(([k, name, n], i) => <button type="button" data-tilt={k} aria-pressed={i === 0 ? 'true' : 'false'}>{name}<span class="hs-tn">{n}</span></button>)}
-          </div>
-          <input class="hs-search" type="search" placeholder="クラブ名で探す" aria-label="対戦相手を探す" />
-        </div>
-        <ul class="card hs-h2h">
-          {sc.h2h.map(h => (
-            <li data-name={`${h.full} ${h.opp}`} data-tilt={tilt(h)}>
-              <span class="hs-ho"><a class="club-link" href={h.url} target="_blank" rel="noopener noreferrer">{h.full}</a><span class={`hs-tag ${tilt(h)}`}>{TILT[tilt(h)]}</span></span>
-              <span class="hs-hp">{h.p}試合</span>
-              <span class="hs-hr">{h.w}勝{h.d}分{h.l}敗</span>
-              <span class="hs-hg">{h.gf}得点 {h.ga}失点</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ))}
+    <p class="note hs-kindnote">通算の記録は、リーグ戦（J3・J2）だけでなく、リーグ戦以外の公式戦（J2昇格プレーオフ・百年構想リーグ・天皇杯・ルヴァンカップ）も含めて数えています。シーズンや種類を選ぶと、その試合だけで数えなおします。PK戦で決まった試合は引き分けで数えます。</p>
+    <div id="hsRec" class="hs-scopebox" aria-live="polite" set:html={firstHtml}></div>
+    <script type="application/json" id="hsData" set:html={hsJson}></script>
   </Acc>
   <p class="note hs-src">試合の結果・得点者・観客数は<a href="https://www.jleague.jp/club/miyazaki/day/" target="_blank" rel="noopener noreferrer">Jリーグ公式サイト</a>、シーズンの順位は<a href="https://www.football-lab.jp/myzk/season/" target="_blank" rel="noopener noreferrer">Football LAB</a>から。天皇杯は、本大会に出た2023・2024・2026年の試合です。天皇杯の「ホーム／アウェイ」は、Jリーグ公式の表記に合わせています（宮崎で行った試合でも、相手のホーム扱いのことがあります）。</p>
 </Base>
 <script>
-  // 通算の記録：リーグ戦だけ／すべての公式戦 を切り替える
-  const seg = document.getElementById('hsScope');
-  seg?.addEventListener('click', e => {
-    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-scope]'); if (!b) return;
-    seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-    document.querySelectorAll<HTMLElement>('.hs-scopebox').forEach(x => { x.hidden = x.dataset.scope !== b.dataset.scope; });
+  // 通算の記録：シーズン × 種類で数えなおす（hsrecords.js をブラウザでも使う）
+  import { renderRecords, pickKind } from '../lib/hsrecords.js';
+  const data = JSON.parse(document.getElementById('hsData')!.textContent || '{}');
+  const box = document.getElementById('hsRec')!, sel = document.getElementById('hsSeason') as HTMLSelectElement, kseg = document.getElementById('hsKind')!;
+  let kind = 'all';
+  const draw = () => {
+    const ms = data.m.filter((m: any) => !sel.value || m.season === sel.value);
+    box.innerHTML = renderRecords(pickKind(ms, kind), { playerUrl: data.p });
+  };
+  sel.addEventListener('change', draw);
+  kseg.addEventListener('click', e => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-kind]'); if (!b) return;
+    kind = b.dataset.kind!;
+    kseg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    draw();
   });
-  // 対戦相手を打つそばから絞り込む＋勝ち越し・五分・負け越しで絞り込む
-  for (const box of document.querySelectorAll<HTMLElement>('.hs-scopebox')) {
-    const inp = box.querySelector<HTMLInputElement>('.hs-search')!, tseg = box.querySelector<HTMLElement>('.hs-tilt')!;
-    let t = '';
-    const apply = () => {
-      const q = inp.value.normalize('NFKC').trim().toLowerCase();
-      box.querySelectorAll<HTMLElement>('.hs-h2h li[data-name]').forEach(li => {
-        li.hidden = (!!q && !li.dataset.name!.normalize('NFKC').toLowerCase().includes(q)) || (!!t && li.dataset.tilt !== t);
-      });
-    };
-    inp.addEventListener('input', apply);
-    tseg.addEventListener('click', e => {
-      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-tilt]'); if (!b) return;
-      t = b.dataset.tilt || '';
-      tseg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-      apply();
+  // 対戦成績：打つそばから絞り込む＋勝ち越し・五分・負け越しで絞り込む（中身を作りなおしても効くよう、箱で受ける）
+  let tilt = '';
+  const apply = () => {
+    const inp = box.querySelector<HTMLInputElement>('.hs-search');
+    const q = (inp?.value || '').normalize('NFKC').trim().toLowerCase();
+    box.querySelectorAll<HTMLElement>('.hs-h2h li[data-name]').forEach(li => {
+      li.hidden = (!!q && !li.dataset.name!.normalize('NFKC').toLowerCase().includes(q)) || (!!tilt && li.dataset.tilt !== tilt);
     });
-  }
+  };
+  box.addEventListener('input', e => { if ((e.target as HTMLElement).matches('.hs-search')) apply(); });
+  box.addEventListener('click', e => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.hs-tilt button[data-tilt]'); if (!b) return;
+    tilt = b.dataset.tilt || '';
+    b.parentElement!.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    apply();
+  });
+  // 作りなおしたら、絞り込みは「すべて」に戻す
+  new MutationObserver(() => { tilt = ''; }).observe(box, { childList: true });
 </script>

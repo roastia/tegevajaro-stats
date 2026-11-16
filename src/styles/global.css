@@ -1181,3 +1181,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-h2h li[data-tilt='up'] .hs-hr { color: var(--ink); font-weight: 700; }
 .hs-h2h li[data-tilt='down'] .hs-hr { color: var(--muted); }
 @media (max-width: 480px) { .hs-h2h li { grid-template-columns: 3.6em 6.4em 1fr; } }
+.hs-scope { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 6px; }
+.hs-scope select { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--fg); }
+.hs-kindnote { margin: 0 0 14px; }
+.hs-empty { color: var(--muted); }
