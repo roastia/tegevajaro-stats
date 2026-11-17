@@ -51,6 +51,18 @@ addEventListener('pageshow', () => { navClicked = false; });
   ss.set('tg:navjump', null); ss.set('tg:navfrom', null);
 }
 
+// スマホの下のメニュー：「メニュー」で全ページの一覧を開く（外側を押す・閉じる・Esc で閉じる）
+{
+  const sheet = document.getElementById('navSheet'), open = document.getElementById('navOpen'), close = document.getElementById('navClose');
+  if (sheet && open && typeof sheet.showModal === 'function') {
+    open.addEventListener('click', () => { sheet.showModal(); open.setAttribute('aria-expanded', 'true'); });
+    close?.addEventListener('click', () => sheet.close());
+    sheet.addEventListener('click', e => { if (e.target === sheet) sheet.close(); });
+    sheet.addEventListener('close', () => open.setAttribute('aria-expanded', 'false'));
+    addEventListener('pageshow', () => { if (sheet.open) sheet.close(); });
+  }
+}
+
 // メニューの今いるページの項目が、横にはみ出して隠れないようにする
 {
   const ul = document.querySelector('.site-nav ul'), cur = ul?.querySelector('[aria-current="page"]');

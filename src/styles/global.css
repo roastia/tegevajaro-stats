@@ -529,22 +529,8 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .site-nav a.nav-miya:hover { color: #A44E14; }
 .site-nav a.nav-miya[aria-current='page'] { color: #A44E14; border-bottom-color: #E8833A; }
 
-/* スマホ：メニューは横スクロールをやめ、タブを5列×2段に並べる（どこに何があるか一目でわかる）。長い名前は短くする（トピック・みやざき）。みやざき情報はオレンジのタブ */
-.site-nav .nav-s { display: none; }
-@media (max-width: 640px) {
-  .site-nav .nav-l { display: none; }
-  .site-nav .nav-s { display: inline; }
-  .site-nav ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 8px 16px; overflow: visible; touch-action: auto; }
-  .site-nav li { min-width: 0; }
-  .site-nav a { display: flex; align-items: center; justify-content: center; gap: 2px; height: 34px; padding: 0 1px; font-size: 12px; letter-spacing: -.04em;
-    border: 1px solid var(--line); border-bottom-width: 1px; border-radius: 9px; background: #fff; color: var(--fg); }
-  .site-nav a[aria-current='page'] { background: var(--brand-deep); border-color: var(--brand-deep); color: #fff; font-weight: 700; }
-  .site-nav a.nav-miya { border-color: #E8A06A; color: #B8571A; background: #FFF6EE; font-weight: 700; }
-  .site-nav a.nav-miya[aria-current='page'] { background: #E8833A; border-color: #E8833A; color: #fff; }
-}
 .spot-form .field-hint { margin: -6px 0 0; font-size: .78rem; }
 .spot-form .field-hint .nw { white-space: nowrap; }
-@media (max-width: 345px) { .site-nav ul { gap: 4px; padding-inline: 10px; } .site-nav a { font-size: 10.5px; letter-spacing: -.06em; } }
 
 /* 非公式の表記：ロゴの横に小さく（必須ルール1。消さない） */
 .site-head .head-sub { display: flex; flex-direction: column; gap: 1px; padding-bottom: 2px; }
@@ -646,11 +632,37 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .site-nav a.nav-miya, .site-nav a.nav-miya:hover { color: var(--apri-ink); }
 .site-nav a.nav-miya[aria-current='page'] { color: var(--apri-ink); border-bottom-color: var(--apri); }
 .spot-form .req { background: var(--brand); }
+/* スマホのメニュー：上のメニューはやめて、画面の下に固定（親指で押しやすい）。よく使う4つ＋「メニュー」で全ページの一覧 */
+.tabbar, .navsheet { display: none; }
 @media (max-width: 640px) {
-  .site-nav a[aria-current='page'] { background: var(--brand); border-color: var(--brand); color: #fff; }
-  .site-nav a.nav-miya { border-color: var(--apri); color: var(--apri-ink); background: var(--apri-soft); }
-  .site-nav a.nav-miya[aria-current='page'] { background: var(--apri); border-color: var(--apri); color: var(--fg); }
+  .site-nav { display: none; }
+  body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+  .tabbar { display: block; position: fixed; inset: auto 0 0 0; z-index: 30; view-transition-name: tabbar;
+    background: color-mix(in srgb, #fff 94%, transparent); backdrop-filter: blur(10px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+  .tabbar ul { list-style: none; margin: 0; padding: 0 4px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .tabbar a, .tabbar button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; height: 58px; width: 100%;
+    padding: 0; border: 0; background: none; font: inherit; font-size: 11px; line-height: 1.2; letter-spacing: -.02em; color: var(--muted); text-decoration: none; cursor: pointer; }
+  .tabbar svg { width: 24px; height: 24px; }
+  .tabbar a[aria-current='page'], .tabbar button.on { color: var(--brand-deep); font-weight: 700; }
+  .tabbar a[aria-current='page'] svg, .tabbar button.on svg { stroke-width: 2.3; }
+  .tabbar a:focus-visible, .tabbar button:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; border-radius: 10px; }
+  /* 全ページの一覧（下からのシート）。今のページは塗り、みやざきはオレンジ */
+  .navsheet[open] { display: block; }
+  .navsheet { position: fixed; inset: auto 0 0 0; margin: 0; width: 100%; max-width: none; box-sizing: border-box; border: 0; border-radius: 18px 18px 0 0;
+    padding: 0; background: var(--panel, #fff); color: var(--fg); }
+  .navsheet-in { padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); }
+  .navsheet::backdrop { background: rgba(40, 20, 28, .35); }
+  .navsheet-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .navsheet-h h2 { margin: 0; font-size: 1rem; color: var(--ink); }
+  .navsheet-x { font: inherit; font-size: .85rem; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; cursor: pointer; }
+  .navsheet ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .navsheet a { display: flex; align-items: center; justify-content: center; height: 48px; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--fg); text-decoration: none; font-size: .9rem; }
+  .navsheet a[aria-current='page'] { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }
+  .navsheet a.nav-miya { border-color: var(--apri); color: var(--apri-ink); background: var(--apri-soft); font-weight: 700; }
+  .navsheet a.nav-miya[aria-current='page'] { background: var(--apri); border-color: var(--apri); color: var(--fg); }
+  @media (prefers-reduced-motion: no-preference) { .navsheet[open] { animation: sheetup .22s var(--ease, ease-out); } }
 }
+@keyframes sheetup { from { transform: translateY(100%); } to { transform: none; } }
 .spot-ask { margin: 0; font-weight: 500; }
 /* 試合ハイライト：試合ごとに、その試合のゴールを並べる */
 .hl-list .glist { grid-column: 1 / -1; list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }

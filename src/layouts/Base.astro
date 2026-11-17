@@ -40,18 +40,30 @@ const bdays = bdayPeople(d.profiles);
 // 今日の誕生日は、ビルドの日（日本時間）で先に HTML にしておく（ブラウザで日付が違うときだけ site.js が作り直す）
 const plUrls = Object.fromEntries(d.players.map(p => [p.name, playerUrl(p.jl_url)]).filter(([, u]) => u));
 const bdToday = bdayState(bdays).today;
-// 4つ目はスマホで使う短い名前（5列×2段に収めるため）
+// PC は上のメニュー、スマホは画面の下のメニュー（よく使う4つ＋「メニュー」で全ページの一覧）
 const nav = [
   ['', 'topics', 'トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手'],
   ['goals/', 'goals', 'ハイライト'], ['schedule/', 'schedule', '日程'], ['history/', 'history', '歴史'],
   ['chants/', 'chants', 'チャント'], ['links/', 'links', 'リンク'], ['spots/', 'spots', 'みやざき'],
 ];
+// スマホの下のメニュー：アイコン（線の絵）＋文字
+const TAB_IC = {
+  topics: '<path d="M3.8 11.2L12 4l8.2 7.2"/><path d="M6 9.6V20h12V9.6"/><path d="M10 20v-5h4v5"/>',
+  ranking: '<path d="M8 4h8v5.2a4 4 0 01-8 0z"/><path d="M8 6H5c0 3 1.5 4.2 3 4.2M16 6h3c0 3-1.5 4.2-3 4.2"/><path d="M12 13.2V17M9 20.5h6M10 17h4"/>',
+  players: '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c.8-4 3.8-6.2 7.5-6.2s6.7 2.2 7.5 6.2"/>',
+  schedule: '<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 9.8h16M8.2 3v4M15.8 3v4"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+};
+const tabSvg = (k: keyof typeof TAB_IC) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TAB_IC[k]}</svg>`;
+const TABS = ['topics', 'ranking', 'players', 'schedule'];
+const tabs = nav.filter(([, id]) => TABS.includes(id));
+const inMenu = !TABS.includes(current);
 ---
 <!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>{fullTitle}</title>
   <meta name="description" content={desc} />
   <link rel="canonical" href={pageUrl} />
@@ -106,9 +118,21 @@ const nav = [
   <span class="navtop" aria-hidden="true"></span>
   <nav class="site-nav" aria-label="ページ">
     <ul>
-      {nav.map(([p, id, label, short]) => <li><a class={id === 'spots' ? 'nw nav-miya' : 'nw'} href={href(p)} data-astro-prefetch="viewport" aria-current={current === id ? 'page' : undefined} aria-label={short ? label : undefined}>{short ? <><span class="nav-l">{label}</span><span class="nav-s" aria-hidden="true">{short}</span></> : label}</a></li>)}
+      {nav.map(([p, id, label]) => <li><a class={id === 'spots' ? 'nw nav-miya' : 'nw'} href={href(p)} data-astro-prefetch="viewport" aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
     </ul>
   </nav>
+  <nav class="tabbar" aria-label="ページ（スマホ）">
+    <ul>
+      {tabs.map(([p, id, label]) => <li><a href={href(p)} data-astro-prefetch="viewport" aria-current={current === id ? 'page' : undefined}><Fragment set:html={tabSvg(id as keyof typeof TAB_IC)} /><span>{label}</span></a></li>)}
+      <li><button type="button" class={inMenu && current ? 'on' : undefined} id="navOpen" aria-haspopup="dialog" aria-controls="navSheet"><Fragment set:html={tabSvg('menu')} /><span>メニュー</span></button></li>
+    </ul>
+  </nav>
+  <dialog class="navsheet" id="navSheet" aria-labelledby="navSheetH"><div class="navsheet-in">
+    <div class="navsheet-h"><h2 id="navSheetH">メニュー</h2><button type="button" class="navsheet-x" id="navClose">閉じる</button></div>
+    <ul>
+      {nav.map(([p, id, label]) => <li><a class={id === 'spots' ? 'nav-miya' : undefined} href={href(p)} aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
+    </ul>
+  </div></dialog>
   <div class="wrap">
     <section class="hbd" id="hbd" hidden={!bdToday.length} aria-live="polite" data-key={bdayKey(bdToday)} set:html={hbdHtml(bdToday, plUrls)}></section>
   </div>
