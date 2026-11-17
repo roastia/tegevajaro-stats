@@ -48,8 +48,8 @@ const timeline = [
 const timelinePost = postText('テゲバジャーロ宮崎の歩み', `2021 J3参入1年目で3位／2025 J2昇格プレーオフ優勝でクラブ初のJ2昇格／2026 百年構想リーグ WEST-B 1位／2026/27 J2で${SITE.rank}位（${SITE.roundLabel}時点）`, '');
 // 試合ごとのポスト
 const resWord = { 勝: '勝利！', 分: '引き分け', 負: '敗戦' };
-// スコアの札の言葉（ハイライトのページと同じ）
-const chipWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
+// スコアの札の言葉（札が横に長くならないよう、引き分けは「分け」）
+const chipWord = { 勝: '勝ち', 分: '分け', 負: '負け' };
 const matchPost = m => postText(`${m.date.slice(0, 4)}年${m.date.slice(5, 7).replace(/^0/, '')}月${m.date.slice(8).replace(/^0/, '')}日 ${label(m)} ${m.oppFull}戦（${haWord(m.ha)}）は${score(m)}で${resWord[m.result]}`,
   m.goals.length ? `得点：${m.goals.map(g => `${g.og ? 'オウンゴール' : g.scorer}${g.minute}'`).join('・')}` : '', '');
 // ポスト文が長すぎないか（X は280。URLは23）。通算は長いもの（全シーズンのすべて）だけ確かめる
