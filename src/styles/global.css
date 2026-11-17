@@ -203,13 +203,12 @@ table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertic
 @media (hover: hover) { .prefs .pref-row:hover .pref-tip, .prefs .pref-row:focus-visible .pref-tip { display: block; } }
 
 /* birthdays */
-.hbd { border-radius: var(--radius); padding: 18px; color: #fff; text-align: center; background: linear-gradient(120deg, #F16682, #F2A93B, #F5C84A, #F16682); background-size: 300% 100%;
+.hbd { border-radius: var(--radius); padding: 12px 16px; color: #fff; text-align: center; background: linear-gradient(120deg, #F16682, #F2A93B, #F5C84A, #F16682); background-size: 300% 100%;
   display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .hbd .msg { font-weight: 700; font-size: clamp(1.6rem, 6vw, 2.4rem); line-height: 1.2; }
 /* 「おたんじょうびおめでとう！」の手描き文字（public/otanjoubi.svg。画像をなぞった SVG） */
-.hbd .msg { line-height: 0; margin: 2px 0 6px; width: 100%; }
-.hbd-title { display: block; width: min(100%, 34rem); height: auto; margin: 0 auto; }
-.hbd .cake .ic { width: 3rem; height: 3rem; }
+.hbd .msg { line-height: 0; margin: 0 0 6px; width: 100%; }
+.hbd-title { display: block; width: min(100%, 28rem); height: auto; margin: 0 auto; }
 .bday { border-radius: var(--radius); padding: 16px; color: #fff; background: linear-gradient(135deg, #E8833A 0%, #F2A93B 50%, #F5C84A 100%); }
 .bday h2 { margin: 0 0 8px; font-size: 1.05rem; display: flex; gap: 6px; align-items: center; }
 .bday .row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -220,10 +219,8 @@ table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertic
 .bpost { align-self: flex-start; margin-top: 4px; font-size: .8rem; color: #0F1419; background: #fff; text-decoration: none; border-radius: 999px; padding: 4px 12px; display: inline-flex; gap: 6px; align-items: center; font-weight: 700; }
 @media (prefers-reduced-motion: no-preference) {
   .hbd { animation: shine 6s linear infinite; }
-  .hbd .cake { animation: bounce 1.4s var(--ease) infinite; }
 }
 @keyframes shine { to { background-position: 300% 0; } }
-@keyframes bounce { 50% { transform: translateY(-6px); } }
 [hidden] { display: none !important; }
 
 /* share page */
@@ -613,7 +610,6 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .soon { background: var(--brand); }
 /* 誕生日 */
 .hbd { background: var(--gold-soft); color: var(--fg); animation: none; }
-.hbd .cake { color: var(--ink); }
 .bday { background: var(--gold-soft); color: var(--fg); }
 .bday h2 { color: var(--gold-ink); }
 .bcard { background: #fff; border-color: #EBD9A6; }
@@ -1114,14 +1110,16 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 /* 誕生日当日の「お祝いをXでポスト」は真ん中に */
 /* お祝いの枠と、すぐ下の枠（もうすぐ誕生日など）がくっつかないように */
 .hbd { margin-bottom: 14px; }
-.hbd > .bpost { align-self: center; justify-self: center; margin-inline: auto; }
+/* 名前・年齢とポストのボタンは1行に（入らないときだけ折り返す）。縦をおさえる */
+.hbd-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 18px; }
+.hbd-row > .bpost { margin-top: 0; align-self: center; }
 /* 誕生日当日：1人ずつ「背番号のシャツ・名前（リンク）・年齢」。年齢は「もうすぐ誕生日」の「おめでとう！」と同じ色で大きく */
-.hbd .who { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; margin-top: 4px; }
+.hbd .who { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; }
 .hbd-p { display: inline-flex; align-items: center; gap: 10px; }
-.hbd-p .jersey.on-color { filter: none; width: 2.9rem; height: 2.9rem; }
-.hbd-p .bmascot { width: 2.9rem; height: 2.9rem; }
+.hbd-p .jersey.on-color { filter: none; width: 2.4rem; height: 2.4rem; }
+.hbd-p .bmascot { width: 2.4rem; height: 2.4rem; }
 .hbd-nm { font-weight: 700; font-size: 1.15rem; color: var(--fg); }
-.hbd-age { font-weight: 700; font-size: 1.9rem; line-height: 1; color: var(--ink); }
+.hbd-age { font-weight: 700; font-size: 1.6rem; line-height: 1; color: var(--ink); }
 
 /* ---------- 歴史（history.astro） ---------- */
 .hs-intro { padding: 14px 16px; margin: 14px 0; }

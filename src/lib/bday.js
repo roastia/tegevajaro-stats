@@ -54,7 +54,7 @@ export function hbdHtml(today, plUrls = {}) {
     return `<span class="hbd-p">${shirt(p)}${nm}<span class="hbd-age">${p.mascot ? 'おめでとう！' : `${b.turning}歳`}</span></span>`;
   }).join('');
   const text = `今日は${names}の誕生日！${today.length === 1 && !today[0].p.mascot ? `${today[0].b.turning}歳、` : ''}おめでとうございます🎂🎉 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`;
-  return `<div class="cake">${icon('cake')}</div><div class="msg"><img class="hbd-title" src="${esc(href('otanjoubi.svg'))}" alt="お誕生日おめでとう！" width="2076" height="263" decoding="async" /></div><div class="who">${who}</div>${post(text, 'お祝いをXでポスト')}`;
+  return `<div class="msg"><img class="hbd-title" src="${esc(href('otanjoubi.svg'))}" alt="お誕生日おめでとう！" width="2076" height="263" decoding="async" /></div><div class="hbd-row"><div class="who">${who}</div>${post(text, 'お祝いをXでポスト')}</div>`;
 }
 
 /** 「もうすぐ誕生日」の中身（31日以内に誕生日がなければ空） */
