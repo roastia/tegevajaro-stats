@@ -206,6 +206,9 @@ table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertic
 .hbd { border-radius: var(--radius); padding: 18px; color: #fff; text-align: center; background: linear-gradient(120deg, #F16682, #F2A93B, #F5C84A, #F16682); background-size: 300% 100%;
   display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .hbd .msg { font-weight: 700; font-size: clamp(1.6rem, 6vw, 2.4rem); line-height: 1.2; }
+/* 「おたんじょうびおめでとう！」の手描き文字（public/otanjoubi.svg。画像をなぞった SVG） */
+.hbd .msg { line-height: 0; margin: 2px 0 6px; width: 100%; }
+.hbd-title { display: block; width: min(100%, 34rem); height: auto; margin: 0 auto; }
 .hbd .cake .ic { width: 3rem; height: 3rem; }
 .bday { border-radius: var(--radius); padding: 16px; color: #fff; background: linear-gradient(135deg, #E8833A 0%, #F2A93B 50%, #F5C84A 100%); }
 .bday h2 { margin: 0 0 8px; font-size: 1.05rem; display: flex; gap: 6px; align-items: center; }
