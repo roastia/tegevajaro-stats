@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Acc from '../components/Acc.astro';
+import Ask from '../components/Ask.astro';
 import { readCsv } from '../lib/data.js';
 import { icon, href, xUrl, mapsUrl, siteUrl, STADIUM, distanceKm, distanceLabel, SPOT_GENRES } from '../lib/util.js';
 import { SITE } from '../config/site.js';
@@ -11,7 +12,6 @@ const spots = readCsv('spots').filter(s => s.name && s.lat !== '' && s.lng !== '
   .map(s => { const km = distanceKm(STADIUM.lat, STADIUM.lng, +s.lat, +s.lng); return { ...s, x: xUrl(s.x_handle), maps: mapsUrl(s.lat, s.lng, s.name, s.place_id), site: siteUrl(s.url), km, dist: distanceLabel(km) }; })
   .sort((a, b) => a.km - b.km);
 const genres = SPOT_GENRES.map(g => ({ g, c: spots.filter(s => s.genre === g).length })).filter(x => x.c);
-const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 // ハート（ログインなしで押せる。数は出さず、多い順に並べかえるだけ）。受付（Cloudflare Workers）があるときだけみんなの分で並ぶ
 const heartsApi = SITE.spots.api ? new URL('/api/hearts', SITE.spots.api).href : '';
 const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 12.3A4.88 4.88 0 0 1 11.2 5.4L12 6.2l.8-.8a4.88 4.88 0 0 1 6.9 6.9z"/></svg>';
@@ -37,7 +37,7 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
           </div>
           <p class="note spot-none" id="spotNone" hidden>見つかりませんでした。ほかの言葉やジャンルで探してみてください。</p>
         </>
-      : <div class="spot-empty"><p>まだありません。最初のおすすめを教えてください！</p><a class="btn-main" href="#post">おすすめを教える</a></div>}
+      : <div class="spot-empty"><p>まだありません。最初のおすすめを教えてください！</p><a class="btn-main" href={href('oshiete/#spot')}>おすすめを教える</a></div>}
     {spots.length > 0 && (
       <ul class="spot-list" id="spotUl" data-hearts={heartsApi || undefined}>
         {spots.map(s => (
@@ -65,47 +65,7 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
   </section>
   </Acc>
 
-  <Acc id="post" title="おすすめを教えて！" icon="sparkle">
-  <section class="card spot-form-card">
-
-    <p class="spot-ask">お店だけじゃなくて、宮崎のいいところなら何でも大歓迎。アウェイから来たみなさんに、見てほしい・食べてほしい・知ってほしい場所を教えてください！</p>
-    <p class="spot-examples"><b>たとえば</b>ごはん・カフェ／海や山の景色／神社・観光地／温泉・銭湯／お土産が買えるお店／試合の前後にちょっと寄れる場所</p>
-    <details class="spot-privacy spot-rules">
-      <summary>投稿のルール</summary>
-      <ul>
-        <li>送ってもらった内容は、すぐにはページに載りません。確認してから、このページに載せます。</li>
-        <li>載せるかどうか・載せる文面は、こちらで判断します（個人のお宅、宣伝、悪口などは載せません）。ひとことは、短く整えたり書き換えたりすることがあります。</li>
-        <li>同じ回線（Wi-Fi など）からの投稿は1日10件まで、同じ内容は1回だけ受け付けます。</li>
-        <li>あとで X のユーザー名を変えても、掲載済みの表示は変更できません。ごめんなさい。</li>
-        <li>載せた内容を消してほしいときは、<a href={href('removal/')}>こちら</a>からご連絡ください。</li>
-      </ul>
-    </details>
-    {ready ? (
-      <form class="spot-form" id="spotForm" novalidate data-api={SITE.spots.api} data-sitekey={SITE.spots.turnstileSiteKey}>
-        <label>場所の名前<span class="req">必須</span><input name="name" required maxlength="60" autocomplete="off" placeholder="例：〇〇食堂・〇〇神社・〇〇海岸" /></label>
-        <label>ひとこと<span class="req">必須</span><textarea name="info" required maxlength="300" rows="3" aria-describedby="infoHint" placeholder="例：新富町の国道沿い。試合前に寄りたい、チキン南蛮がおいしいお店"></textarea></label>
-        <p class="note field-hint" id="infoHint">同じ名前の場所がほかにあるかもしれないので、場所がわかる特徴（町名・近くの目印・どんな場所か など）も書いてください。</p>
-        <label>あなたの X のユーザー名<span class="opt">任意</span><span class="xin"><span class="at" aria-hidden="true">@</span><input name="x_handle" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="latin" aria-describedby="xHint" placeholder="tegesapo" /></span></label>
-        <p class="note field-hint" id="xHint">X のプロフィールで「@」のあとに出ている英数字です（@tegesapo なら tegesapo）。入れると「教えてくれた人 <span class="nw">@〇〇</span>」として載ります。空のままでも送れます。</p>
-        <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
-        <div class="ts" id="spotTs"></div>
-        <button class="spot-send" type="submit">送る</button>
-        <p class="spot-msg" id="spotMsg" role="status" aria-live="polite"></p>
-      </form>
-    ) : (
-      <p class="spot-wait">投稿フォームは準備中です。</p>
-    )}
-    <details class="spot-privacy">
-      <summary>送った内容の扱い</summary>
-      <ul>
-        <li>送ってもらうのは「場所の名前・ひとこと・X のユーザー名（任意）」だけです。</li>
-        <li>同じ回線から1日10件までの確認のため、IP アドレスを、元に戻せない形（日ごとに変わる鍵でハッシュ化した値）にして2日間だけ使い、そのあと消します。IP アドレスそのものは保存しません。</li>
-        <li>同じ内容の投稿かどうかの確認のため、場所の名前とひとことから作った値を2日間だけ使い、そのあと消します。</li>
-        <li>ボット対策に Cloudflare Turnstile を使っています。</li>
-      </ul>
-    </details>
-  </section>
-  </Acc>
+  <Ask topic="spot" id="post" q="ここにない、あなたのおすすめはありますか？" />
 
 
   <Acc id="away" title="アウェイからお越しのみなさんへ" icon="plane">
@@ -206,51 +166,4 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 4.3 1
     }
   }
 
-  // ---- 投稿フォーム ----
-  const form = document.getElementById('spotForm') as HTMLFormElement | null;
-  if (form) {
-    const msg = document.getElementById('spotMsg')!;
-    const send = form.querySelector<HTMLButtonElement>('.spot-send')!;
-    let token = '';
-    let widget: string | undefined;
-    const say = (t: string, ok = false) => { msg.textContent = t; msg.classList.toggle('ok', ok); };
-    // Turnstile（ボット対策）は、フォームが画面に近づいたら読み込む
-    const render = () => {
-      if (widget !== undefined) return;
-      widget = (window as any).turnstile.render('#spotTs', {
-        sitekey: form.dataset.sitekey, action: 'spot', language: 'ja', appearance: 'interaction-only',
-        callback: (t: string) => { token = t; }, 'expired-callback': () => { token = ''; }, 'error-callback': () => { token = ''; },
-      });
-    };
-    const loadTs = () => {
-      if ((window as any).turnstile) { render(); return; }
-      if (document.getElementById('ts-js')) return;
-      (window as any).onTsLoad = render;
-      const s = document.createElement('script');
-      s.id = 'ts-js'; s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTsLoad'; s.async = true;
-      document.head.append(s);
-    };
-    new IntersectionObserver((es, io) => { if (es.some(e => e.isIntersecting)) { loadTs(); io.disconnect(); } }, { rootMargin: '400px' }).observe(form);
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const f = new FormData(form);
-      const body = Object.fromEntries(['name', 'info', 'x_handle', 'website'].map(k => [k, String(f.get(k) || '')]));
-      if (!body.name.trim() || !body.info.trim()) { say('「場所の名前」と「ひとこと」を入れてください'); return; }
-      body.x_handle = body.x_handle.trim().replace(/^[@＠]/, '');
-      if (body.x_handle && !/^[A-Za-z0-9_]{1,15}$/.test(body.x_handle)) { say('X のユーザー名は「@」のあとの英数字（と _）を15文字まで入れてください'); return; }
-      if (!token) { say('確認中です。少し待ってから、もう一度「送る」を押してください'); return; }
-      send.disabled = true; say('送っています…');
-      try {
-        const r = await fetch(form.dataset.api!, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, turnstile: token }), credentials: 'omit', referrerPolicy: 'no-referrer' });
-        const d = await r.json().catch(() => ({}));
-        if (r.ok && d.ok) { form.reset(); say('ありがとうございます！確認してから載せます。', true); }
-        else say(d.error || '送れませんでした。時間をおいて、もう一度お試しください');
-      } catch { say('送れませんでした。電波のよいところで、もう一度お試しください'); }
-      finally {
-        send.disabled = false; token = '';
-        try { (window as any).turnstile?.reset(widget); } catch { /* 次の送信で確認し直す */ }
-      }
-    });
-  }
 </script>

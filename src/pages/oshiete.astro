@@ -1,0 +1,169 @@
+---
+import Base from '../layouts/Base.astro';
+import { href } from '../lib/util.js';
+import { SITE } from '../config/site.js';
+// 教えて！：宮崎のおすすめ（/api/spots）と、テゲバの情報サイト（/api/links）の受付をまとめたページ
+// #spot・#site で来たら、そちらを開く。受付は Cloudflare Workers（worker/）と Turnstile。送った内容は確認してから載せる
+const linksApi = SITE.spots.api ? new URL('/api/links', SITE.spots.api).href : '';
+const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
+---
+<Base current="oshiete" title="教えて！" description="テゲスタ！に、宮崎のおすすめの場所と、テゲバの情報を発信しているチャンネル・サイトを教えてください（非公式サポーターサイト）。">
+  <section class="card osh-hero">
+    <h2 class="links-h">教えて！</h2>
+    <p class="page-lead">テゲスタ！は、テゲサポのみなさんが教えてくれた情報でできています。宮崎のおすすめの場所や、テゲバの情報を発信しているチャンネル・サイトを知っていたら、ぜひ教えてください。</p>
+    <div class="seg osh-seg" role="group" aria-label="教えてほしいこと">
+      <button type="button" data-topic="spot" aria-controls="spot" aria-pressed="true">宮崎のおすすめ</button>
+      <button type="button" data-topic="site" aria-controls="site" aria-pressed="false">テゲバの情報サイト</button>
+    </div>
+  </section>
+
+  <section class="card spot-form-card osh-panel osh-spot" id="spot">
+    <h2 class="osh-h">宮崎のおすすめを教えて！</h2>
+    <p class="spot-ask">お店だけじゃなくて、宮崎のいいところなら何でも大歓迎。アウェイから来たみなさんに、見てほしい・食べてほしい・知ってほしい場所を教えてください！載せた場所は<a href={href('spots/')}>みやざき</a>のページに並びます。</p>
+    <p class="spot-examples"><b>たとえば</b>ごはん・カフェ／海や山の景色／神社・観光地／温泉・銭湯／お土産が買えるお店／試合の前後にちょっと寄れる場所</p>
+    <details class="spot-privacy spot-rules">
+      <summary>投稿のルール</summary>
+      <ul>
+        <li>送ってもらった内容は、すぐにはページに載りません。確認してから、みやざきのページに載せます。</li>
+        <li>載せるかどうか・載せる文面は、こちらで判断します（個人のお宅、宣伝、悪口などは載せません）。ひとことは、短く整えたり書き換えたりすることがあります。</li>
+        <li>同じ回線（Wi-Fi など）からの投稿は1日10件まで、同じ内容は1回だけ受け付けます。</li>
+        <li>あとで X のユーザー名を変えても、掲載済みの表示は変更できません。ごめんなさい。</li>
+        <li>載せた内容を消してほしいときは、<a href={href('removal/')}>こちら</a>からご連絡ください。</li>
+      </ul>
+    </details>
+    {ready ? (
+      <form class="spot-form" id="spotForm" novalidate data-api={SITE.spots.api} data-sitekey={SITE.spots.turnstileSiteKey} data-ts="spotTs" data-action="spot">
+        <label>場所の名前<span class="req">必須</span><input name="name" required maxlength="60" autocomplete="off" placeholder="例：〇〇食堂・〇〇神社・〇〇海岸" /></label>
+        <label>ひとこと<span class="req">必須</span><textarea name="info" required maxlength="300" rows="3" aria-describedby="infoHint" placeholder="例：新富町の国道沿い。試合前に寄りたい、チキン南蛮がおいしいお店"></textarea></label>
+        <p class="note field-hint" id="infoHint">同じ名前の場所がほかにあるかもしれないので、場所がわかる特徴（町名・近くの目印・どんな場所か など）も書いてください。</p>
+        <label>あなたの X のユーザー名<span class="opt">任意</span><span class="xin"><span class="at" aria-hidden="true">@</span><input name="x_handle" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="latin" aria-describedby="xHint" placeholder="tegesapo" /></span></label>
+        <p class="note field-hint" id="xHint">X のプロフィールで「@」のあとに出ている英数字です（@tegesapo なら tegesapo）。入れると「教えてくれた人 <span class="nw">@〇〇</span>」として載ります。空のままでも送れます。</p>
+        <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <div class="ts" id="spotTs"></div>
+        <button class="spot-send" type="submit">送る</button>
+        <p class="spot-msg" role="status" aria-live="polite"></p>
+      </form>
+    ) : (
+      <p class="spot-wait">投稿フォームは準備中です。</p>
+    )}
+    <details class="spot-privacy">
+      <summary>送った内容の扱い</summary>
+      <ul>
+        <li>送ってもらうのは「場所の名前・ひとこと・X のユーザー名（任意）」だけです。</li>
+        <li>同じ回線から1日10件までの確認のため、IP アドレスを、元に戻せない形（日ごとに変わる鍵でハッシュ化した値）にして2日間だけ使い、そのあと消します。IP アドレスそのものは保存しません。</li>
+        <li>同じ内容の投稿かどうかの確認のため、場所の名前とひとことから作った値を2日間だけ使い、そのあと消します。</li>
+        <li>ボット対策に Cloudflare Turnstile を使っています。</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="card spot-form-card osh-panel osh-site" id="site">
+    <h2 class="osh-h">テゲバの情報サイトを教えて！</h2>
+    <p class="spot-ask">テゲバの情報を発信しているチャンネルやホームページを知っていたら、教えてください。YouTube・ブログ・note・ポッドキャストなど、何でも大歓迎です。自分のチャンネルの紹介もうれしいです！載せたものは<a href={href('links/')}>リンク</a>のページに並びます。</p>
+    <details class="spot-privacy spot-rules">
+      <summary>投稿のルール</summary>
+      <ul>
+        <li>送ってもらった URL は、すぐにはページに載りません。確認してから、リンクのページに載せます。</li>
+        <li>載せるかどうか・載せる文面は、こちらで判断します（個人の情報がわかるもの、宣伝、悪口などは載せません）。</li>
+        <li>同じ回線（Wi-Fi など）からの送信は1日10件まで、同じ URL は1回だけ受け付けます。</li>
+        <li>載せた内容を消してほしいときは、<a href={href('removal/')}>こちら</a>からご連絡ください。</li>
+      </ul>
+    </details>
+    {ready ? (
+      <form class="spot-form" id="linkForm" novalidate data-api={linksApi} data-sitekey={SITE.spots.turnstileSiteKey} data-ts="linkTs" data-action="link">
+        <label>URL<span class="req">必須</span><input name="url" type="url" required maxlength="300" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="url" placeholder="https://" /></label>
+        <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <div class="ts" id="linkTs"></div>
+        <button class="spot-send" type="submit">送る</button>
+        <p class="spot-msg" role="status" aria-live="polite"></p>
+      </form>
+    ) : (
+      <p class="spot-wait">受付は準備中です。</p>
+    )}
+    <details class="spot-privacy">
+      <summary>送った内容の扱い</summary>
+      <ul>
+        <li>送ってもらうのは URL だけです。お名前などは送られません。</li>
+        <li>同じ回線から1日10件までの確認のため、IP アドレスを、元に戻せない形（日ごとに変わる鍵でハッシュ化した値）にして2日間だけ使い、そのあと消します。IP アドレスそのものは保存しません。</li>
+        <li>同じ URL かどうかの確認のため、URL から作った値を2日間だけ使い、そのあと消します。</li>
+        <li>ボット対策に Cloudflare Turnstile を使っています。</li>
+      </ul>
+    </details>
+  </section>
+</Base>
+
+<script>
+  // ---- 切りかえ：#spot・#site で来たらそちら。押したら URL の # も変える（戻る・共有でも同じものが開く） ----
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('.osh-seg [data-topic]')];
+  const show = (t: string) => {
+    const k = t === 'site' ? 'site' : 'spot';
+    for (const b of tabs) b.setAttribute('aria-pressed', String(b.dataset.topic === k));
+    for (const p of document.querySelectorAll<HTMLElement>('.osh-panel')) p.hidden = p.id !== k;
+    document.getElementById(k)?.querySelector('form') && loadTs();
+  };
+  for (const b of tabs) b.addEventListener('click', () => { history.replaceState(null, '', `#${b.dataset.topic}`); show(b.dataset.topic!); });
+  addEventListener('hashchange', () => show(location.hash.slice(1)));
+
+  // ---- Turnstile（ボット対策）：1回だけ読み込み、見えているフォームの分を作る ----
+  const widgets = new Map<HTMLFormElement, { id?: string; token: string }>();
+  const renderAll = () => {
+    for (const form of document.querySelectorAll<HTMLFormElement>('.osh-panel:not([hidden]) form[data-ts]')) {
+      if (widgets.get(form)?.id !== undefined) continue;
+      const st = { id: undefined as string | undefined, token: '' };
+      widgets.set(form, st);
+      st.id = (window as any).turnstile.render(`#${form.dataset.ts}`, {
+        sitekey: form.dataset.sitekey, action: form.dataset.action, language: 'ja', appearance: 'interaction-only',
+        callback: (t: string) => { st.token = t; }, 'expired-callback': () => { st.token = ''; }, 'error-callback': () => { st.token = ''; },
+      });
+    }
+  };
+  function loadTs() {
+    if ((window as any).turnstile) { renderAll(); return; }
+    if (document.getElementById('ts-js')) return;
+    (window as any).onTsLoad = renderAll;
+    const s = document.createElement('script');
+    s.id = 'ts-js'; s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTsLoad'; s.async = true;
+    document.head.append(s);
+  }
+
+  // ---- 送る（宮崎のおすすめ・テゲバの情報サイト） ----
+  const submit = (form: HTMLFormElement, check: (f: FormData) => string | Record<string, string>) => {
+    const msg = form.querySelector<HTMLElement>('.spot-msg')!, send = form.querySelector<HTMLButtonElement>('.spot-send')!;
+    const say = (t: string, ok = false) => { msg.textContent = t; msg.classList.toggle('ok', ok); };
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const body = check(new FormData(form));
+      if (typeof body === 'string') { say(body); return; }
+      const st = widgets.get(form);
+      if (!st?.token) { say('確認中です。少し待ってから、もう一度「送る」を押してください'); return; }
+      send.disabled = true; say('送っています…');
+      try {
+        const r = await fetch(form.dataset.api!, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, turnstile: st.token }), credentials: 'omit', referrerPolicy: 'no-referrer' });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && d.ok) { form.reset(); say('ありがとうございます！確認してから載せます。', true); }
+        else say(d.error || '送れませんでした。時間をおいて、もう一度お試しください');
+      } catch { say('送れませんでした。電波のよいところで、もう一度お試しください'); }
+      finally {
+        send.disabled = false; st.token = '';
+        try { (window as any).turnstile?.reset(st.id); } catch { /* 次の送信で確認し直す */ }
+      }
+    });
+  };
+  const spotForm = document.getElementById('spotForm') as HTMLFormElement | null;
+  if (spotForm) submit(spotForm, f => {
+    const b = Object.fromEntries(['name', 'info', 'x_handle', 'website'].map(k => [k, String(f.get(k) || '')]));
+    if (!b.name.trim() || !b.info.trim()) return '「場所の名前」と「ひとこと」を入れてください';
+    b.x_handle = b.x_handle.trim().replace(/^[@＠]/, '');
+    if (b.x_handle && !/^[A-Za-z0-9_]{1,15}$/.test(b.x_handle)) return 'X のユーザー名は「@」のあとの英数字（と _）を15文字まで入れてください';
+    return b;
+  });
+  const linkForm = document.getElementById('linkForm') as HTMLFormElement | null;
+  if (linkForm) submit(linkForm, f => {
+    const url = String(f.get('url') || '').trim();
+    if (!url) return 'URL を入れてください';
+    if (!/^(https?:\/\/)?[^\s/]+\.[^\s/]{2,}/i.test(url)) return 'URL の形になっていないようです（https:// から始まるアドレスを入れてください）';
+    return { url, website: String(f.get('website') || '') };
+  });
+
+  show(location.hash.slice(1));
+</script>

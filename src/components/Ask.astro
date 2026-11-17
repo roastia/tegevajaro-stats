@@ -1,0 +1,11 @@
+---
+// 「教えて！」の問いかけ。読んだ流れで「ちょうど思いついた」人を「教えて！」ページへ（src/pages/oshiete.astro）
+// topic：spot＝宮崎のおすすめ（オレンジ）、site＝テゲバの情報サイト（ピンク）。q は1行の問いかけ
+import { href } from '../lib/util.js';
+interface Props { topic: 'spot' | 'site'; q: string; id?: string }
+const { topic, q, id } = Astro.props;
+---
+<aside class={`ask ask-${topic}`} id={id}>
+  <p class="ask-q">{q}</p>
+  <a class="ask-btn" href={href(`oshiete/#${topic}`)}>教えて！</a>
+</aside>
