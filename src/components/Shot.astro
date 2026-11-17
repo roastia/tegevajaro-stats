@@ -1,5 +1,5 @@
 ---
-// 画像のように見せるカード（ポスト用画像と同じデザイン）
+// 画像のように見せるカード（ポスト用画像と同じデザイン）。「第〇節時点」は上の見出しの行に（下の帯はなくして縦をおさえる）
 import { icon, href } from '../lib/util.js';
 import { CHARS } from '../lib/meta.js';
 import { SITE } from '../config/site.js';
@@ -12,11 +12,10 @@ const headline = item.kind === 'r' ? `${item.label} 1位` : item.headline;
 ---
 <Tag class="shot">
   <span class="char" aria-hidden="true">{ch && ch.img ? <img src={href(ch.img)} alt="" width="56" height="56" /> : <Fragment set:html={icon(item.icon)} />}</span>
-  <div class="lb"><Fragment set:html={icon(item.icon)} />{kicker}</div>
+  <div class="lb"><Fragment set:html={icon(item.icon)} /><span>{kicker}</span><span class="asof">{SITE.roundLabel}時点</span></div>
   <div class="hl">{headline}</div>
   <div class="bg">{item.big}</div>
   {item.sub && <div class="sb">{item.sub}</div>}
   {item.top && item.top.length > 1 && <div class="sb">{item.top.slice(1).map(t => `${t.rank}位 ${t.name}`).join('　')}</div>}
   {item.cheer && <div class="ch">{item.cheer}</div>}
-  <div class="ft"><span>{SITE.short}</span><span>{SITE.roundLabel}時点</span></div>
 </Tag>

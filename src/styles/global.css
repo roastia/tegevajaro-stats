@@ -76,17 +76,18 @@ input[type=search] { flex: 1 1 10rem; }
 
 /* ===== share card（画像のように見せるトピックカード） ===== */
 .share { display: flex; flex-direction: column; border-radius: var(--radius); overflow: hidden; border: 1px solid color-mix(in srgb, var(--brand) 40%, var(--line)); background: var(--panel); }
-.shot { position: relative; overflow: hidden; padding: 18px; min-height: 15rem; display: flex; flex-direction: column; gap: 4px; color: #fff;
+.shot { position: relative; overflow: hidden; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; color: #fff;
   background: linear-gradient(150deg, var(--brand-dark) 0%, var(--brand-deep) 55%, var(--brand) 100%); isolation: isolate; }
 .shot::before { content: ''; position: absolute; inset: -40%; z-index: -1; opacity: .35;
   background: conic-gradient(from var(--spin), transparent 0 70%, rgba(255,255,255,.5) 80%, transparent 90%); }
 .shot::after { content: ''; position: absolute; right: -30px; top: -30px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,.08); }
 .shot .lb { font-size: .8rem; opacity: .9; letter-spacing: .04em; display: flex; gap: 6px; align-items: center; padding-right: 64px; }
 .shot .hl { font-weight: 700; font-size: 1.08rem; line-height: 1.45; padding-right: 64px; }
-.shot .bg { font-weight: 700; font-size: clamp(2.4rem, 8vw, 3.2rem); line-height: 1.05; margin-top: auto; color: #FFF4C2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.shot .bg { font-weight: 700; font-size: clamp(2.4rem, 8vw, 3.2rem); line-height: 1.05; color: #FFF4C2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .shot .sb { font-size: .82rem; opacity: .95; line-height: 1.55; }
 .shot .ch { font-weight: 700; }
-.shot .ft { font-size: .68rem; opacity: .7; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,.22); padding-top: 6px; margin-top: 4px; }
+.shot .lb .asof { font-size: .72rem; opacity: .8; letter-spacing: 0; white-space: nowrap; }
+.shot .lb .asof::before { content: '・'; }
 .char { position: absolute; right: 14px; top: 14px; width: 56px; height: 56px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,.14); }
 .char .ic { width: 60%; height: 60%; }
 .char img { width: 100%; height: 100%; object-fit: contain; }
@@ -569,7 +570,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .shot .bg { color: var(--ink); }
 .shot .sb { color: #5E5257; opacity: 1; }
 .shot .ch { color: var(--ink); }
-.shot .ft { color: var(--muted); opacity: 1; border-top-color: var(--line); }
+.shot .lb .asof { color: var(--muted); opacity: 1; }
 .char { background: #fff; color: var(--ink); }
 /* ポストのボタン */
 .postbtn, .spot-send { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 3px 0 #D9506F; }
