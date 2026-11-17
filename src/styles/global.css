@@ -1137,12 +1137,19 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-sw { margin-left: auto; font-size: .85rem; color: var(--muted); }
 .hs-meta { margin: 0; padding: 0 14px 8px; font-size: .85rem; color: var(--muted); }
 .hs-list { list-style: none; margin: 0; padding: 0 14px 12px; }
-.hs-row { display: grid; grid-template-columns: 3.2em minmax(4.5em, auto) 1fr auto auto; align-items: baseline; gap: 2px 10px; padding: 6px 0; border-top: 1px dotted var(--line); font-size: .88rem; }
+.hs-row { display: grid; grid-template-columns: 3.2em 12em 1fr auto auto; align-items: baseline; gap: 2px 10px; padding: 6px 0; border-top: 1px dotted var(--line); font-size: .88rem; }
 .hs-d { color: var(--muted); }
 .hs-c { color: var(--muted); font-size: .8rem; }
 .hs-o small { color: var(--muted); }
 .hs-res { margin-left: 0; text-decoration: none; color: inherit; white-space: nowrap; }
-.hs-g { grid-column: 2 / -1; font-size: .78rem; color: var(--muted); }
+.hs-row { position: relative; }
+.hs-row > .hs-res, .hs-row > .hs-x { align-self: start; }
+/* 得点者：行には出さず、小さい「得点者」ボタンの吹き出しに（行の高さをおさえる） */
+.hs-gw { position: relative; display: inline-block; margin-left: 8px; }
+.hs-gb { font: inherit; font-size: .72rem; font-weight: 700; color: var(--ink); background: #FFF1F4; border: 1px solid color-mix(in srgb, var(--brand) 35%, var(--line)); border-radius: 999px; padding: 0 9px; line-height: 1.6; cursor: pointer; }
+.hs-gb[aria-expanded='true'] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.hs-gb:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.hs-gp { position: absolute; z-index: 5; top: calc(100% + 6px); left: 0; width: max-content; max-width: 22em; padding: 8px 12px; border-radius: 10px; background: var(--panel, #fff); color: var(--fg); border: 1px solid var(--line); box-shadow: 0 6px 18px rgba(60, 20, 35, .14); font-size: .82rem; line-height: 1.6; white-space: normal; }
 .hs-scope { margin-bottom: 14px; }
 .hs-total { padding: 12px 14px; margin: 0 0 14px; font-size: .95rem; }
 .hs-total .note { display: block; margin-top: 2px; }
@@ -1221,7 +1228,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .hs-scope { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 6px; }
 .hs-kindnote { margin: 0 0 14px; }
 .hs-empty { color: var(--muted); }
-/* スマホ：1行目に日付・相手・スコア、2行目に節や大会名（百年構想リーグ 3-4位決定戦など長い名前でも相手チーム名が細くならない）、3行目に得点者 */
+/* スマホ：1行目に日付・相手・スコア、2行目に節や大会名と「得点者」（百年構想リーグ 3-4位決定戦など長い名前でも相手チーム名が細くならない） */
 @media (max-width: 480px) {
   .hs-row { grid-template-columns: 3.2em minmax(0, 1fr) auto; }
   .hs-row .hs-x { grid-row: 2; grid-column: 3; justify-self: end; }
@@ -1229,7 +1236,9 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
   .hs-o { grid-row: 1; grid-column: 2; }
   .hs-res { grid-row: 1; grid-column: 3; }
   .hs-c { grid-row: 2; grid-column: 2 / -1; }
-  .hs-g { grid-row: 3; }
+  /* スマホ：吹き出しは行の幅いっぱいに（画面からはみ出さない） */
+  .hs-gw { position: static; }
+  .hs-gp { left: 3.2em; right: 0; top: calc(100% - 4px); width: auto; max-width: none; }
 }
 .hs-season > .post { padding: 4px 14px 14px; }
 .hs-none { margin: 0; padding: 0 14px 12px; font-size: .85rem; color: var(--muted); }

@@ -47,6 +47,8 @@ const timeline = [
   { y: '2026/27', t: `J2リーグ1年目。${SITE.roundLabel}時点で${SITE.rank}位` },
 ];
 const timelinePost = postText('テゲバジャーロ宮崎の歩み', `2021 J3参入1年目で3位／2025 J2昇格プレーオフ優勝でクラブ初のJ2昇格／2026 百年構想リーグ WEST-B 1位／2026/27 J2で${SITE.rank}位（${SITE.roundLabel}時点）`, '');
+// 得点者（行には出さず「得点者」ボタンで開く。PC はマウスを乗せる、スマホは押す）
+const goalText = m => m.goals.map(g => `${g.og ? 'オウンゴール' : g.scorer}${g.minute}'`).join('・');
 // 試合ごとのポスト
 const resWord = { 勝: '勝利！', 分: '引き分け', 負: '敗戦' };
 // スコアの札の言葉（札が横に長くならないよう、引き分けは「分け」）
@@ -109,14 +111,15 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
             </details>
           )}
           <ul class="hs-list">
-            {s.ms.map(m => (
+            {s.ms.map((m, mi) => (
               <li class="hs-row" data-lg={m.league ? '1' : '0'}>
                 <span class="hs-d">{md(m.date)}</span>
-                <span class="hs-c">{label(m)}</span>
+                <span class="hs-c">{label(m)}{m.goals.length > 0 && (
+                  <span class="hs-gw"><button type="button" class="hs-gb" aria-expanded="false" aria-controls={`g-${seasonId(s)}-${mi}`}>得点者</button><span class="hs-gp" id={`g-${seasonId(s)}-${mi}`} role="tooltip" hidden>{goalText(m)}</span></span>
+                )}</span>
                 <span class="hs-o"><a class="club-link" href={m.oppUrl} target="_blank" rel="noopener noreferrer">{m.oppFull}</a><small>（{haWord(m.ha)}）</small></span>
                 <a class={`lu-res hs-res ${resCls[m.result]}`} href={m.url} target="_blank" rel="noopener noreferrer" aria-label={`${m.oppFull}戦 ${score(m)} ${chipWord[m.result]}（Jリーグ公式の試合ページ）`}>{score(m)} {chipWord[m.result]}</a>
                 <a class="hs-x" href={xIntent(matchPost(m), `${SITE.url}/history/#${seasonId(s)}`, '')} target="_blank" rel="noopener noreferrer" aria-label={`${m.oppFull}戦をXでポスト`} title={`${m.oppFull}戦をXでポスト`} set:html={`<span>${xLabel('Xでポスト')}</span>`} />
-                {m.goals.length > 0 && <span class="hs-g">{m.goals.map(g => `${g.og ? 'オウンゴール' : g.scorer}${g.minute}'`).join('・')}</span>}
               </li>
             ))}
           </ul>
@@ -174,6 +177,23 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
     kseg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     draw();
   });
+  // シーズンごとの全試合：得点者の吹き出し（PC はマウスを乗せると出る、押すと出たまま。スマホは押すたびに開け閉め。外を押す・Esc で閉じる）
+  {
+    const wrap = document.getElementById('hsSeasons')!;
+    const hover = matchMedia('(hover: hover) and (pointer: fine)');
+    const set = (b: HTMLButtonElement, on: boolean) => { b.setAttribute('aria-expanded', String(on)); (b.nextElementSibling as HTMLElement).hidden = !on; };
+    const closeAll = (except?: Element) => wrap.querySelectorAll<HTMLButtonElement>('.hs-gb[aria-expanded="true"]').forEach(b => { if (b !== except) set(b, false); });
+    wrap.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.hs-gb');
+      if (!b) { closeAll(); return; }
+      const on = b.dataset.pin !== '1' || b.getAttribute('aria-expanded') !== 'true';
+      closeAll(b); b.dataset.pin = on ? '1' : ''; set(b, on);
+    });
+    wrap.addEventListener('mouseover', e => { if (!hover.matches) return; const b = (e.target as HTMLElement).closest('.hs-gw')?.querySelector<HTMLButtonElement>('.hs-gb'); if (b && b.getAttribute('aria-expanded') !== 'true') { closeAll(); set(b, true); } });
+    wrap.addEventListener('mouseout', e => { if (!hover.matches) return; const w = (e.target as HTMLElement).closest('.hs-gw'); if (w && !w.contains(e.relatedTarget as Node)) { const b = w.querySelector<HTMLButtonElement>('.hs-gb')!; if (b.dataset.pin !== '1') set(b, false); } });
+    document.addEventListener('click', e => { if (!wrap.contains(e.target as Node)) { closeAll(); wrap.querySelectorAll<HTMLElement>('.hs-gb').forEach(b => { b.dataset.pin = ''; }); } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAll(); wrap.querySelectorAll<HTMLElement>('.hs-gb').forEach(b => { b.dataset.pin = ''; }); } });
+  }
   // シーズンごとの全試合：すべて・リーグ戦（J3・J2）・リーグ戦以外で絞り込む
   {
     const mseg = document.getElementById('hsMKind')!, wrap = document.getElementById('hsSeasons')!;
