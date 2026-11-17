@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Ask from '../components/Ask.astro';
 import Acc from '../components/Acc.astro';
 import { SITE } from '../config/site.js';
 import { getData } from '../lib/data.js';
@@ -124,6 +125,7 @@ const firstHtml = renderRecords(pickKind(matches, 'all'), { playerUrl: playerUrl
         </details>
       ))}
     </div>
+    <Ask topic="site" q="昔の試合のことを書いたブログや動画があれば教えてください" />
   </Acc>
 
   <Acc id="records" title="通算の記録" icon="trophy">

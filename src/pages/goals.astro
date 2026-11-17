@@ -1,6 +1,7 @@
 ---
 import { SITE } from '../config/site.js';
 import Base from '../layouts/Base.astro';
+import Ask from '../components/Ask.astro';
 import Acc from '../components/Acc.astro';
 import { getData, readCsv } from '../lib/data.js';
 import { buildLineups } from '../lib/lineups.js';
@@ -78,6 +79,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
     </Acc>))}
   </div>
   <p class="hl-empty" id="hlEmpty" hidden>該当する試合はありません</p>
+  <Ask topic="site" q="テゲバの試合を語っている動画やブログ、知っていますか？" />
 
 </Base>
 <style>

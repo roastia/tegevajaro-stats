@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Ask from '../components/Ask.astro';
 import Acc from '../components/Acc.astro';
 import Chant from '../components/Chant.astro';
 import { readCsv } from '../lib/data.js';
@@ -77,6 +78,7 @@ const group = readCsv('links').filter(r => /ブーゲンビリーバー/.test(r.
       </ul>
     </section>
   </Acc>
+  <Ask topic="site" q="チャントを紹介している動画やサイト、知っていますか？" />
 
   <p class="note">コール・原曲・音源は、宮崎ブーゲンビリーバーの歌詞カード・紹介ポスト・YouTube をもとにまとめています。原曲がわからないチャントは、空けています。ひょっとこは歌詞カードにない昔からのチャントで、ブーゲンビリーバーの音源がないチャント（We are テゲバ・ひょっとこ）は TEGEmania channel の録音にリンクしています。テゲスタ！は宮崎ブーゲンビリーバーとは別の、非公式のサイトです。</p>
 </Base>
