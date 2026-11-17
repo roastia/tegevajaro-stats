@@ -51,17 +51,6 @@ export function historyTopics({ nextFx, now = new Date() } = {}) {
   const add = (group, id, emoji, label, headline, big, sub, cheer) => T.push({ group, id, emoji, label, headline, big, sub, cheer, timeless: TIMELESS.has(id) });
   const all = record(ms);
 
-  // 公式戦の通算勝利：次の節目（50勝ごと）まで。ちょうど節目に届いた直後は「達成！」
-  {
-    const step = 50, w = all.w, last = ms.at(-1);
-    const hit = w % step === 0 && last.result === '勝';
-    const goal = hit ? w : Math.ceil((w + 1) / step) * step;
-    add('main', 'clubwins', '🏆', '公式戦の通算勝利',
-      hit ? `J参入から公式戦の通算${w}勝を達成！` : `J参入から公式戦の通算${w}勝。${goal}勝まであと${goal - w}勝！`,
-      `${w}勝`, `2021年から${all.p}試合で${all.w}勝${all.d}分${all.l}敗（PK戦は引き分けで数える）`,
-      hit ? '次の節目に向けて、また1勝ずつ' : `${goal}勝目をみんなで見届けよう`);
-  }
-
   // この日のテゲバ：過去の同じ日付の試合（負けた試合は出さない）。なければ前後3日まで
   {
     const today = todayJst(now), y = Number(today.slice(0, 4)), key = today.slice(5);
