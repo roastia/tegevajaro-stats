@@ -254,7 +254,7 @@ test('おすすめスポットの検索：名前・よみ・ローマ字で見�
   assert.ok(!matchName(k, 'すし'));
 });
 
-test('リンク集：URL は https、名前があり、決めた分類だけ・公式は1つ', () => {
+test('リンク集：URL は https、名前があり、決めた分類だけ・公式はクラブ公式サイトのページだけ', () => {
   const rows = readCsv('links');
   const groups = new Set(['official', 'program', 'group', 'youtube', 'read']);
   const urls = new Set();
@@ -264,7 +264,9 @@ test('リンク集：URL は https、名前があり、決めた分類だけ・�
     assert.match(r.url, /^https:\/\/[^\s<>"']+$/, r.name);
     assert.ok(!urls.has(r.url), `URL が重なっている：${r.name}`); urls.add(r.url);
   }
-  assert.equal(rows.filter(r => r.group === 'official').length, 1);
+  // 公式：クラブ公式サイトのトップと、パートナー・スポンサー一覧（各社の名前やロゴはこのサイトには載せず、公式の一覧へ）
+  const off = rows.filter(r => r.group === 'official');
+  assert.ok(off.length >= 1 && off.every(r => r.url.startsWith('https://www.tegevajaro.com/')), '公式はクラブ公式サイトだけ');
   const ids = rows.map(r => r.id);
   assert.ok(ids.every(id => /^l\d{1,4}$/.test(id)) && new Set(ids).size === ids.length, 'id は l〇 で重ならない');
 });
