@@ -8,6 +8,7 @@ import { milestones } from './milestones.js';
 import { SITE } from '../config/site.js';
 import { splitDisp as splitDispB } from './util.js';
 import { cheerOf } from './cheers.js';
+import { historyTopics, historyRecords } from './histtopics.js';
 
 // ビルドはプロジェクトの直下で実行する前提（npm run build）
 const DATA_DIR = path.resolve(process.cwd(), 'src/data');
@@ -31,6 +32,8 @@ export function getData() {
   if (cache) return cache;
   const D = Object.fromEntries(DATASETS.map(n => [n, readCsv(n)]));
   const all = computeAll(D, SITE.asOf);
+  // 歴代ランキング（J通算ゴール・ハットトリック）：J参入からの全試合から（src/lib/histtopics.js）
+  all.records = [...all.records, ...historyRecords()];
   const records = RECORDS
     .filter(r => SITE.footballLab || r.src !== 'Football LAB')
     .map(meta => ({ meta, rows: rankRows(meta, all.records) }));
@@ -75,10 +78,15 @@ export function getData() {
       cheer: 'テゲスタ！の選手ランキングは毎節動く。次に上がるのは誰だ？' });
   }
 
-  // 記録まであと少し
-  // 次の試合（結果がまだ入っていない、いちばん前の節）がホームかアウェイか
+  // 次の試合（結果がまだ入っていない、いちばん前の節）
   const playedR = new Set(D.matches.map(m => String(m.round)));
   const nextFx = readCsv('fixtures').filter(f => !playedR.has(String(f.round))).sort((a, b) => Number(a.round) - Number(b.round))[0];
+  // J参入からの話題（通算勝利は今季の話題の先頭、ほかは「J参入からの話題」）。応援のひとことは日ごとに切りかえる
+  historyTopics({ nextFx }).forEach((t, i) => {
+    const cheer = cheerOf('t', t.id, t.cheer);
+    topics.push({ ...t, cheer, order: t.group === 'main' ? 0.5 : 1000 + i, post: `${t.headline}\n${t.sub}\n${cheer}\n#テゲバジャーロ宮崎 #テゲバ #テゲスタ` });
+  });
+  // 記録まであと少し：次の試合がホームかアウェイか
   const ms = milestones({ ...D, nextHa: nextFx?.ha });
   cache = { ...all, topics, rankings: records, prevRound, climbs, milestones: ms };
   return cache;
@@ -99,7 +107,7 @@ export function getShareables() {
   const d = getData();
   const out = [];
   for (const t of [...d.topics].sort((a, b) => a.order - b.order)) {
-    out.push({ kind: 't', id: t.id, label: t.label, icon: ICON_OF_TOPIC[t.id] || 'sparkle', headline: t.headline, big: t.big, sub: t.sub, cheer: t.cheer,
+    out.push({ kind: 't', id: t.id, group: t.group || 'main', label: t.label, icon: ICON_OF_TOPIC[t.id] || 'sparkle', headline: t.headline, big: t.big, sub: t.sub, cheer: t.cheer,
       text: postText(t.headline, t.sub, t.cheer) });
   }
   for (const { meta, rows } of d.rankings) {
