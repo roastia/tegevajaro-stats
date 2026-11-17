@@ -123,8 +123,8 @@ export function historyTopics({ nextFx, now = new Date() } = {}) {
 
   // トリビア：1-0の勝利
   {
-    const n = ms.filter(m => m.gf === 1 && m.ga === 0).length;
-    if (n) add('hist', 'h_unozero', '🎯', '1-0の勝利', `J参入から、1-0で勝った試合は${n}回！`, `${n}回`, `勝った${all.w}試合のうち、およそ${Math.round((n / all.w) * 100)}%`, '1点を守り切る強さ');
+    const list = ms.filter(m => m.gf === 1 && m.ga === 0), n = list.length, last = list.at(-1);
+    if (n) add('hist', 'h_unozero', '🎯', '1-0の勝利', `J参入から、1-0で勝った試合は${n}回！`, `${n}回`, `いちばん最近は${Number(last.date.slice(0, 4))}年${Number(last.date.slice(5, 7))}月${Number(last.date.slice(8, 10))}日の${last.oppFull}戦`, '1点を守り切る強さ');
   }
 
   // トリビア：1試合の最多得点
