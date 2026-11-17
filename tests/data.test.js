@@ -332,10 +332,12 @@ test('誕生日：ビルド時とブラウザで同じ HTML（日本時間で数
   const t = todayJst(new Date('2026-11-11T14:30:00Z'));
   const st = bdayState(people, t);
   assert.equal(bdayKey(st.today), 'ジャーロくん:0');
-  assert.equal(bdayKey(st.soon), 'ジャーロくん:0|小西 宏登:1');
+  assert.equal(bdayKey(st.soon), '小西 宏登:1', '今日の人は「もうすぐ誕生日」に入れない（上のお祝いと重ねない）');
+  assert.doesNotMatch(soonHtml(st.soon), /ジャーロくん|今日は誕生日/);
   assert.ok(!/歳/.test(hbdHtml(st.today)), 'マスコットは年齢を出さない');
   const st2 = bdayState(people, todayJst(new Date('2026-11-12T03:00:00Z')));
   assert.match(hbdHtml(st2.today, { '小西 宏登': 'https://www.jleague.jp/player/1/' }), /24歳/);
-  assert.match(soonHtml(st2.soon), /小西 宏登/);
+  assert.match(soonHtml(st.soon), /小西 宏登/);
+  assert.doesNotMatch(soonHtml(st2.soon), /小西 宏登/, '当日は「もうすぐ」に出さない');
   assert.equal(hbdHtml([]), '');
 });

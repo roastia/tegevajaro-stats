@@ -28,10 +28,10 @@ export const bdayPeople = (profiles, mascots = SITE.mascots || []) => [
   ...mascots.map(m => ({ name: m.name, birth: `0000-${m.birth}`, mascot: true })),
 ];
 
-/** 31日以内の誕生日（近い順）と、今日の誕生日 */
+/** 今日の誕生日と、これから31日以内の誕生日（近い順）。今日の人はページ上の「お誕生日おめでとう！」で祝うので、「もうすぐ誕生日」には入れない */
 export function bdayState(people, t = todayJst()) {
-  const soon = people.map(p => ({ p, b: bdayInfo(p.birth, t) })).filter(x => x.b && x.b.days <= 31).sort((a, b) => a.b.days - b.b.days);
-  return { soon, today: soon.filter(x => x.b.days === 0) };
+  const all = people.map(p => ({ p, b: bdayInfo(p.birth, t) })).filter(x => x.b && x.b.days <= 31).sort((a, b) => a.b.days - b.b.days);
+  return { soon: all.filter(x => x.b.days > 0), today: all.filter(x => x.b.days === 0) };
 }
 /** 表示が同じかどうかを見分ける印（名前と日数） */
 export const bdayKey = list => list.map(({ p, b }) => `${p.name}:${b.days}`).join('|');
@@ -62,13 +62,9 @@ export function soonHtml(soon) {
   if (!soon.length) return '';
   const cards = soon.map(({ p, b }) => {
     const nm = `<span class="nm">${shirt(p)}<span>${esc(p.name)}</span></span>`;
-    const text = b.days === 0
-      ? `今日${b.m}月${b.d}日は${callName(p)}の${ageText(p, b)}${p.mascot ? '' : 'の'}誕生日！おめでとうございます🎂 テゲサポみんなでお祝いしよう！\n${SITE.hashtags}`
-      : `${b.m}月${b.d}日は${callName(p)}の${ageText(p, b)}${p.mascot ? '' : 'の'}誕生日🎂 あと${b.days}日！ みんなでお祝いしよう\n${SITE.hashtags}`;
-    const inner = b.days === 0
-      ? `<span class="cd">TODAY</span>${nm}<span class="bg2">おめでとう！</span><span class="cd">${p.mascot ? '今日が誕生日' : `今日で${b.turning}歳`}</span>`
-      : `<span class="cd">あと${b.days}日</span>${nm}<button class="bdbtn" type="button" data-bday-open="${esc(p.birth)}">${icon('cake')}${b.m}月${b.d}日${p.mascot ? '' : 'で'}</button><span class="bg2">${p.mascot ? 'お誕生日' : `${b.turning}歳`}</span>`;
-    return `<div class="bcard${b.days === 0 ? ' today' : ''}">${inner}${post(text, b.days === 0 ? 'Xでお祝い' : 'Xでポスト')}</div>`;
+    const text = `${b.m}月${b.d}日は${callName(p)}の${ageText(p, b)}${p.mascot ? '' : 'の'}誕生日🎂 あと${b.days}日！ みんなでお祝いしよう\n${SITE.hashtags}`;
+    const inner = `<span class="cd">あと${b.days}日</span>${nm}<button class="bdbtn" type="button" data-bday-open="${esc(p.birth)}">${icon('cake')}${b.m}月${b.d}日${p.mascot ? '' : 'で'}</button><span class="bg2">${p.mascot ? 'お誕生日' : `${b.turning}歳`}</span>`;
+    return `<div class="bcard">${inner}${post(text, 'Xでポスト')}</div>`;
   }).join('');
-  return `<h2>${icon('cake')}${soon[0].b.days === 0 ? '今日は誕生日！' : 'もうすぐ誕生日'}</h2><div class="row">${cards}</div>`;
+  return `<h2>${icon('cake')}もうすぐ誕生日</h2><div class="row">${cards}</div>`;
 }

@@ -211,7 +211,6 @@ table.simple td { border-bottom: 1px solid var(--line); padding: 6px 8px; vertic
 .bday h2 { margin: 0 0 8px; font-size: 1.05rem; display: flex; gap: 6px; align-items: center; }
 .bday .row { display: flex; flex-wrap: wrap; gap: 8px; }
 .bcard { flex: 1 1 13rem; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.4); border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
-.bcard.today { background: rgba(255,255,255,.3); box-shadow: 0 0 0 2px #fff inset; }
 .bcard .cd { font-size: .78rem; opacity: .95; }
 .bcard .nm { font-weight: 700; font-size: 1.05rem; }
 .bcard .bg2 { font-weight: 700; font-size: 1.8rem; line-height: 1; }
@@ -352,7 +351,6 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .bcard > .nm { grid-area: nm; min-width: 0; }
 .bcard > .bdbtn, .bcard > .cd:not(:first-child) { grid-area: dt; justify-self: start; }
 .bcard > .bg2 { grid-area: big; justify-self: end; align-self: end; font-size: 2.1rem; }
-.bcard.today > .bg2 { font-size: 1.3rem; }
 .bcard > .bpost { grid-area: post; justify-self: end; margin-top: 0; }
 .bcard .jno { min-width: 2.1rem; padding: 1px 5px; }
 .bcard .jno b { font-size: .95rem; }
@@ -616,7 +614,6 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .bday { background: var(--gold-soft); color: var(--fg); }
 .bday h2 { color: var(--gold-ink); }
 .bcard { background: #fff; border-color: #EBD9A6; }
-.bcard.today { background: #fff; box-shadow: 0 0 0 2px var(--gold) inset; }
 .bcard .bg2 { color: var(--ink); }
 .bcard .cd { color: var(--muted); opacity: 1; }
 .bpost { background: var(--brand); color: #fff; }
@@ -1112,6 +1109,8 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .bmascot { display: inline-grid; place-items: center; flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--soft); color: var(--ink); }
 .bmascot .ic { width: 1.3rem; height: 1.3rem; }
 /* 誕生日当日の「お祝いをXでポスト」は真ん中に */
+/* お祝いの枠と、すぐ下の枠（もうすぐ誕生日など）がくっつかないように */
+.hbd { margin-bottom: 14px; }
 .hbd > .bpost { align-self: center; justify-self: center; margin-inline: auto; }
 /* 誕生日当日：1人ずつ「背番号のシャツ・名前（リンク）・年齢」。年齢は「もうすぐ誕生日」の「おめでとう！」と同じ色で大きく */
 .hbd .who { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; margin-top: 4px; }
