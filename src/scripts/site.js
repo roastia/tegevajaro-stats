@@ -57,7 +57,8 @@ addEventListener('pageshow', () => { navClicked = false; });
   if (sheet && open && typeof sheet.showModal === 'function') {
     open.addEventListener('click', () => { sheet.showModal(); open.setAttribute('aria-expanded', 'true'); });
     close?.addEventListener('click', () => sheet.close());
-    sheet.addEventListener('click', e => { if (e.target === sheet) sheet.close(); });
+    // 外側を押したら閉じる。中のリンクを押したときも閉じる（同じページの別の場所〔教えて！の #spot・#site など〕へ移るときは、ページが読み込み直されないため）
+    sheet.addEventListener('click', e => { if (e.target === sheet || (e.target).closest?.('a[href]')) sheet.close(); });
     sheet.addEventListener('close', () => open.setAttribute('aria-expanded', 'false'));
     addEventListener('pageshow', () => { if (sheet.open) sheet.close(); });
   }
