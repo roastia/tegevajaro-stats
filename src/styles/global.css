@@ -975,6 +975,7 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 .fx-wait { background: var(--muted); }
 .fx-venue { margin-top: 2px; font-size: .8rem; color: var(--muted); }
 .fx-prev { font-size: .78rem; color: var(--muted); white-space: nowrap; text-align: right; }
+.fx-prev .fx-h2h { display: block; }   /* J参入からの通算成績（前回の結果の下に） */
 .fx-res { font-weight: 700; color: var(--fg); }
 .fx-res.win { color: var(--brand-deep); }
 .fx-src { margin-top: 14px; }

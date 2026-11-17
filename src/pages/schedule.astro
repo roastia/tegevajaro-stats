@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Ask from '../components/Ask.astro';
+import { loadHistory, headToHead } from '../lib/clubhistory.js';
 import { getData, readCsv } from '../lib/data.js';
 import { clubUrl } from '../config/clubs.js';
 import { href, icon, playerUrl } from '../lib/util.js';
@@ -23,6 +24,9 @@ const bdOn = date => d.profiles.filter(p => p.birth && p.birth.slice(5) === date
 const prevOf = f => d.matches.filter(m => m.opponent === f.opponent).sort((a, b) => Number(b.round) - Number(a.round))[0];
 const home = fixtures.filter(f => f.ha === 'H').length;
 const months = [...new Set(fixtures.map(f => f.date.slice(0, 7)))].map(k => [k, fixtures.filter(f => f.date.slice(0, 7) === k)]);
+// J参入からの通算成績（相手ごと。歴史のページと同じ数え方：PK戦は引き分け）
+const h2h = headToHead(loadHistory().matches);
+const h2hOf = f => h2h.find(h => h.opp === f.opponent || h.full === f.opponent_full);
 // 次のホーム戦の行に「宮崎のおすすめを教えて」
 const nextHome = fixtures.find(f => f.ha === 'H');
 ---
@@ -59,7 +63,8 @@ const nextHome = fixtures.find(f => f.ha === 'H');
                     </div>
                     <div class="fx-prev">{p
                       ? <span>前回 第{p.round}節 <span class={`fx-res ${resCls[p.result]}`}>{p.gf}-{p.ga} {resWord[p.result]}</span></span>
-                      : <span>今季初対戦</span>}</div>
+                      : <span>今季初対戦</span>}
+                      {(() => { const h = h2hOf(f); return <span class="fx-h2h">{h ? `通算 ${h.w}勝${h.d}分${h.l}敗` : '公式戦で初対戦'}</span>; })()}</div>
                   </li>
                 );
               })}
