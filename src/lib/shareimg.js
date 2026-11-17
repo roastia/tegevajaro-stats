@@ -191,7 +191,7 @@ export function shareTree(item, asOf = SITE.roundLabel) {
         h('div', { display: 'flex', fontSize: 27, fontWeight: 900, color: '#6B6066' }, SITE.tagline),
         h('div', { display: 'flex', fontSize: 20, fontWeight: 700, color: C.muted }, '非公式サポーターサイト'))),
     h('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', fontSize: 22, fontWeight: 700, color: C.muted, lineHeight: 1.4 },
-      h('div', { display: 'flex', fontWeight: 900, color: C.fg, fontSize: 28 }, `${item.upto ? `第${item.upto}節まで` : `${asOf}時点`}`),
+      ...(item.timeless ? [] : [h('div', { display: 'flex', fontWeight: 900, color: C.fg, fontSize: 28 }, `${item.upto ? `第${item.upto}節まで` : `${asOf}時点`}`)]),
       ...creditOf(item).map(t => h('div', { display: 'flex' }, t))));
   return h('div', { width: W, height: H, display: 'flex', flexDirection: 'column', fontFamily: 'Jp', fontWeight: 700, position: 'relative', backgroundColor: P.base },
     img(bgUri(), W, H, { position: 'absolute', left: 0, top: 0 }),

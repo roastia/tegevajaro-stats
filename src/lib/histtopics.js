@@ -46,7 +46,9 @@ export function historyTopics({ nextFx, now = new Date() } = {}) {
   const { matches: ms } = loadHistory();
   if (!ms.length) return [];
   const T = [];
-  const add = (group, id, emoji, label, headline, big, sub, cheer) => T.push({ group, id, emoji, label, headline, big, sub, cheer });
+  // 決まった過去の出来事・歴代の記録は「第〇節時点」を付けない（試合ごとに数が増える通算の数字には付ける）
+  const TIMELESS = new Set(['onthisday', 'h_maxgoals', 'h_crowd']);
+  const add = (group, id, emoji, label, headline, big, sub, cheer) => T.push({ group, id, emoji, label, headline, big, sub, cheer, timeless: TIMELESS.has(id) });
   const all = record(ms);
 
   // 公式戦の通算勝利：次の節目（50勝ごと）まで。ちょうど節目に届いた直後は「達成！」

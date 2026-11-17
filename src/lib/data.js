@@ -107,7 +107,7 @@ export function getShareables() {
   const d = getData();
   const out = [];
   for (const t of [...d.topics].sort((a, b) => a.order - b.order)) {
-    out.push({ kind: 't', id: t.id, group: t.group || 'main', label: t.label, icon: ICON_OF_TOPIC[t.id] || 'sparkle', headline: t.headline, big: t.big, sub: t.sub, cheer: t.cheer,
+    out.push({ kind: 't', id: t.id, group: t.group || 'main', timeless: !!t.timeless, label: t.label, icon: ICON_OF_TOPIC[t.id] || 'sparkle', headline: t.headline, big: t.big, sub: t.sub, cheer: t.cheer,
       text: postText(t.headline, t.sub, t.cheer) });
   }
   for (const { meta, rows } of d.rankings) {

@@ -11,5 +11,5 @@ const char = item.kind === 'r' ? CHAR_OF_RECORD[item.id] : CHAR_OF_TOPIC[item.id
 ---
 <article class="share reveal" id={`${item.kind}-${item.id}`}>
   <Shot item={item} char={char} />
-  <PostBox what={item.label} text={item.text} url={`${SITE.url}/${sharePath(item)}`} img={shareImgPath(item)} short={shortPost(item)} />
+  <PostBox what={item.label} text={item.text} url={`${SITE.url}/${sharePath(item)}`} img={shareImgPath(item)} short={shortPost(item)} asOf={item.timeless ? '' : undefined} />
 </article>
