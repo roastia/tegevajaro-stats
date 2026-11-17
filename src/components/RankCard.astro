@@ -4,6 +4,7 @@ import { shareImgPath, shortPost } from '../lib/shareimg.js';
 import Name from './Name.astro';
 import { icon, splitDisp } from '../lib/util.js';
 import { ICON_OF_RECORD, plainTitle } from '../lib/meta.js';
+import { cheerOf } from '../lib/cheers.js';
 import { SITE } from '../config/site.js';
 interface Props { meta: any; rows: any[]; share?: any }
 const { meta, rows, share } = Astro.props;
@@ -27,6 +28,8 @@ const top = rows.filter(r => r._rank <= 5).slice(0, 5).map(row);
 const rest = rows.slice(top.length).map(row);
 const pid = `info-${meta.id}`;
 const title = plainTitle(meta.title);
+// 応援のひとことは日ごとに切りかえる（src/lib/cheers.js）
+const cheer = cheerOf('r', meta.id, meta.cheer || '');
 ---
 <section class="card rec reveal" id={`rank-${meta.id}`} data-cat={meta.cat}>
   <h2>
@@ -35,7 +38,7 @@ const title = plainTitle(meta.title);
     <span class="src">{meta.src}{meta.upto && `・第${meta.upto}節まで`}</span>
   </h2>
   <div class="pop" id={pid} popover><b>{title}</b><br />{meta.note}</div>
-  {meta.cheer && <p class="cheer">{meta.cheer}</p>}
+  {cheer && <p class="cheer">{cheer}</p>}
   <div class="champ">
     <span class="nm">{climbed && <span class="climb">首位浮上！</span>}{champs.map((r, i) => <>{i > 0 && '・'}<Name name={r.name} /></>)}</span>
   </div>

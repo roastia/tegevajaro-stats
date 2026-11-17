@@ -341,3 +341,31 @@ test('誕生日：ビルド時とブラウザで同じ HTML（日本時間で数
   assert.doesNotMatch(soonHtml(st2.soon), /小西 宏登/, '当日は「もうすぐ」に出さない');
   assert.equal(hbdHtml([]), '');
 });
+
+test('応援のひとこと：ランキングは全部に10個ずつ・短い・前向き・重ならない、日ごとに切りかわる', async () => {
+  const { cheerOf, allCheers } = await import('../src/lib/cheers.js');
+  const all = allCheers();
+  const by = new Map();
+  for (const { key, text } of all) by.set(key, [...(by.get(key) || []), text]);
+  for (const r of RECORDS) assert.ok((by.get(`r:${r.id}`) || []).length >= 10, `ランキング「${r.id}」のひとことが10個ない`);
+  for (const [key, list] of by) {
+    assert.match(key, /^[rt]:[a-z_0-9]+$/, key);
+    assert.equal(new Set(list).size, list.length, `${key} に同じ文がある`);
+  }
+  // UI と画像が崩れない長さ（全角18文字まで）。人を傷つける言葉・汚い言葉は使わない
+  const NG = ['死', '殺', 'バカ', 'ばか', 'アホ', 'クソ', 'くそ', 'ブス', 'デブ', 'ハゲ', 'ヘタ', '下手', 'ザコ', '雑魚', 'ざまぁ', '戦犯', '負け犬', 'カス', 'ゴミ', 'うざ', 'キモ', 'きも'];
+  for (const { key, text } of all) {
+    assert.ok([...text].length <= 18, `${key}「${text}」が長い`);
+    const plain = text.replace(/テゲバ/g, '');   // 「テゲバカラー」の「バカ」のような、つながりの読みちがいは数えない
+    assert.ok(!NG.some(w => plain.includes(w)), `${key}「${text}」に使わない言葉`);
+    assert.ok(!/[<>"]/.test(text), `${key}「${text}」に使えない記号`);
+  }
+  // 同じ日は同じ文、日が変わると変わる。ない id は今の文のまま
+  const d1 = new Date('2026-11-17T03:00:00Z'), d1b = new Date('2026-11-17T14:00:00Z'), d2 = new Date('2026-11-18T03:00:00Z');
+  assert.equal(cheerOf('r', 'tall', '', d1), cheerOf('r', 'tall', '', d1b));
+  assert.notEqual(cheerOf('r', 'tall', '', d1), cheerOf('r', 'tall', '', d2));
+  assert.equal(cheerOf('t', 'timezone', 'そのまま', d1), 'そのまま');
+  // 10日で10個すべてが一度ずつ出る
+  const seen = new Set(Array.from({ length: 10 }, (_, i) => cheerOf('r', 'tall', '', new Date(d1.getTime() + i * 86400e3))));
+  assert.equal(seen.size, by.get('r:tall').length);
+});

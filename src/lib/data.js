@@ -7,6 +7,7 @@ import { ranksOf, movesOf, newLeaders } from './history.js';
 import { milestones } from './milestones.js';
 import { SITE } from '../config/site.js';
 import { splitDisp as splitDispB } from './util.js';
+import { cheerOf } from './cheers.js';
 
 // ビルドはプロジェクトの直下で実行する前提（npm run build）
 const DATA_DIR = path.resolve(process.cwd(), 'src/data');
@@ -107,12 +108,13 @@ export function getShareables() {
     const names = champs.map(r => r.name).join('・');
     const val = champs.length > 1 || meta.hideValue ? '' : splitDisp(champs[0].display)[0];
     const title = plainTitle(meta.title);
+    const cheer = cheerOf('r', meta.id, meta.cheer || '');   // 日ごとに切りかえる応援のひとこと
     out.push({ kind: 'r', id: meta.id, label: title, icon: ICON_OF_RECORD[meta.id] || 'star', headline: `${title} 1位は${names}！`,
-      big: names, sub: val, cheer: meta.cheer || '', note: meta.note,
+      big: names, sub: val, cheer, note: meta.note,
       top: rows.filter(r => r._rank <= 3).slice(0, 3).map(r => ({ rank: r._rank, name: r.name, display: meta.hideValue ? '' : r.display })),
       // 画像でポスト用：上位5行まで（表示はメインの数字だけ）。src・upto はデータ元と「第〇節まで」の表記に使う
       top5: rows.filter(r => r._rank <= 5).slice(0, 5).map(r => ({ rank: r._rank, name: r.name, display: meta.hideValue ? '' : splitDisp(r.display)[0] })), src: meta.src, upto: meta.upto,
-      text: postText(`${title}\n1位は${names}${val ? `（${val}）` : ''}！`, '', meta.cheer).replace('\n\n', '\n') });
+      text: postText(`${title}\n1位は${names}${val ? `（${val}）` : ''}！`, '', cheer).replace('\n\n', '\n') });
   }
   for (const f of [...d.roots_facts].sort((a, b) => a.order - b.order)) {
     out.push({ kind: 'b', id: f.id, label: f.label, icon: f.icon, headline: f.headline, big: f.big, sub: f.sub, cheer: f.cheer,

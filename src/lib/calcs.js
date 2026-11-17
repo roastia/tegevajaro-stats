@@ -3,6 +3,7 @@
 // AS_OF: 年齢を数える基準日（YYYY-MM-DD）
 // Football LAB 由来のデータが何節までの値か（毎節は更新しない）。ランキングの札・ポスト文・計算の範囲に使う
 // （2026-11-07 取得：選手のシュート・ラストパス・CBP・パス交換は第15節まで、ゴール期待値の選手上位10人は第16節まで）
+import { cheerOf } from './cheers.js';
 export const LAB_UPTO = { players: 16, xg: 16, pass_pairs: 16, cbp: 16 };
 // 国民の祝日・休日（内閣府「国民の祝日」の一覧。2026〜2027年）。平日開催の判定に使う
 export const HOLIDAYS = new Set([
@@ -511,7 +512,8 @@ dash.calc('topics', {
     // シュート数
     const sf = sum(ms, 'shots_for'), sa = sum(ms, 'shots_against');
     if (sf > sa && ms.length) add('shots', '🎯', '打ち勝つ', `シュート数で相手を${sf - sa}本上回る！`, `${sf}本`, `1試合平均${(sf / ms.length).toFixed(1)}本（相手は${(sa / ms.length).toFixed(1)}本）`, '打てば入る、打たなきゃ入らない');
-    return T.map((t, i) => ({ ...t, order: i + 1, post: `${t.headline}\n${t.sub}\n${t.cheer}\n#テゲバジャーロ宮崎 #テゲバ #テゲスタ` }));
+    // 応援のひとことは日ごとに切りかえる（src/data/cheers.csv。ないものは上の文のまま）
+    return T.map((t, i) => { const cheer = cheerOf('t', t.id, t.cheer); return { ...t, cheer, order: i + 1, post: `${t.headline}\n${t.sub}\n${cheer}\n#テゲバジャーロ宮崎 #テゲバ #テゲスタ` }; });
   }
 });
 
