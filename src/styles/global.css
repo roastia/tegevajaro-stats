@@ -1238,7 +1238,8 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
   .hs-d { grid-row: 1; grid-column: 1; }
   .hs-o { grid-row: 1; grid-column: 2; }
   .hs-res { grid-row: 1; grid-column: 3; }
-  .hs-c { grid-row: 2; grid-column: 2 / -1; }
+  /* 節・大会名と「得点者」は2列目だけに（3列目の「Xでポスト」と重ならない。長い名前のときは「得点者」が次の行へ） */
+  .hs-c { grid-row: 2; grid-column: 2; }
   /* スマホ：吹き出しは行の幅いっぱいに（画面からはみ出さない） */
   .hs-gw { position: static; }
   .hs-gp { left: 3.2em; right: 0; top: calc(100% - 4px); width: auto; max-width: none; }
