@@ -55,11 +55,8 @@ function bars(ol, data, mine, label = 'あなた') {
   });
 }
 
-// 画像の共有ができる端末か（指で操作する端末で、ファイルを共有できるとき）
-const canFiles = (() => {
-  try { return matchMedia('(pointer: coarse)').matches && !!navigator.canShare && navigator.canShare({ files: [new File([''], 'x.jpg', { type: 'image/jpeg' })] }); }
-  catch { return false; }
-})();
+// 指で操作する端末（スマホ・タブレット）。画像つきの共有メニューを使う
+const touch = matchMedia('(pointer: coarse)').matches;
 const imgs = new Map();
 const imgFile = (src) => {
   if (!imgs.has(src)) imgs.set(src, fetch(src).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(b => new File([b], src.split('/').pop(), { type: 'image/jpeg' })));
@@ -116,7 +113,7 @@ function setupCard(card) {
       a.href = 'https://twitter.com/intent/tweet?' + new URLSearchParams({ text, url }).toString();
       a.dataset.img = `${card.dataset.imgBase}y-${mine.gf}-${mine.ga}.jpg`;
       a.dataset.text = `${text} ${url}`;
-      if (canFiles) imgFile(a.dataset.img).catch(() => {});   // 先に読んでおく
+      if (touch) imgFile(a.dataset.img).catch(() => {});   // 先に読んでおく（押したらすぐ共有メニューを開けるように）
       a.hidden = mine.gf > MAX;
     } else $('[data-share]').hidden = true;
     const win = data.scores.filter(s => s.gf > s.ga).reduce((t, s) => t + s.n, 0);
@@ -152,13 +149,20 @@ function setupCard(card) {
   // PC は画像を保存して、リンクどおり X の投稿画面（文入り）を開く。押してすぐ共有メニューを開けるよう、画像は先に読んでおく
   $('[data-share]').addEventListener('click', async e => {
     const a = e.currentTarget;
-    if (canFiles) {
-      e.preventDefault();   // 先にリンクを止める（止めないと X の投稿画面が先に開いてしまう）
+    if (touch) {
+      // スマホ：まずリンクを止める（止めないと X の投稿画面が先に開いてしまう）。画像つきの共有メニューを開く
+      e.preventDefault();
       try {
-        await navigator.share({ files: [await imgFile(a.dataset.img)], text: a.dataset.text });
+        const file = await imgFile(a.dataset.img);
+        if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+          await navigator.share({ files: [file], text: a.dataset.text });
+          return;
+        }
       } catch (err) {
-        if (!(err && err.name === 'AbortError')) location.href = a.dataset.img;   // うまく開けないときは画像を開いて保存できるように
+        if (err && err.name === 'AbortError') return;   // 共有をやめた
       }
+      // 画像を共有できない端末：X の投稿画面（文だけ）を開く
+      location.href = a.href;
       return;
     }
     imgFile(a.dataset.img).then(file => {
