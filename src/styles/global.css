@@ -1381,8 +1381,10 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .ys-bars .bar { height: 12px; border-radius: 6px; background: color-mix(in srgb, var(--brand) 35%, transparent); width: var(--w, 4%); }
 .ys-bars li.top .bar { background: var(--brand); }
 .ys-bars .p { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
-.ys-bars .you { font-size: .68rem; font-weight: 700; color: var(--brand-deep); border: 1px solid var(--brand); border-radius: 999px; padding: 0 7px; background: var(--panel); }
-.ys-bars li:not(.me) { grid-template-columns: 2.6em minmax(0, 1fr) 3.4em; }
+.ys-bars .you { white-space: nowrap; justify-self: start; font-size: .68rem; font-weight: 700; color: var(--brand-deep); border: 1px solid var(--brand); border-radius: 999px; padding: 0 7px; background: var(--panel); }
+/* 「あなた」「結果」の印がある一覧は、どの行も印の列をとって、%の位置をそろえる */
+.ys-bars:not(:has(.you)) li { grid-template-columns: 2.6em minmax(0, 1fr) 3.4em; }
+.ys-bars:has(.you) li { grid-template-columns: 2.6em minmax(0, 1fr) 3.4em 4.2em; }
 .ys-msg { margin: 0; font-size: .85rem; font-weight: 700; color: var(--brand-deep); }
 .ys-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; }
 .ys-last { margin: 0; font-size: .78rem; color: var(--muted); }
