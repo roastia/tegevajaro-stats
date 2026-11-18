@@ -1,5 +1,4 @@
 /* ===== テゲスタ！：全体のスタイル ===== */
-@property --spin { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 
 :root {
   color-scheme: light;
@@ -78,8 +77,8 @@ input[type=search] { flex: 1 1 10rem; }
 .share { display: flex; flex-direction: column; border-radius: var(--radius); overflow: hidden; border: 1px solid color-mix(in srgb, var(--brand) 40%, var(--line)); background: var(--panel); }
 .shot { position: relative; overflow: hidden; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; color: #fff;
   background: linear-gradient(150deg, var(--brand-dark) 0%, var(--brand-deep) 55%, var(--brand) 100%); isolation: isolate; }
-.shot::before { content: ''; position: absolute; inset: -40%; z-index: -1; opacity: .35;
-  background: conic-gradient(from var(--spin), transparent 0 70%, rgba(255,255,255,.5) 80%, transparent 90%); }
+.shot::before { content: ''; position: absolute; inset: -100%; z-index: -1; opacity: .35;
+  background: conic-gradient(transparent 0 70%, rgba(255,255,255,.5) 80%, transparent 90%); }
 .shot::after { content: ''; position: absolute; right: -30px; top: -30px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,.08); }
 .shot .lb { font-size: .8rem; opacity: .9; letter-spacing: .04em; display: flex; gap: 6px; align-items: center; padding-right: 64px; }
 .shot .hl { font-weight: 700; font-size: 1.08rem; line-height: 1.45; padding-right: 64px; }
@@ -138,9 +137,10 @@ input[type=search] { flex: 1 1 10rem; }
 @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: no-preference) {
-  .shot::before { animation: spin 9s linear infinite; }
+  /* 光の筋は、絵を回すだけ（描きなおさずに GPU で回せるので軽い） */
+  .shot::before { animation: spin 9s linear infinite; will-change: transform; }
 }
-@keyframes spin { to { --spin: 360deg; } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* team tiles & form */
 .tile .big { font-size: 2rem; }
@@ -582,7 +582,7 @@ p, .sub, .sb, .note, .lead, .page-lead { text-wrap: pretty; }
 .season-rec .rank { background: #fff; }
 /* 注目トピックのカード */
 .shot { background: var(--soft); color: var(--fg); }
-.shot::before { background: conic-gradient(from var(--spin), transparent 0 70%, rgba(241,102,130,.18) 80%, transparent 90%); }
+.shot::before { background: conic-gradient(transparent 0 70%, rgba(241,102,130,.18) 80%, transparent 90%); }
 .shot::after { background: rgba(241,102,130,.07); }
 .shot .lb { color: var(--ink); opacity: 1; }
 .shot .bg { color: var(--ink); }
@@ -1429,3 +1429,11 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .yh-meta { margin: 4px 0 8px; display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: .8rem; color: var(--muted); }
 .yh-empty { margin: 0; font-size: .88rem; color: var(--muted); }
 .yh-rules ul { margin: 6px 0 0; padding-left: 1.2em; font-size: .85rem; line-height: 1.7; }
+
+/* ---------- 軽くするための指定（見た目・動きは変えない） ---------- */
+/* ランキングのカード（50枚近く・1枚に20行以上）：画面の外にあるあいだは中の配置を計算しない。ページを開く・スクロールするときに軽くなる */
+.card.rec { content-visibility: auto; contain-intrinsic-size: auto 420px; }
+/* トップの話題のカード（40枚ほど）も同じ */
+.share { content-visibility: auto; contain-intrinsic-size: auto 290px; }
+/* リンク（#rank-〇〇・#t-〇〇）で来たときは、いったん全部を配置して、ねらった場所にぴったり止める（site.js の reveal） */
+.cv-all .card.rec, .cv-all .share { content-visibility: visible; }

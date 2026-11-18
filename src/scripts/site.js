@@ -249,7 +249,12 @@ document.addEventListener('click', e => {
   // 貼りついている見出しに .stuck（見た目を平らな帯に変える）
   const heads = [...document.querySelectorAll('details.acc > .acc-h')];
   let rq = 0;
-  const markStuck = () => { rq = 0; const top = stickH() + 1; for (const h of heads) { const d = h.parentElement; h.classList.toggle('stuck', d.open && d.getBoundingClientRect().top < top - 1 && h.getBoundingClientRect().top <= top); } };
+  // 先に全部の位置を測ってから、まとめて印を付けかえる（測る・書くを交互にすると重くなるため）
+  const markStuck = () => {
+    rq = 0; const top = stickH() + 1;
+    const on = heads.map(h => { const d = h.parentElement; return d.open && d.getBoundingClientRect().top < top - 1 && h.getBoundingClientRect().top <= top; });
+    heads.forEach((h, i) => { if (h.classList.contains('stuck') !== on[i]) h.classList.toggle('stuck', on[i]); });
+  };
   addEventListener('scroll', () => { if (!rq) rq = requestAnimationFrame(markStuck); }, { passive: true });
   addEventListener('resize', markStuck); document.addEventListener('toggle', markStuck, true); markStuck();
   const accs = [...document.querySelectorAll('details[data-acc][id]')];
@@ -289,6 +294,11 @@ document.addEventListener('click', e => {
     try { t = document.getElementById(decodeURIComponent(hash.slice(1))); } catch { t = null; }
     if (!t) return;
     for (let p = t; p; p = p.parentElement) if (p instanceof HTMLDetailsElement && !p.open) p.open = true;
+    // 画面の外のカードは高さを仮に置いている（CSS の content-visibility）ので、いったん全部を配置してからそこへ。
+    // 一度配置した高さは覚えておかれるので、少したって元に戻してもずれない
+    const root = document.documentElement;
+    root.classList.add('cv-all');
+    setTimeout(() => root.classList.remove('cv-all'), 1500);
     requestAnimationFrame(() => t.scrollIntoView({ block: 'start', behavior: smooth && !reduced ? 'smooth' : 'auto' }));
   };
   reveal(location.hash, false);
