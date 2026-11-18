@@ -1333,8 +1333,9 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .yosou { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
 .yosou[hidden], .yosou [hidden] { display: none !important; }
 /* 予想ずみ・締め切り：はじめから予想の画面を出さず、みんなの予想の場所をとっておく（数は読み込んでから入る） */
-.yosou[data-state] .ys-form { display: none !important; }
-.yosou[data-state] .ys-res[hidden] { display: flex !important; }
+/* （スクリプトが動きはじめたら .ys-ready が付き、あとは hidden で切りかえる。付けたままだと「予想を変える」が効かない） */
+.yosou[data-state]:not(.ys-ready) .ys-form { display: none !important; }
+.yosou[data-state]:not(.ys-ready) .ys-res[hidden] { display: flex !important; }
 .yosou[data-state] .ys-sum:empty { min-height: 1.5em; }
 .yosou[data-state] .ys-bars:empty { min-height: 7.6rem; }
 .yosou[data-state="closed"] .ys-mine, .yosou[data-state="closed"] .ys-share { display: none; }

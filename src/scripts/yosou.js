@@ -116,7 +116,8 @@ function setupCard(card) {
     bars($('[data-bars]'), data, mine);
   };
 
-  const load = () => fetch(`${api}?match=${encodeURIComponent(key)}`).then(r => r.ok ? r.json() : Promise.reject(r.status));
+  // いつも最新の数を読む（ブラウザに残った少し前の数だと、自分の予想がまだ入っていないことがある）
+  const load = () => fetch(`${api}?match=${encodeURIComponent(key)}`, { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(r.status));
 
   $('[data-go]').addEventListener('click', async () => {
     const go = $('[data-go]');
@@ -154,8 +155,10 @@ function setupCard(card) {
   const mine = ls.get(store);
   if (mine && Number.isInteger(mine.gf)) { st.gf = mine.gf; st.ga = mine.ga; $('[data-mine]').textContent = `${mine.gf}-${mine.ga}`; }
   draw();
+  // ここからはスクリプトが hidden で切りかえる（表示前に決めた data-state の見せ方はやめる）
+  if (mine || closed()) { $('[data-form]').hidden = true; $('[data-res]').hidden = false; }
+  card.classList.add('ys-ready');
   if (mine || closed()) {
-    if (closed()) $('[data-form]').hidden = true;
     load().then(d => showRes(d, mine)).catch(() => msg('みんなの予想を読み込めませんでした'));
   }
 
