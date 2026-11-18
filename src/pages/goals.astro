@@ -62,7 +62,8 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
           ? <ul class="glist">{gs.map(x => <li data-scorer={x.scorer}><Fragment set:html={icon('ball')} /><span class="gt">{x.time}</span>{urlOf.get(x.scorer) ? <a class="gname" href={urlOf.get(x.scorer)} target="_blank" rel="noopener noreferrer"><b>{x.scorer}</b></a> : <b>{x.scorer}</b>}</li>)}</ul>
           : <p class="glist none">宮崎の得点なし</p>}
         {g && (
-          <details class="hl-xi">
+          <details class="hl-xi" open={m === lastM}>
+            {/* 最新の試合のスタメンは、はじめから開いておく（「テゲバ スタメン」で来た人がすぐ見られるように） */}
             <summary>スタメン＆フォーメーション<span class="xi-form">{g.formation}</span></summary>
             <div class="pitch" role="img" aria-label={`${g.formation}：${g.lines.flat().map(x => `${x.role} ${x.name}`).join('、')}`}>
               <span class="pa" aria-hidden="true"></span><span class="ga" aria-hidden="true"></span><span class="parc" aria-hidden="true"></span>
