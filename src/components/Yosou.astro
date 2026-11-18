@@ -22,9 +22,8 @@ const ha = open?.ha === 'H' ? 'ホーム' : 'アウェイ';
     data-last={last && JSON.stringify({ key: last.key, round: last.round, opp: last.oppFull, gf: last.gf, ga: last.ga })}>
     <div class="ys-top">
       <h2 class="ys-kicker"><Fragment set:html={icon('target')} />みんなのスコア予想</h2>
-      <span class="ys-dl" data-dl>締め切り {open.day} {open.kickoffLabel}</span>
     </div>
-    <p class="ys-match">第{open.round}節 <b>{open.oppFull}</b>戦<span>{open.day} {open.kickoffLabel}・{ha}</span></p>
+    <p class="ys-match">第{open.round}節 <b>{open.oppFull}</b>戦<span>{open.day} {open.kickoffLabel}・{ha}<span class="ys-dl" data-dl>締め切り {open.day} {open.kickoffLabel}</span></span></p>
 
     <div class="ys-form" data-form>
       <div class="ys-board" data-board>
@@ -48,7 +47,7 @@ const ha = open?.ha === 'H' ? 'ホーム' : 'アウェイ';
       </div>
       <p class="ys-verdict" data-verdict aria-live="polite">{verdict(g0, a0)}</p>
       <button type="button" class="ys-go" data-go>この予想で決定！</button>
-      <p class="ys-note">負け予想はなし。テゲバを信じよう。キックオフまでなら何度でも変えられます</p>
+      <p class="ys-note">負け予想はなし。キックオフまで何度でも変えられます</p>
     </div>
 
     <div class="ys-res" data-res hidden>
