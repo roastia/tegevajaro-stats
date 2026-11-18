@@ -48,7 +48,7 @@ const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
     <Acc id={`m-${mk}`} title={`${Number(mk.slice(5))}月の試合`} icon="calendar" count={list.length}>
     <ul class="grid hl-games" data-month={mk}>
     {list.map(m => { const gs = d.goals.filter(g => String(g.round) === String(m.round)).sort((a, b) => Number(a.minute) - Number(b.minute)); const v = safeUrl(m.video_url), p = safeUrl(m.match_url); const g = xiOf.get(String(m.round)); return (
-      <li class="card hl-game" data-res={m.result} data-round={m.round} data-scorers={[...new Set(gs.map(x => x.scorer))].join('|')}>
+      <li class="card hl-game" id={`xi-${m.round}`} data-res={m.result} data-round={m.round} data-scorers={[...new Set(gs.map(x => x.scorer))].join('|')}>
         <div class="lu-head">
           <span class="lu-rd">第{m.round}節</span>
           <span class="lu-vs">{md(m.date)} {clubUrl(m.opponent) ? <a class="club-link" href={clubUrl(m.opponent)} target="_blank" rel="noopener noreferrer">{m.opponent}</a> : m.opponent}<small>（{ha(m)}）</small></span>

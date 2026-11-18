@@ -8,6 +8,7 @@ import { href, icon, playerUrl } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 import { eventsLd } from '../lib/seo.js';
 import { todayJst } from '../lib/bday.js';
+import { buildLineups } from '../lib/lineups.js';
 // 日程：これからの試合（fixtures.csv のうち、結果がまだ入っていない節）を、前回の対戦といっしょに並べる
 const d = getData();
 const played = new Set(d.matches.map(m => String(m.round)));
@@ -32,6 +33,8 @@ const h2hOf = f => h2h.find(h => h.opp === f.opponent || h.full === f.opponent_f
 const jpDate = s => { const [, m, dd] = s.split('-').map(Number); return `${m}月${dd}日（${wd(s)}）`; };
 const nx = fixtures.find(f => f.date >= todayJst()) || fixtures[0];
 const nextText = nx ? `次の試合は${jpDate(nx.date)}${nx.kickoff || ''}、${nx.ha === 'H' ? 'ホーム' : 'アウェイ'}で${nx.opponent_full || nx.opponent}戦（${nx.venue}）。` : '';
+// 次の試合の行に、前節のスタメン（ハイライトのページのスタメン図へ）。「スタメン」は試合の前日・当日によく探されるため
+const lastXi = buildLineups({ lineups: readCsv('lineups'), matches: readCsv('matches'), players: readCsv('players') }).games[0];
 // 次のホーム戦の行に「宮崎のおすすめを教えて」
 const nextHome = fixtures.find(f => f.ha === 'H');
 ---
@@ -63,6 +66,7 @@ const nextHome = fixtures.find(f => f.ha === 'H');
                         <span class="fx-wait" hidden>結果は更新待ち</span>
                       </div>
                       <div class="fx-venue">{f.venue}</div>
+                      {f === fixtures[0] && lastXi && <a class="fx-xi" href={href(`goals/#xi-${lastXi.round}`)}>前節（第{lastXi.round}節）のスタメンを見る<span>{lastXi.formation}</span></a>}
                       {f === nextHome && <Ask topic="spot" q="試合の前後に寄りたい宮崎のお店、教えてください" />}
                       {bd.length > 0 && <div class="fx-bd"><Fragment set:html={icon('cake')} /><span>この日は{bd.map((b, i) => <>{i > 0 && '・'}{b.url ? <a href={b.url} target="_blank" rel="noopener noreferrer">{b.name}</a> : b.name}選手の{b.age}歳</>)}の誕生日！</span></div>}
                     </div>
