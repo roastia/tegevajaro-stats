@@ -246,13 +246,32 @@ document.addEventListener('click', e => {
   addEventListener('resize', markStuck); document.addEventListener('toggle', markStuck, true); markStuck();
   const accs = [...document.querySelectorAll('details[data-acc][id]')];
   const key = (d) => `tg:acc:${location.pathname}:${d.id}`;
+  let bulk = false;   // 「すべて閉じる」の最中は、1つずつの位置合わせをしない
   for (const d of accs) {
     const v = ss.get(key(d));
     if (v !== null) d.open = v === '1';
     d.addEventListener('toggle', () => {
       ss.set(key(d), d.open ? '1' : '0');
       // 上に貼りついた見出しで閉じたら、閉じた見出しが画面の上に来るように戻す（中身の分だけ飛ばない）
-      if (!d.open && d.getBoundingClientRect().top < stickH()) d.scrollIntoView({ block: 'start' });
+      if (!bulk && !d.open && d.getBoundingClientRect().top < stickH()) d.scrollIntoView({ block: 'start' });
+    });
+  }
+  // すべて閉じる：開いているまとまり（中の小さいまとまりも）をまとめて閉じ、いま見ていたまとまりの見出しを画面の上に
+  const closeAll = document.querySelector('.close-all');
+  if (closeAll && accs.length) {
+    const opened = () => [...document.querySelectorAll('main details[open]')];
+    let rq2 = 0;
+    const upd = () => { rq2 = 0; closeAll.hidden = !(scrollY > innerHeight * 0.8 && opened().length > 0); };
+    addEventListener('scroll', () => { if (!rq2) rq2 = requestAnimationFrame(upd); }, { passive: true });
+    document.addEventListener('toggle', () => { if (!rq2) rq2 = requestAnimationFrame(upd); }, true);
+    upd();
+    closeAll.addEventListener('click', () => {
+      const top = stickH() + 1;
+      const cur = accs.find(d => { const r = d.getBoundingClientRect(); return r.top <= top + 1 && r.bottom > top; }) || accs.find(d => d.getBoundingClientRect().bottom > top);
+      bulk = true;
+      for (const d of opened()) d.open = false;
+      if (cur) cur.scrollIntoView({ block: 'start' });
+      setTimeout(() => { bulk = false; if (cur) cur.scrollIntoView({ block: 'start' }); upd(); }, 60);
     });
   }
   // リンク先（#rank-〇〇 など）がたたまれた中にあれば、まわりを開いてからそこへ

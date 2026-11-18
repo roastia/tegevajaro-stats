@@ -148,6 +148,8 @@ const inMenu = !TABS.includes(current);
       </aside>
     )}
   </main>
+  <!-- 開いているまとまりを、このページでまとめて閉じる（スクロールしたときだけ、画面の下に出る。src/scripts/site.js） -->
+  <button type="button" class="close-all" hidden>すべて閉じる</button>
   <footer class="site-foot">
     <div class="wrap">
       <p>このサイトは個人が運営する<b>非公式のサポーターサイト</b>です。テゲバジャーロ宮崎、Jリーグ、各データ提供元とは関係ありません。ランキングは公開データをもとに独自に集計したもので、公式記録ではありません。広告・収益化はしていません。</p>
