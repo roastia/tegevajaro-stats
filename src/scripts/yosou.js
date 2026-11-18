@@ -55,6 +55,17 @@ function bars(ol, data, mine, label = 'あなた') {
   });
 }
 
+// 画像の共有ができる端末か（指で操作する端末で、ファイルを共有できるとき）
+const canFiles = (() => {
+  try { return matchMedia('(pointer: coarse)').matches && !!navigator.canShare && navigator.canShare({ files: [new File([''], 'x.jpg', { type: 'image/jpeg' })] }); }
+  catch { return false; }
+})();
+const imgs = new Map();
+const imgFile = (src) => {
+  if (!imgs.has(src)) imgs.set(src, fetch(src).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(b => new File([b], src.split('/').pop(), { type: 'image/jpeg' })));
+  return imgs.get(src);
+};
+
 function setupCard(card) {
   const $ = s => card.querySelector(s);
   const api = card.dataset.api, key = card.dataset.key, kickoff = Date.parse(card.dataset.kickoff), MAX = Number(card.dataset.max) || 6;
@@ -105,6 +116,7 @@ function setupCard(card) {
       a.href = 'https://twitter.com/intent/tweet?' + new URLSearchParams({ text, url }).toString();
       a.dataset.img = `${card.dataset.imgBase}y-${mine.gf}-${mine.ga}.jpg`;
       a.dataset.text = `${text} ${url}`;
+      if (canFiles) imgFile(a.dataset.img).catch(() => {});   // 先に読んでおく
       a.hidden = mine.gf > MAX;
     } else $('[data-share]').hidden = true;
     const win = data.scores.filter(s => s.gf > s.ga).reduce((t, s) => t + s.n, 0);
@@ -136,21 +148,23 @@ function setupCard(card) {
     $('[data-res]').hidden = true; $('[data-form]').hidden = false; draw();
   });
 
-  // 画像でポスト：スマホは共有メニュー（画像つき）、PC は画像を保存して X の投稿画面へ
+  // 画像でポスト：スマホ（画像の共有ができる端末）は共有メニューだけを開く（X の投稿画面へのリンクには進まない）。
+  // PC は画像を保存して、リンクどおり X の投稿画面（文入り）を開く。押してすぐ共有メニューを開けるよう、画像は先に読んでおく
   $('[data-share]').addEventListener('click', async e => {
     const a = e.currentTarget;
-    const touch = matchMedia('(pointer: coarse)').matches;
-    try {
-      const blob = await fetch(a.dataset.img).then(r => r.ok ? r.blob() : Promise.reject(r.status));
-      const file = new File([blob], a.dataset.img.split('/').pop(), { type: 'image/jpeg' });
-      if (touch && navigator.canShare && navigator.canShare({ files: [file] })) {
-        e.preventDefault();
-        await navigator.share({ files: [file], text: a.dataset.text });
-        return;
+    if (canFiles) {
+      e.preventDefault();   // 先にリンクを止める（止めないと X の投稿画面が先に開いてしまう）
+      try {
+        await navigator.share({ files: [await imgFile(a.dataset.img)], text: a.dataset.text });
+      } catch (err) {
+        if (!(err && err.name === 'AbortError')) location.href = a.dataset.img;   // うまく開けないときは画像を開いて保存できるように
       }
-      const d = document.createElement('a'); d.href = URL.createObjectURL(blob); d.download = file.name;
+      return;
+    }
+    imgFile(a.dataset.img).then(file => {
+      const d = document.createElement('a'); d.href = URL.createObjectURL(file); d.download = file.name;
       document.body.append(d); d.click(); d.remove();
-    } catch (err) { if (err && err.name === 'AbortError') e.preventDefault(); }
+    }).catch(() => {});
   });
 
   // 締め切りまでの時間
