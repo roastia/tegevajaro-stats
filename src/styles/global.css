@@ -1047,8 +1047,6 @@ p .ss, .spot-info .ss, .pop .ss, .ms-list .tx .ss, .det .ss, .pref-tip .ss, .spo
 
 /* リンク集 */
 .links-h { margin: 0 0 6px; font-size: 1.15rem; color: var(--ink); }
-.links-count { margin: 8px 0 0; font-size: .85rem; color: var(--muted); }
-.links-count b { font-size: 1.3rem; color: var(--ink); margin-left: 4px; }
 .link-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 @media (min-width: 761px) { .link-list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); } }
 .link-item { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--fg); text-decoration: none; height: 100%; }

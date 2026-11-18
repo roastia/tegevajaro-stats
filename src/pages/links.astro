@@ -16,13 +16,11 @@ const GROUPS = [
 ];
 const rows = readCsv('links').map(r => ({ ...r, url: siteUrl(r.url), host: (() => { try { return new URL(r.url).host.replace(/^www\./, ''); } catch { return ''; } })() })).filter(r => r.name && r.url);
 // 情報提供の受付は「教えて！」ページ（src/pages/oshiete.astro）
-const fans = rows.filter(r => r.group === 'group' || r.group === 'youtube').length;
 ---
 <Base current="links" ld={[linksLd(rows)]} title="リンク集" description="テゲバジャーロ宮崎を応援・発信している団体やYouTubeチャンネル、応援番組のリンク集（非公式）。">
   <section class="card links-hero">
     <h2 class="links-h">テゲバを応援する人たち</h2>
     <p class="page-lead">テゲバジャーロ宮崎を応援し、発信している人たちのリンク集です。ゴール裏で声を出す人、遠征を記録する人、試合を語り合う人。テゲバを応援している人は、こんなにいます。気になるチャンネルをのぞいて、いっしょに盛り上がりましょう！</p>
-    <p class="links-count">団体・チャンネル <b>{fans}</b></p>
   </section>
   {GROUPS.map(([id, label, ic]) => {
     const list = rows.filter(r => r.group === id);
