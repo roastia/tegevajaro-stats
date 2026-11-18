@@ -109,9 +109,8 @@ function setupCard(card) {
       if (touch) preload(a.dataset.img);   // 先に読んでおく（押したらすぐ共有メニューを開けるように）
       a.hidden = mine.gf > MAX;
     } else $('[data-share]').hidden = true;
-    const win = data.scores.filter(s => s.gf > s.ga).reduce((t, s) => t + s.n, 0);
     $('[data-sum]').textContent = data.total
-      ? `${data.total}人が予想${closed() ? '（締め切り）' : ''}・勝ち予想 ${pct(win, data.total)}%`
+      ? `${data.total}人が予想${closed() ? '（締め切り）' : ''}`
       : 'まだだれも予想していません';
     bars($('[data-bars]'), data, mine);
   };
@@ -168,9 +167,8 @@ function setupCard(card) {
     fetch(`${api}?match=${encodeURIComponent(last.key)}`).then(r => r.ok ? r.json() : null).then(d => {
       if (!d || !d.total) return;
       const exact = d.scores.filter(s => s.gf === last.gf && s.ga === last.ga).reduce((t, s) => t + s.n, 0);
-      const side = d.scores.filter(s => Math.sign(s.gf - s.ga) === Math.sign(last.gf - last.ga)).reduce((t, s) => t + s.n, 0);
       const el = $('[data-lastline]');
-      el.textContent = `前節 ${last.opp}戦 ${last.gf}-${last.ga}：ぴったり的中 ${pct(exact, d.total)}%・${last.gf > last.ga ? '勝ち' : '引き分け'}予想 ${pct(side, d.total)}%（${d.total}人）`;
+      el.textContent = `前節 ${last.opp}戦 ${last.gf}-${last.ga}：ぴったり的中 ${pct(exact, d.total)}%（${d.total}人）`;
       el.hidden = false;
     }).catch(() => {});
   };
@@ -195,11 +193,10 @@ document.querySelectorAll('[data-yosou]').forEach(setupCard);
         if (!d || !d.total) { li.remove(); continue; }
         const gf = Number(li.dataset.gf), ga = Number(li.dataset.ga);
         const exact = d.scores.filter(s => s.gf === gf && s.ga === ga).reduce((t, s) => t + s.n, 0);
-        const side = d.scores.filter(s => Math.sign(s.gf - s.ga) === Math.sign(gf - ga)).reduce((t, s) => t + s.n, 0);
         const top = d.scores[0];
         li.querySelector('.yh-top').textContent = `1番人気 ${top.gf}-${top.ga}（${pct(top.n, d.total)}%）`;
         li.querySelector('.yh-hit').textContent = gf >= ga
-          ? `ぴったり的中 ${pct(exact, d.total)}%・${gf > ga ? '勝ち' : '引き分け'}予想 ${pct(side, d.total)}%`
+          ? `ぴったり的中 ${pct(exact, d.total)}%`
           : 'つぎこそ！';
         li.querySelector('.yh-n').textContent = `${d.total}人が予想`;
         bars(li.querySelector('.ys-bars'), d, { gf, ga }, '結果');
