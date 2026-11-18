@@ -28,7 +28,12 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci --ignore-scripts
+      # 部品の脆弱性チェック：critical（最も重い）は公開を止める。high 以下は結果を残すだけ（公開は止めない）
+      # 理由：このサイトは静的な HTML を作るだけで、high の多くはビルドの道具の中の話（2026-11 時点の picomatch のように直った版がまだ出ていないものもある）。
+      # 直った版が出たら Dependabot が知らせるので、そのとき更新する
+      - run: npm audit --audit-level=critical --omit=dev
       - run: npm audit --audit-level=high --omit=dev
+        continue-on-error: true
       - run: npm test
       - run: npm run build
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
