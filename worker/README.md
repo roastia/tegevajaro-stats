@@ -106,3 +106,21 @@ npx wrangler@4.150.0 d1 execute tegesta-spots --remote --command "UPDATE link_su
 `/removal/` のフォームから、対象（s〇・l〇）と理由・ひとことだけを受け付けます（連絡先は受け取らない）。ルールはほかの受付と同じ（Turnstile・1日10件・同じ対象は1日1回）。
 
 はじめて使うとき：`schema.sql` を流し直して（`removal_requests` の表が増える）`deploy`。届いたものは `npm run removals:pull` で `private/removals-inbox.json` に。対応の方針は `docs/spots.md`「掲載をやめる依頼」。
+
+## 8. みんなのスコア予想（/api/yosou）
+- サイトのトップ・日程・/yosou/ に出る「みんなのスコア予想」の受付です。名前は受け取らず、同じ回線から1試合1票（キックオフまでは変えられる）。負け予想は受けません。
+- 受け付ける試合とキックオフの時刻は、サイトの `/yosou.json`（毎日のビルドで作る）を見ます。キックオフを過ぎたら締め切ります。
+- 回線のハッシュ（yosou_votes）は試合の3日後に数だけ yosou_tally にまとめて消します（毎日の scheduled）。
+
+はじめて入れるとき（テーブルを足して、Worker を更新）：
+```sh
+cd worker
+npx wrangler@4.150.0 d1 execute tegesta-spots --remote --file schema.sql   # IF NOT EXISTS なので、何度実行してもよい
+npx wrangler@4.150.0 deploy
+```
+Worker を更新してから、サイトを push します（先にサイトを出すと、予想ボタンが「送信できませんでした」になります）。
+
+予想の数を見るとき：
+```sh
+npx wrangler@4.150.0 d1 execute tegesta-spots --remote --command "SELECT match, gf, ga, COUNT(*) AS n FROM yosou_votes GROUP BY match, gf, ga ORDER BY match, n DESC"
+```

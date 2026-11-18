@@ -50,7 +50,7 @@ const len = s => [...String(s || '')].reduce((n, c) => n + (c.codePointAt(0) > 0
 const fit = (s, width, max, min) => Math.max(min, Math.min(max, Math.floor(width * .92 / Math.max(1, len(s)))));
 
 /** データ元の表記 */
-export const creditOf = item => item.src === 'Football LAB' ? ['データ：Football LAB', '©DataStadium Inc.']
+export const creditOf = item => item.kind === 'y' ? (item.credit || []) : item.src === 'Football LAB' ? ['データ：Football LAB', '©DataStadium Inc.']
   : item.src ? ['データ：Jリーグ公式'] : ['データ：Jリーグ公式・Football LAB', '©DataStadium Inc.'];
 
 // 名前（2人組の「＆」は細く小さく。名前の途中で改行しない）
@@ -173,7 +173,7 @@ function rankBody(item) {
 
 export function shareTree(item, asOf = SITE.roundLabel) {
   const isRank = item.kind === 'r';
-  const tag = isRank ? 'RANKING' : 'TOPIC';
+  const tag = item.tag || (isRank ? 'RANKING' : 'TOPIC');
   const body = h('div', { display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', padding: `${PAD}px ${PAD}px 0`, position: 'relative' },
     h('div', { display: 'flex', alignItems: 'center', gap: 16, paddingRight: 220, marginTop: 20 },
       h('div', { display: 'flex', fontFamily: 'SairaLabel', fontWeight: 900, fontSize: 40, letterSpacing: 3, color: '#FFFFFF', backgroundColor: P.deep, padding: '2px 18px 0', lineHeight: 1.2 }, tag),

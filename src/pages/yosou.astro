@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import Yosou from '../components/Yosou.astro';
+import { SITE } from '../config/site.js';
+import { readCsv } from '../lib/data.js';
+import { yosouData } from '../lib/yosou.js';
+import { clubFull } from '../config/clubs.js';
+import { todayJst } from '../lib/bday.js';
+// みんなのスコア予想：次の試合の予想と、これまでの試合ごとの「みんなの予想」と答え合わせ（数は Worker の /api/yosou?all=1 からブラウザで読む）
+const { open, past } = yosouData({ fixtures: readCsv('fixtures'), matches: readCsv('matches'), clubFull, today: todayJst().toISOString().slice(0, 10) });
+const api = SITE.spots.api ? new URL('/api/yosou', SITE.spots.api).href : '';
+const res = (gf: number, ga: number) => (gf > ga ? '勝ち' : gf === ga ? '引き分け' : '負け');
+---
+<Base current="yosou" title="みんなのスコア予想" description={`${open ? `第${open.round}節 ${open.oppFull}戦（${open.day}）のスコアを予想しよう。` : ''}テゲバジャーロ宮崎の次の試合のスコアを、テゲサポのみんなで予想。キックオフまで受付、試合のあとは答え合わせ（非公式サポーターサイト）。`}>
+  <Yosou id="yosou" />
+  {!open && <section class="card"><p class="page-lead">次の試合の日程が決まったら、ここで予想できるようになります。</p></section>}
+  <section class="card yh">
+    <h2 class="ys-kicker">これまでの予想</h2>
+    <p class="yh-lead">試合ごとに、みんなの予想と実際の結果を並べました。</p>
+    <ol class="yh-list" data-yosou-history data-api={api}>
+      {past.map(m => (
+        <li data-key={m.key} data-gf={m.gf} data-ga={m.ga} hidden>
+          <p class="yh-h"><span class="yh-rd">第{m.round}節 {m.day}</span><b>{m.oppFull}</b>戦 <span class={`yh-res r-${res(m.gf, m.ga)}`}>{m.gf}-{m.ga} {res(m.gf, m.ga)}</span></p>
+          <p class="yh-meta"><span class="yh-top"></span><span class="yh-hit"></span><span class="yh-n"></span></p>
+          <ol class="ys-bars"></ol>
+        </li>
+      ))}
+    </ol>
+    <p class="yh-empty" data-yosou-empty hidden>まだ答え合わせできる試合はありません。次の試合から、ここに並びます。</p>
+  </section>
+  <section class="card yh-rules">
+    <h2 class="ys-kicker">予想のルール</h2>
+    <ul>
+      <li>名前の登録はいりません。同じ回線（Wi-Fi など）から1試合1回、キックオフまでなら何度でも変えられます。</li>
+      <li>テゲバのサイトなので、負け予想はできません。</li>
+      <li>予想の数は、回線を元に戻せない形に変えて数えています。試合の3日後には数だけを残して消します。</li>
+    </ul>
+  </section>
+</Base>

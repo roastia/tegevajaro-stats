@@ -1,4 +1,5 @@
 ---
+import Yosou from '../components/Yosou.astro';
 import Base from '../layouts/Base.astro';
 import Ask from '../components/Ask.astro';
 import { loadHistory, headToHead } from '../lib/clubhistory.js';
@@ -31,7 +32,7 @@ const h2h = headToHead(loadHistory().matches);
 const h2hOf = f => h2h.find(h => h.opp === f.opponent || h.full === f.opponent_full);
 // 検索結果に出る説明の先頭に、次の試合（日時・相手・ホーム／アウェイ・会場）。「テゲバ 次の試合」で探した人が開かなくてもわかる
 const jpDate = s => { const [, m, dd] = s.split('-').map(Number); return `${m}月${dd}日（${wd(s)}）`; };
-const nx = fixtures.find(f => f.date >= todayJst()) || fixtures[0];
+const nx = fixtures.find(f => f.date >= todayJst().toISOString().slice(0, 10)) || fixtures[0];
 const nextText = nx ? `次の試合は${jpDate(nx.date)}${nx.kickoff || ''}、${nx.ha === 'H' ? 'ホーム' : 'アウェイ'}で${nx.opponent_full || nx.opponent}戦（${nx.venue}）。` : '';
 // 次の試合の行に、前節のスタメン（ハイライトのページのスタメン図へ）。「スタメン」は試合の前日・当日によく探されるため
 const lastXi = buildLineups({ lineups: readCsv('lineups'), matches: readCsv('matches'), players: readCsv('players') }).games[0];
@@ -39,6 +40,7 @@ const lastXi = buildLineups({ lineups: readCsv('lineups'), matches: readCsv('mat
 const nextHome = fixtures.find(f => f.ha === 'H');
 ---
 <Base current="schedule" ld={fixtures.length ? [eventsLd(fixtures)] : []} title="試合日程・次の試合" description={`${nextText}テゲバジャーロ宮崎のこれからの試合日程（J2 2026/27）。節・日時・ホーム／アウェイ・会場と、前回の対戦結果・通算成績をまとめています。`}>
+  <Yosou id="yosou" />
   <section class="card fx-card">
     {fixtures.length > 0 ? (
       <>

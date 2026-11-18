@@ -7,6 +7,7 @@ import { getData, getShareables } from '../lib/data.js';
 import { milestonePost } from '../lib/milestones.js';
 import PostBox from '../components/PostBox.astro';
 import Acc from '../components/Acc.astro';
+import Yosou from '../components/Yosou.astro';
 import { icon, xLength, flatPost } from '../lib/util.js';
 import { formSummary, RES_WORD } from '../lib/form.js';
 import { SITE } from '../config/site.js';
@@ -46,6 +47,7 @@ const faq = faqItems(getData(), readCsv('fixtures'));
     <p class="cheer">{fs.cheer}</p>
     <PostBox what="直近5試合" text={fs.text} url={`${SITE.url}/`} />
   </section>
+  <Yosou id="yosou" />
   <BdaySoon />
   <Acc id="topics" title="今季の話題" icon="sparkle" count={items.length}>
     <div class="grid">

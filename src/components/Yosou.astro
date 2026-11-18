@@ -1,0 +1,67 @@
+---
+// みんなのスコア予想（トップ・日程）。＋−でテゲバと相手の点を選んで「決定」。負け予想は選べない。
+// 予想するとみんなの予想（人気の順）が見られる。キックオフで締め切り。動きは src/scripts/yosou.js、受付は Worker の /api/yosou
+import { SITE } from '../config/site.js';
+import { readCsv } from '../lib/data.js';
+import { yosouData, verdict, YOSOU_UI_MAX } from '../lib/yosou.js';
+import { clubFull } from '../config/clubs.js';
+import { todayJst } from '../lib/bday.js';
+import { icon, href, xIntent } from '../lib/util.js';
+interface Props { id?: string }
+const { id = 'yosou' } = Astro.props;
+const { open, past } = yosouData({ fixtures: readCsv('fixtures'), matches: readCsv('matches'), clubFull, today: todayJst().toISOString().slice(0, 10) });
+const api = SITE.spots.api ? new URL('/api/yosou', SITE.spots.api).href : '';
+const last = past[0];
+const g0 = 2, a0 = 1;   // はじめに出しておくスコア
+const ha = open?.ha === 'H' ? 'ホーム' : 'アウェイ';
+---
+{open && api && (
+  <section class="card yosou" id={id} data-yosou data-api={api} data-key={open.key} data-kickoff={open.kickoff} data-max={YOSOU_UI_MAX}
+    data-round={open.round} data-opp={open.oppFull} data-when={`${open.day} ${open.kickoffLabel}・${ha}`} data-site={SITE.url} data-tags={SITE.hashtags}
+    data-img-base={href('share/')}
+    data-last={last && JSON.stringify({ key: last.key, round: last.round, opp: last.oppFull, gf: last.gf, ga: last.ga })}>
+    <div class="ys-top">
+      <h2 class="ys-kicker"><Fragment set:html={icon('target')} />みんなのスコア予想</h2>
+      <span class="ys-dl" data-dl>締め切り {open.day} {open.kickoffLabel}</span>
+    </div>
+    <p class="ys-match">第{open.round}節 <b>{open.oppFull}</b>戦<span>{open.day} {open.kickoffLabel}・{ha}</span></p>
+
+    <div class="ys-form" data-form>
+      <div class="ys-board" data-board>
+        <div class="ys-side">
+          <span class="ys-team">テゲバ</span>
+          <div class="ys-dial">
+            <button type="button" class="ys-pm" data-step="gf" data-by="1" aria-label="テゲバの点を1点ふやす">＋</button>
+            <output class="ys-n ys-n-us" data-gf>{g0}</output>
+            <button type="button" class="ys-pm" data-step="gf" data-by="-1" aria-label="テゲバの点を1点へらす">−</button>
+          </div>
+        </div>
+        <span class="ys-dash" aria-hidden="true">-</span>
+        <div class="ys-side">
+          <span class="ys-team">{open.oppFull}</span>
+          <div class="ys-dial">
+            <button type="button" class="ys-pm" data-step="ga" data-by="1" aria-label="相手の点を1点ふやす">＋</button>
+            <output class="ys-n" data-ga>{a0}</output>
+            <button type="button" class="ys-pm" data-step="ga" data-by="-1" aria-label="相手の点を1点へらす">−</button>
+          </div>
+        </div>
+      </div>
+      <p class="ys-verdict" data-verdict aria-live="polite">{verdict(g0, a0)}</p>
+      <button type="button" class="ys-go" data-go>この予想で決定！</button>
+      <p class="ys-note">負け予想はなし。テゲバを信じよう。キックオフまでなら何度でも変えられます</p>
+    </div>
+
+    <div class="ys-res" data-res hidden>
+      <p class="ys-mine"><span>あなたの予想</span><b data-mine></b><span class="ys-rank" data-rank></span><button type="button" class="ys-change" data-change>予想を変える</button></p>
+      <p class="ys-sum" data-sum></p>
+      <ol class="ys-bars" data-bars></ol>
+      <a class="postbtn ys-share" data-share href={xIntent(`第${open.round}節 ${open.oppFull}戦のスコアを予想しよう！`, `${SITE.url}/yosou/`, '')} target="_blank" rel="noopener noreferrer"><span><b>「わたしの予想」</b>を画像でポスト</span></a>
+    </div>
+    <p class="ys-msg" data-msg hidden></p>
+    <div class="ys-foot">
+      <p class="ys-last" data-lastline hidden></p>
+      <a class="ys-more" href={href('yosou/')}>これまでの予想</a>
+    </div>
+  </section>
+)}
+<script>import "../scripts/yosou.js";</script>

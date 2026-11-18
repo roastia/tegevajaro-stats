@@ -63,6 +63,17 @@ export function validateHeart(input) {
   return { ok: true, value: { id, on: input.on } };
 }
 
+// スコア予想：試合（日付 YYYY-MM-DD）と、テゲバ・相手の点（0〜9）。負け予想（相手の点が多い）は受けない
+export const YOSOU_MAX = 9;
+export function validateYosou(input) {
+  if (!input || typeof input !== 'object') return { ok: false };
+  const { match, gf, ga } = input;
+  if (typeof match !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(match)) return { ok: false };
+  if (!Number.isInteger(gf) || !Number.isInteger(ga) || gf < 0 || ga < 0 || gf > YOSOU_MAX || ga > YOSOU_MAX) return { ok: false };
+  if (ga > gf) return { ok: false };
+  return { ok: true, value: { match, gf, ga } };
+}
+
 // リンク集への情報提供：テゲバの情報を載せているページの URL だけ
 export function validateLink(input) {
   if (!input || typeof input !== 'object') return { ok: false, error: '送信内容を読み取れませんでした' };

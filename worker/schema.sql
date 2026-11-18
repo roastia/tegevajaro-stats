@@ -59,3 +59,21 @@ CREATE TABLE IF NOT EXISTS removal_requests (
   note       TEXT    NOT NULL DEFAULT '',
   status     TEXT    NOT NULL DEFAULT 'pending'  -- pending / done（取り下げた） / kept（そのまま）
 );
+
+-- スコア予想（みんなの予想）。名前は受け取らない。同じ回線から1試合1票（キックオフまでは変えられる）
+-- voter は IP を「その試合だけの鍵」でハッシュ化した値（元の IP には戻せない）。試合の3日後に yosou_tally（数だけ）へまとめて消す
+CREATE TABLE IF NOT EXISTS yosou_votes (
+  match      TEXT    NOT NULL,   -- 試合の日付 YYYY-MM-DD
+  voter      TEXT    NOT NULL,
+  gf         INTEGER NOT NULL,   -- テゲバの点
+  ga         INTEGER NOT NULL,   -- 相手の点
+  updated_at TEXT    NOT NULL,
+  PRIMARY KEY (match, voter)
+);
+CREATE TABLE IF NOT EXISTS yosou_tally (
+  match TEXT    NOT NULL,
+  gf    INTEGER NOT NULL,
+  ga    INTEGER NOT NULL,
+  n     INTEGER NOT NULL,
+  PRIMARY KEY (match, gf, ga)
+);
