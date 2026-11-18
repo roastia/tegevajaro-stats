@@ -14,7 +14,7 @@ interface Props { title?: string; description?: string; image?: string; path?: s
 const { title, description, image = 'og/site.png', path = '', current = '', ld: extraLd = [], noindex = false } = Astro.props;
 // 検索結果のタイトル：ページ名｜テゲバジャーロ宮崎｜テゲスタ！（トップはサイト名＋説明）
 const fullTitle = title ? `${title}｜${SITE.team}｜${SITE.short}` : `${SITE.name} ${SITE.team}のスタッツ・ランキング（非公式サポーターサイト）`;
-const desc = description || `${SITE.team}の今季の記録から作った、テゲサポが語りたくなるランキングと注目トピック。直近5試合の成績・選手の称号・試合ハイライトも（非公式サポーターサイト）。${SITE.roundLabel}時点。`;
+const desc = description || `${SITE.rank ? `J2で${SITE.rankPending ? "暫定" : ""}${SITE.rank}位（${SITE.roundLabel}時点）。` : ''}${SITE.team}の今季の記録から作った、テゲサポが語りたくなるランキングと注目トピック。直近5試合の成績・選手の称号・試合ハイライトも（非公式サポーターサイト）。${SITE.rank ? '' : `${SITE.roundLabel}時点。`}`;
 // canonical は各ページ自身の URL（path を渡さないページは、開いている URL から決める）
 const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 const selfPath = path || Astro.url.pathname.slice(base.length).replace(/^\//, '');

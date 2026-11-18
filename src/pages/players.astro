@@ -32,7 +32,7 @@ d.rankings.forEach(({ meta, rows }, idx) => {
 });
 const players = [...d.profiles].sort((a, b) => Number(a.no) - Number(b.no));
 ---
-<Base current="players" ld={[playersLd(players, d.players)]} title="選手名鑑・チームデータ" description="テゲバジャーロ宮崎の選手名鑑（背番号・年齢・出身地・出身校と今季の称号）と、大学経由・アカデミー育ち・平均年齢などのチームデータ（非公式）。">
+<Base current="players" ld={[playersLd(players, d.players)]} title="選手一覧・選手名鑑" description={`テゲバジャーロ宮崎の今季の選手${players.length}人の一覧。背番号・年齢・出身地・出身校と今季の称号、大学経由・アカデミー育ち・平均年齢などのチームデータ（非公式）。`}>
   <BdaySoon />
   <Acc id="titles" title="選手名鑑" icon="medal" count={players.length}>
   <section class="card">

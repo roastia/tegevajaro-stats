@@ -13,8 +13,13 @@ const share = new Map(getShareables().filter(s => s.kind === 'r').map(s => [s.id
 const CAT_ICON = { goal: 'ball', time: 'stopwatch', team: 'flag', play: 'network', trivia: 'star' };
 const cats = [['goal', 'ゴール'], ['time', '出場'], ['team', '貢献'], ['play', 'プレー'], ['trivia', 'トリビア'], ['history', '歴代']]
   .filter(([c]) => c && d.rankings.some(r => r.meta.cat === c && r.rows.length));
+// 検索結果に出る説明の先頭に、いくつかのランキングの1位（「テゲバジャーロ宮崎 ランキング」で探した人が中身をつかめるように）
+const lead = id => { const r = d.rankings.find(x => x.meta.id === id); const f = r?.rows.filter(x => x._rank === 1) || []; return f.length && f.length <= 2 ? `${r.meta.title.replace(/^\S+\s/, '')}1位は${f.map(x => x.name).join('・')}` : ''; };
+const leads = ['share', 'winner', 'iron'].map(lead).filter(Boolean);
+const leadText = leads.length ? `${leads.join('、')}。` : '';
+const nRank = d.rankings.filter(r => r.rows.length).length;
 ---
-<Base current="ranking" title="選手ランキング" description={`テゲバジャーロ宮崎の選手ランキング。得点・アシスト・出場時間・決勝ゴールなど、今季の記録から独自に集計したランキングを、選手の称号つきで（非公式）。${SITE.roundLabel}時点。`}>
+<Base current="ranking" title="選手ランキング" description={`${leadText}テゲバジャーロ宮崎の選手ランキング${nRank}種。得点・アシスト・出場時間・決勝ゴールなど、今季の記録から独自に集計（非公式）。${SITE.roundLabel}時点。`}>
   {climb && d.climbs?.length > 0 && <ClimbBoard climbs={d.climbs} prevRound={d.prevRound} round={SITE.roundLabel} share={climb} />}
   {d.prevRound > 0 && <p class="page-lead mv-lead"><span class="mv up" aria-hidden="true">↑2</span><span class="mv down" aria-hidden="true">↓1</span><span class="mv new" aria-hidden="true">NEW</span>は第{d.prevRound}節からの順位の動き（NEW は第{d.prevRound}節でランク外）</p>}
   <div id="recGrid">

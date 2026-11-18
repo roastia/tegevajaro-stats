@@ -20,11 +20,17 @@ const matches = [...d.matches].sort((a, b) => Number(b.round) - Number(a.round))
 // 大項目（アコーディオン）：月ごと
 const months = [...new Set(matches.map(m => m.date.slice(0, 7)))].map(k => [k, matches.filter(m => m.date.slice(0, 7) === k)]);
 const ha = m => (m.ha === 'H' ? 'ホーム' : 'アウェイ');
+// 検索結果に出る説明の先頭に、最新の試合（スタメンのフォーメーション・結果）と得点ランキングの1位。「テゲバ スタメン」で探した人向け
+const fullOf = new Map(readCsv('fixtures').map(f => [String(f.round), f.opponent_full]));
+const lastM = matches[0], lastXi = lastM && xiOf.get(String(lastM.round));
+const topN = scorers[0]?.[1], tops = scorers.filter(s => s[1] === topN).map(s => s[0]);
+const latestText = lastM ? `最新は第${lastM.round}節 ${fullOf.get(String(lastM.round)) || lastM.opponent}戦（${lastM.gf}-${lastM.ga}で${({ 勝: '勝利', 分: '引き分け', 負: '敗戦' })[lastM.result] || ''}）${lastXi ? `、スタメンは${lastXi.formation}` : ''}。` : '';
+const topText = topN ? `得点ランキング1位は${tops.length > 2 ? `${tops[0]}ほか${tops.length - 1}人` : tops.join('・')}（${topN}点）。` : '';
 const md = s => { const [, m, dd] = s.split('-').map(Number); return `${m}/${dd}`; };
 const resCls = { 勝: 'win', 分: 'draw', 負: 'lose' };
 const resWord = { 勝: '勝ち', 分: '引き分け', 負: '負け' };
 ---
-<Base current="goals" title="試合ハイライト・スタメン" description={`テゲバジャーロ宮崎の今季の試合ハイライト動画・ゴールした選手・スタメンとフォーメーションを試合ごとにまとめました（非公式）。${SITE.roundLabel}時点。`}>
+<Base current="goals" title="スタメン・試合ハイライト" description={`${latestText}${topText}テゲバジャーロ宮崎の今季のスタメンとフォーメーション、試合ハイライト動画、ゴールした選手を試合ごとにまとめました（非公式）。${SITE.roundLabel}時点。`}>
   <section class="hl-controls" aria-label="絞り込み">
     <div class="controls">
       <div class="seg" id="resSeg" role="group" aria-label="結果">
