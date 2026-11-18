@@ -3,6 +3,7 @@
 // - 自分の予想はこの端末だけに覚えておく（localStorage。名前などは送らない）
 // - 予想した人と、締め切ったあとは、みんなの予想（人気の順）を見せる
 import { verdict } from '../lib/yosou.js';
+import { touch, preload, postImage } from './postimage.js';
 
 const ls = {
   get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch { return null; } },
@@ -55,14 +56,6 @@ function bars(ol, data, mine, label = 'あなた') {
   });
 }
 
-// 指で操作する端末（スマホ・タブレット）。画像つきの共有メニューを使う
-const touch = matchMedia('(pointer: coarse)').matches;
-const imgs = new Map();
-const imgFile = (src) => {
-  if (!imgs.has(src)) imgs.set(src, fetch(src).then(r => r.ok ? r.blob() : Promise.reject(r.status)).then(b => new File([b], src.split('/').pop(), { type: 'image/jpeg' })));
-  return imgs.get(src);
-};
-
 function setupCard(card) {
   const $ = s => card.querySelector(s);
   const api = card.dataset.api, key = card.dataset.key, kickoff = Date.parse(card.dataset.kickoff), MAX = Number(card.dataset.max) || 6;
@@ -113,7 +106,7 @@ function setupCard(card) {
       a.href = 'https://twitter.com/intent/tweet?' + new URLSearchParams({ text, url }).toString();
       a.dataset.img = `${card.dataset.imgBase}y-${mine.gf}-${mine.ga}.jpg`;
       a.dataset.text = `${text} ${url}`;
-      if (touch) imgFile(a.dataset.img).catch(() => {});   // 先に読んでおく（押したらすぐ共有メニューを開けるように）
+      if (touch) preload(a.dataset.img);   // 先に読んでおく（押したらすぐ共有メニューを開けるように）
       a.hidden = mine.gf > MAX;
     } else $('[data-share]').hidden = true;
     const win = data.scores.filter(s => s.gf > s.ga).reduce((t, s) => t + s.n, 0);
@@ -145,31 +138,8 @@ function setupCard(card) {
     $('[data-res]').hidden = true; $('[data-form]').hidden = false; draw();
   });
 
-  // 画像でポスト：スマホ（画像の共有ができる端末）は共有メニューだけを開く（X の投稿画面へのリンクには進まない）。
-  // PC は画像を保存して、リンクどおり X の投稿画面（文入り）を開く。押してすぐ共有メニューを開けるよう、画像は先に読んでおく
-  $('[data-share]').addEventListener('click', async e => {
-    const a = e.currentTarget;
-    if (touch) {
-      // スマホ：まずリンクを止める（止めないと X の投稿画面が先に開いてしまう）。画像つきの共有メニューを開く
-      e.preventDefault();
-      try {
-        const file = await imgFile(a.dataset.img);
-        if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-          await navigator.share({ files: [file], text: a.dataset.text });
-          return;
-        }
-      } catch (err) {
-        if (err && err.name === 'AbortError') return;   // 共有をやめた
-      }
-      // 画像を共有できない端末：X の投稿画面（文だけ）を開く
-      location.href = a.href;
-      return;
-    }
-    imgFile(a.dataset.img).then(file => {
-      const d = document.createElement('a'); d.href = URL.createObjectURL(file); d.download = file.name;
-      document.body.append(d); d.click(); d.remove();
-    }).catch(() => {});
-  });
+  // 画像でポスト（src/scripts/postimage.js：スマホは共有メニュー、PC は画像を保存して X の投稿画面へ）
+  $('[data-share]').addEventListener('click', e => { const a = e.currentTarget; postImage(e, a, { img: a.dataset.img, text: a.dataset.text }); });
 
   // 締め切りまでの時間
   const dl = $('[data-dl]');
@@ -189,9 +159,9 @@ function setupCard(card) {
     load().then(d => showRes(d, mine)).catch(() => msg('みんなの予想を読み込めませんでした'));
   }
 
-  // 前節の予想の答え合わせ（勝ち・引き分けのときだけ）
+  // 前節の予想の答え合わせ（勝ち・引き分けのときだけ）。カードが見えてきてから読む（読まれないページで受付に問い合わせない）
   const last = card.dataset.last ? JSON.parse(card.dataset.last) : null;
-  if (last && last.gf >= last.ga) {
+  const answer = () => {
     fetch(`${api}?match=${encodeURIComponent(last.key)}`).then(r => r.ok ? r.json() : null).then(d => {
       if (!d || !d.total) return;
       const exact = d.scores.filter(s => s.gf === last.gf && s.ga === last.ga).reduce((t, s) => t + s.n, 0);
@@ -200,6 +170,12 @@ function setupCard(card) {
       el.textContent = `前節 ${last.opp}戦 ${last.gf}-${last.ga}：ぴったり的中 ${pct(exact, d.total)}%・${last.gf > last.ga ? '勝ち' : '引き分け'}予想 ${pct(side, d.total)}%（${d.total}人）`;
       el.hidden = false;
     }).catch(() => {});
+  };
+  if (last && last.gf >= last.ga) {
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); answer(); } }, { rootMargin: '200px' });
+      io.observe(card);
+    } else answer();
   }
 }
 
