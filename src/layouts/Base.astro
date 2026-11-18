@@ -84,6 +84,8 @@ const inMenu = !TABS.includes(current);
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href={href('favicon.svg')} type="image/svg+xml" />
   <link rel="apple-touch-icon" href={href('apple-touch-icon.png')} />
+  {/* アクセス解析（Cloudflare Web Analytics。Cookie を使わず、個人を追わない） */}
+  {SITE.cfBeacon && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: SITE.cfBeacon })}></script>}
 </head>
 <body>
   <script type="application/json" id="pl-urls" is:inline set:html={JSON.stringify(plUrls).replace(/</g, '\\u003c')}></script>
@@ -154,6 +156,7 @@ const inMenu = !TABS.includes(current);
     <div class="wrap">
       <p>このサイトは個人が運営する<b>非公式のサポーターサイト</b>です。テゲバジャーロ宮崎、Jリーグ、各データ提供元とは関係ありません。ランキングは公開データをもとに独自に集計したもので、公式記録ではありません。広告・収益化はしていません。</p>
       <p>選手の写真・クラブのエンブレムは使用していません。選手名からJリーグ公式の選手ページへリンクしています。</p>
+      {SITE.cfBeacon && <p>見られているページの数を、Cookie を使わないアクセス解析（Cloudflare Web Analytics）で数えています。個人を特定する情報は集めていません。</p>}
       <p>出典</p>
       <ul>
         <li><a href="https://www.jleague.jp/" rel="noopener noreferrer" target="_blank">Jリーグ公式サイト</a>（試合結果・出場記録・選手情報・公式ハイライト・スタメンとフォーメーション）</li>

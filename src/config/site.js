@@ -26,6 +26,8 @@ export const SITE = {
   footballLab: true,
   // おすすめスポットの投稿受付（Cloudflare Workers。worker/README.md の手順で用意してから入れる）
   // 空のあいだは投稿フォームが「準備中」になる
+  // アクセス解析：Cloudflare Web Analytics（Cookie を使わない）のトークン（公開してよい値）。空にすると読み込まない
+  cfBeacon: '3953572eef154b1fb9d1de10f39b4c4a',
   spots: {
     api: 'https://tegesta-spots.tegestats.workers.dev/api/spots',
     turnstileSiteKey: '0x4AAAAAAF01OOzpZSjTEVm4',  // Cloudflare Turnstile のサイトキー（公開してよい値）

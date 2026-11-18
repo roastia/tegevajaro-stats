@@ -7,6 +7,9 @@ import { SITE } from './src/config/site.js';
 // おすすめスポット：投稿の送り先（Cloudflare Workers）とボット対策（Turnstile）だけ外部を許可する
 const spotsApiOrigin = SITE.spots.api ? new URL(SITE.spots.api).origin : '';
 const TURNSTILE = 'https://challenges.cloudflare.com';
+// アクセス解析（Cloudflare Web Analytics）：スクリプトの読み込み先と、数えた結果の送り先
+const CF_BEACON = 'https://static.cloudflareinsights.com';
+const CF_RUM = 'https://cloudflareinsights.com';
 
 export default defineConfig({
   site: 'https://tegestats.com',
@@ -26,7 +29,7 @@ export default defineConfig({
         "default-src 'self'",
         "img-src 'self' data:",
         "font-src 'self'",
-        `connect-src 'self'${spotsApiOrigin ? ' ' + spotsApiOrigin : ''}`,
+        `connect-src 'self'${spotsApiOrigin ? ' ' + spotsApiOrigin : ''}${SITE.cfBeacon ? ' ' + CF_RUM : ''}`,
         `frame-src ${TURNSTILE}`,
         "object-src 'none'",
         "base-uri 'self'",
@@ -34,7 +37,7 @@ export default defineConfig({
         'upgrade-insecure-requests',
       ],
       styleDirective: { resources: ["'self'"] },
-      scriptDirective: { resources: ["'self'", TURNSTILE] },
+      scriptDirective: { resources: ["'self'", TURNSTILE, ...(SITE.cfBeacon ? [CF_BEACON] : [])] },
     },
   },
 });
