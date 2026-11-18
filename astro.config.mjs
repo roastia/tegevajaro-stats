@@ -2,7 +2,9 @@
 import { defineConfig } from 'astro/config';
 import phraseBreak from './integrations/phrase-break.mjs';
 import stableNames from './integrations/stable-names.mjs';
+import { createHash } from 'node:crypto';
 import { SITE } from './src/config/site.js';
+import { YOSOU_EARLY } from './src/config/inline.js';
 
 // おすすめスポット：投稿の送り先（Cloudflare Workers）とボット対策（Turnstile）だけ外部を許可する
 const spotsApiOrigin = SITE.spots.api ? new URL(SITE.spots.api).origin : '';
@@ -37,7 +39,11 @@ export default defineConfig({
         'upgrade-insecure-requests',
       ],
       styleDirective: { resources: ["'self'"] },
-      scriptDirective: { resources: ["'self'", TURNSTILE, ...(SITE.cfBeacon ? [CF_BEACON] : [])] },
+      scriptDirective: {
+        resources: ["'self'", TURNSTILE, ...(SITE.cfBeacon ? [CF_BEACON] : [])],
+        // ページに直接書く小さなスクリプト（src/config/inline.js）は、中身のハッシュで1つずつ許可する
+        hashes: [`sha256-${createHash('sha256').update(YOSOU_EARLY).digest('base64')}`],
+      },
     },
   },
 });

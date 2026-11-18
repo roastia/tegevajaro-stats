@@ -7,6 +7,7 @@ import { yosouData, verdict, YOSOU_UI_MAX } from '../lib/yosou.js';
 import { clubFull } from '../config/clubs.js';
 import { todayJst } from '../lib/bday.js';
 import { icon, href, xIntent } from '../lib/util.js';
+import { YOSOU_EARLY } from '../config/inline.js';
 interface Props { id?: string }
 const { id = 'yosou' } = Astro.props;
 const { open, past } = yosouData({ fixtures: readCsv('fixtures'), matches: readCsv('matches'), clubFull, today: todayJst().toISOString().slice(0, 10) });
@@ -20,6 +21,8 @@ const ha = open?.ha === 'H' ? 'ホーム' : 'アウェイ';
     data-round={open.round} data-opp={open.oppFull} data-when={`${open.day} ${open.kickoffLabel}・${ha}`} data-site={SITE.url} data-tags={SITE.hashtags}
     data-img-base={href('share/')}
     data-last={last && JSON.stringify({ key: last.key, round: last.round, opp: last.oppFull, gf: last.gf, ga: last.ga })}>
+    {/* 表示の前に、この端末で予想ずみか・締め切りかを決めておく（読み込んだ直後に「予想前の画面」が一瞬出てずれないように） */}
+    <script is:inline set:html={YOSOU_EARLY}></script>
     <div class="ys-top">
       <h2 class="ys-kicker"><Fragment set:html={icon('target')} />みんなのスコア予想</h2>
     </div>
@@ -51,8 +54,8 @@ const ha = open?.ha === 'H' ? 'ホーム' : 'アウェイ';
     </div>
 
     <div class="ys-res" data-res hidden>
-      <p class="ys-mine"><span>あなたの予想</span><b data-mine></b><span class="ys-rank" data-rank></span><button type="button" class="ys-change" data-change>予想を変える</button></p>
-      <p class="ys-sum" data-sum></p>
+      <p class="ys-mine"><span>あなたの予想</span><b data-mine></b><span class="ys-rank" data-rank></span></p>
+      <div class="ys-sumrow"><p class="ys-sum" data-sum></p><button type="button" class="ys-change" data-change>予想を変える</button></div>
       <ol class="ys-bars" data-bars></ol>
       <a class="postbtn ys-share" data-share href={xIntent(`第${open.round}節 ${open.oppFull}戦のスコアを予想しよう！`, `${SITE.url}/yosou/`, '')} target="_blank" rel="noopener noreferrer"><span><b>「わたしの予想」</b>を画像でポスト</span></a>
     </div>

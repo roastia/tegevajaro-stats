@@ -178,7 +178,7 @@ function setupCard(card) {
 
   // はじめに：予想ずみ・締め切りなら、みんなの予想を見せる
   const mine = ls.get(store);
-  if (mine && Number.isInteger(mine.gf)) { st.gf = mine.gf; st.ga = mine.ga; }
+  if (mine && Number.isInteger(mine.gf)) { st.gf = mine.gf; st.ga = mine.ga; $('[data-mine]').textContent = `${mine.gf}-${mine.ga}`; }
   draw();
   if (mine || closed()) {
     if (closed()) $('[data-form]').hidden = true;

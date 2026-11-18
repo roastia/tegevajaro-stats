@@ -1332,6 +1332,12 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 /* ---------- みんなのスコア予想（src/components/Yosou.astro・src/pages/yosou.astro） ---------- */
 .yosou { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
 .yosou[hidden], .yosou [hidden] { display: none !important; }
+/* 予想ずみ・締め切り：はじめから予想の画面を出さず、みんなの予想の場所をとっておく（数は読み込んでから入る） */
+.yosou[data-state] .ys-form { display: none !important; }
+.yosou[data-state] .ys-res[hidden] { display: flex !important; }
+.yosou[data-state] .ys-sum:empty { min-height: 1.5em; }
+.yosou[data-state] .ys-bars:empty { min-height: 7.6rem; }
+.yosou[data-state="closed"] .ys-mine, .yosou[data-state="closed"] .ys-share { display: none; }
 .ys-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .ys-kicker { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 1rem; font-weight: 800; color: var(--brand-deep); }
 .ys-kicker .ic { width: 1.1em; height: 1.1em; }
@@ -1363,9 +1369,10 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .ys-res { position: relative; display: flex; flex-direction: column; gap: 6px; }
 .ys-res .ys-share { padding-block: 9px; }
 .ys-mine { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 0; font-weight: 700; }
-.ys-mine b { font-size: 1.6rem; line-height: 1; color: var(--brand-deep); font-variant-numeric: tabular-nums; }
+.ys-mine b { font-size: 1.6rem; line-height: 1; min-width: 2.4em; color: var(--brand-deep); font-variant-numeric: tabular-nums; }
 .ys-rank { font-size: .85rem; color: var(--brand-deep); }
-.ys-change { margin-left: auto; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: inherit; font-size: .78rem; cursor: pointer; }
+.ys-sumrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 2em; }
+.ys-change { flex: none; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: inherit; font-size: .78rem; cursor: pointer; }
 .ys-sum { margin: 0; font-size: .82rem; color: var(--muted); }
 .ys-bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .ys-bars li { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) 3.4em auto; align-items: center; gap: 8px; font-size: .85rem; line-height: 1.6; }
