@@ -76,15 +76,22 @@ addEventListener('pageshow', () => { navClicked = false; });
 }
 
 /* ---------- ランキング・ゴール集の名前：長い名前は文字を少し小さくして1行に収める（省略しない） ---------- */
+// まとめて「戻す → 測る → 縮める」の順に行う（1つずつ測ると、そのたびにページ全体の配置を計算しなおして重くなるため）
 {
-  const fit = n => {
-    n.style.fontSize = ''; n.style.lineHeight = '';
-    if (!n.clientWidth) return;
-    let k = 1;
-    const lh = n.getBoundingClientRect().height + 'px';  // 文字を小さくしても行の高さは変えない
-    while (n.scrollWidth > n.clientWidth + 1 && k > 0.7) { n.style.lineHeight = lh; k -= 0.04; n.style.fontSize = k.toFixed(2) + 'em'; }
+  const fitAll = ns => {
+    ns.forEach(n => { n.style.fontSize = ''; n.style.lineHeight = ''; });
+    const m = ns.map(n => (n.clientWidth ? { n, cw: n.clientWidth, sw: n.scrollWidth, h: n.getBoundingClientRect().height } : null)).filter(x => x && x.sw > x.cw + 1);
+    // 文字の幅は大きさにほぼ比例するので、はみ出した割合だけ縮める（0.04 きざみ・0.7 まで）
+    m.forEach(x => { x.k = Math.max(0.7, Math.floor((x.cw / x.sw) * 25) / 25); x.n.style.lineHeight = x.h + 'px'; x.n.style.fontSize = x.k.toFixed(2) + 'em'; });
+    // まだはみ出すものだけ、もう少し縮める（ほとんどない）
+    m.filter(x => x.n.scrollWidth > x.n.clientWidth + 1).forEach(x => {
+      while (x.n.scrollWidth > x.n.clientWidth + 1 && x.k > 0.7) { x.k -= 0.04; x.n.style.fontSize = x.k.toFixed(2) + 'em'; }
+    });
   };
-  const ro = new ResizeObserver(es => es.forEach(e => { const w = Math.round(e.contentRect.width); if (e.target._fitW !== w) { e.target._fitW = w; fit(e.target); } }));
+  const ro = new ResizeObserver(es => {
+    const ns = es.filter(e => { const w = Math.round(e.contentRect.width); if (e.target._fitW === w) return false; e.target._fitW = w; return true; }).map(e => e.target);
+    if (ns.length) fitAll(ns);
+  });
   document.querySelectorAll('.rank li > span:nth-child(3), .vlist .gh').forEach(n => ro.observe(n));
 }
 
