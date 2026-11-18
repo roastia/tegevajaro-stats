@@ -23,6 +23,11 @@ const C = [
   ['大分', '大分トリニータ', 'https://www.oita-trinita.co.jp/'],
 ];
 const MAP = new Map(C.flatMap(([s, f, u]) => [[s, u], [f, u]]));
+const FULL = new Map(C.map(([s, f]) => [s, f]));
+/** 略称 → 正式名（ないときはそのまま） */
+export const clubFull = name => FULL.get(String(name || '').trim()) || String(name || '');
+/** 正式名を、かな・英字と漢字の切れ目で分ける（狭い箱で「アルビレックス／新潟」のように切れ目で折り返すため） */
+export const nameParts = name => String(name).match(/[\p{sc=Han}]+|[^\p{sc=Han}]+/gu) || [String(name)];
 /** 相手チーム名（略称・正式名）→ 公式サイトの URL（ないときは ''） */
 export const clubUrl = name => MAP.get(String(name || '').trim()) || '';
 export const CLUB_LIST = C;
