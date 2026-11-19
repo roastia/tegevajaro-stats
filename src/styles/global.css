@@ -1476,6 +1476,8 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .res-no { color: var(--fg); font-weight: 700; font-variant-numeric: tabular-nums; }
 .res-nm { color: var(--bbs-name); font-weight: 800; }
 .res-mark { color: var(--bbs-name); margin-left: 2px; }
+/* 検索した言葉（tegesuki.astro の mark()） */
+::highlight(suki-q) { background-color: color-mix(in srgb, var(--brand) 45%, transparent); color: inherit; }
 .res-at { font-variant-numeric: tabular-nums; }
 .res-body { margin: 6px 0 0 1.2em; white-space: pre-line; line-height: 1.85; font-size: .98rem; overflow-wrap: anywhere; color: var(--fg); }
 .res-body .ss { display: inline; }

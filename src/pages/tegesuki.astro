@@ -210,10 +210,43 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
     matched = sorted.filter(li => (!tag || (li.dataset.tags || '').split('|').includes(tag)) && ts.every(t => text.get(li)!.includes(t)));
     list.append(pin, ...sorted);
   }
+  // 検索した言葉に色を付ける（CSS Custom Highlight API。ページの文字には手を加えないので、リンクや折り返しに影響しない。
+  // 使えないブラウザでは色が付かないだけ）。ひらがな・カタカナ・全角半角のちがいは、絞り込みと同じく無視して探す
+  const canMark = typeof CSS !== 'undefined' && 'highlights' in CSS;
+  function mark(shown: Iterable<HTMLLIElement>) {
+    if (!canMark) return;
+    const ts = terms(), ranges: Range[] = [];
+    if (ts.length) for (const li of shown) for (const el of li.querySelectorAll('.res-nm, .res-body')) {
+      // 文字ごとに「探す用の文字」と「元の場所」を対応させる（文が細かい span に分かれていても、つなげて探す）
+      let flat = '';
+      const at: [Text, number, number][] = [];
+      const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      for (let n = walk.nextNode() as Text | null; n; n = walk.nextNode() as Text | null) {
+        let i = 0;
+        for (const ch of n.data) {
+          const c = norm(ch);
+          for (const x of c) { flat += x; at.push([n, i, ch.length]); }
+          i += ch.length;
+        }
+      }
+      for (const t of ts) {
+        for (let k = flat.indexOf(t); k >= 0; k = flat.indexOf(t, k + t.length)) {
+          const [sn, so] = at[k], [en, eo, el2] = at[k + t.length - 1];
+          const r = document.createRange();
+          r.setStart(sn, so); r.setEnd(en, eo + el2);
+          ranges.push(r);
+        }
+      }
+    }
+    // @ts-ignore Highlight は新しめの API
+    CSS.highlights.set('suki-q', new Highlight(...ranges));
+  }
+
   function render() {
     page = Math.min(Math.max(0, page), pages() - 1);
     const from = page * size(), show = new Set(matched.slice(from, from + size()));
     for (const li of items) li.hidden = !show.has(li);
+    mark(show);
     // >>1（スレのはじめ）は、しぼりこみなしの1ページ目だけ
     pin.hidden = filtering() || page > 0;
     const f = filtering();
