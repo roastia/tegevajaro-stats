@@ -1456,11 +1456,22 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .suki-q input, .suki-sort select { width: 100%; font: inherit; font-size: .92rem; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--fg); }
 .suki-sort { flex: 0 0 auto; margin-left: auto; }
 .suki-q input:focus-visible, .suki-sort select:focus-visible { outline: 3px solid var(--brand); outline-offset: 1px; }
+.suki-per { margin-left: 0; }
+@media (max-width: 600px) { .suki-q { flex-basis: 100%; } .suki-sort { flex: 1 1 0; min-width: 0; margin-left: 0; } .suki-sort select { padding-inline: 8px; } }
+.bbs-pager { margin-top: 12px; padding-top: 12px; border-top: 1px dotted light-dark(#cfc9b8, #4a4440); text-align: center; }
+.bbs-pager[hidden] { display: none; }
+.bbs-range { margin: 0 0 8px; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bbs-pages { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; }
+.bbs-nums { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--muted); }
+.bbs-pages button { min-width: 36px; min-height: 36px; padding: 0 10px; border-radius: 999px; border: 1px solid light-dark(#d8d2c2, #4a4440); background: var(--panel); color: var(--fg); font: inherit; font-size: .86rem; font-weight: 700; cursor: pointer; font-variant-numeric: tabular-nums; }
+.bbs-pages button[aria-current="page"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.bbs-pages button:disabled { opacity: .4; cursor: default; }
+.bbs-pages button:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
 .suki-none { margin: 8px 0; color: var(--muted); font-size: .9rem; }
 .bbs-list { list-style: none; margin: 0; padding: 0; }
 .res { padding: 10px 0 12px; border-top: 1px dotted light-dark(#cfc9b8, #4a4440); scroll-margin-top: 80px; }
 .res:first-child { border-top: 0; }
-.res.hit { background: color-mix(in srgb, #ffe86b 22%, transparent); }
+.res.hit { background: color-mix(in srgb, var(--brand) 9%, transparent); }
 .res-h { margin: 0; font-size: .84rem; line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; }
 .res-no { color: var(--fg); font-weight: 700; font-variant-numeric: tabular-nums; }
 .res-nm { color: var(--bbs-name); font-weight: 800; }

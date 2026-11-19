@@ -1,6 +1,6 @@
 // テゲスキ！（テゲバの好きなところ）：テゲサポの声をスレッドのように並べる。src/data/suki.json（確認して整えた声だけ）を読む
 // 1件の形：{ id: 'k12'（受付の番号）, no: 2（レス番号。1 はスレ立て）, date: 'YYYY-MM-DD', time: 'HH:MM'（任意）,
-//            nickname: ''（空なら「テゲサポさん」）, body: '本文（改行あり。>>12 で返信）', tags: ['選手', …] }
+//            nickname: ''（空なら「テゲサポさん」）, body: '本文（改行あり。>>12 でそのレスにつながる声に）', tags: ['選手', …] }
 // タグは届いた声を読んでこちらで付ける（並びと説明は下の SUKI_TAGS。ここにないタグは使わない）
 import fs from 'node:fs';
 import path from 'node:path';
@@ -56,7 +56,7 @@ export function readSuki() {
 
 export const nickOf = r => r.nickname ? `${r.nickname}さん`.replace(/さんさん$/, 'さん') : NICK_DEFAULT;
 
-/** 本文の >>12（返信）をすべて拾う */
+/** 本文の >>12（つながる先のレス）をすべて拾う */
 export const anchorsOf = body => [...String(body).matchAll(/(?:>>|＞＞)(\d{1,5})/g)].map(m => Number(m[1]));
 
 /** 本文を HTML に：文字はエスケープし、>>12 だけをそのレスへのリンクに（改行は CSS の pre-line でそのまま） */
