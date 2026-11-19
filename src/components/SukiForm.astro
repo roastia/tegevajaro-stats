@@ -21,7 +21,7 @@ const themes = live ? [live, ...SUKI_THEMES] : SUKI_THEMES;
       {themes.map(t => <button type="button" class={t.live ? 'live' : undefined} data-start={t.s}>{t.live && <b>{t.live}</b>}{t.t}</button>)}
     </div>
     <label>名前<span class="opt">任意</span><input name="nickname" maxlength="20" autocomplete="off" placeholder="テゲサポさん" /></label>
-    <label>本文<span class="req">必須</span><textarea name="body" required maxlength="600" rows="6" placeholder="ひとことでもOK。上手に書かなくて大丈夫です。&#10;ほかのレスにつなげるときは >>番号 を入れてください（例：>>12 わかる！）"></textarea></label>
+    <label>本文<span class="req">必須</span><textarea name="body" required maxlength="600" rows="6" placeholder="ひとことでもOK。上手に書かなくて大丈夫です。"></textarea></label>
     <p class="note field-hint"><span data-len>0</span>／600字。ひとことでもOK。URL は入れられません。</p>
     <label class="suki-agree"><input type="checkbox" name="agree" required /><span>この声がてげ好きのページに載り、テゲサポの記録として残ること（あとから消すことはできません）、表現を少し整えることがあることに同意します</span></label>
     <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>

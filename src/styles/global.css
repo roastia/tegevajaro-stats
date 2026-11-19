@@ -1481,8 +1481,6 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .res-at { font-variant-numeric: tabular-nums; }
 .res-body { margin: 6px 0 0 1.2em; white-space: pre-line; line-height: 1.85; font-size: .98rem; overflow-wrap: anywhere; color: var(--fg); }
 .res-body .ss { display: inline; }
-a.anc { color: var(--bbs-anc); text-decoration: underline; text-underline-offset: 2px; font-weight: 600; }
-.res-rep { margin: 6px 0 0 1.2em; font-size: .8rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 8px; }
 .res-act { margin: 8px 0 0 1.2em; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
 .res-act button, .res-x { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; border: 1px solid light-dark(#d8d2c2, #4a4440); background: var(--panel); color: var(--fg); font: inherit; font-size: .78rem; font-weight: 700; text-decoration: none; cursor: pointer; line-height: 1.6; }
 .res-like[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
@@ -1495,10 +1493,6 @@ a.anc { color: var(--bbs-anc); text-decoration: underline; text-underline-offset
 .res-act .res-tags button { border: 0; background: none; padding: 0 2px; color: var(--bbs-anc); font-weight: 600; }
 .res-act button:focus-visible, .res-x:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
 .bbs-empty { margin: 8px 0 0; color: var(--muted); }
-.res-pop { position: fixed; left: var(--x, 12px); top: var(--y, 12px); width: var(--w, 360px); max-height: 50vh; overflow: auto; z-index: 40; padding: 4px 12px; border-radius: 10px;
-  background: light-dark(#fffef8, #2b2725); border: 1px solid light-dark(#cfc9b8, #4a4440); box-shadow: 0 8px 24px rgba(0, 0, 0, .18); }
-.res-pop[hidden] { display: none; }
-.res-pop .res { border-top: 0; }
 .bbs-write-h { margin: 0 0 8px; font-size: 1rem; font-weight: 800; }
 .suki-note { margin: 4px 4px 0; }
 .suki-themes { display: flex; flex-wrap: wrap; gap: 6px; }

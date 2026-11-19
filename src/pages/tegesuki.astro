@@ -3,19 +3,15 @@ import Base from '../layouts/Base.astro';
 import SukiForm from '../components/SukiForm.astro';
 import { SITE } from '../config/site.js';
 import { href, xIntent } from '../lib/util.js';
-import { readSuki, nickOf, sukiPost, tagCounts, bodyHtml, anchorsOf } from '../lib/suki.js';
+import { readSuki, nickOf, sukiPost, tagCounts } from '../lib/suki.js';
 import { sukiLd } from '../lib/seo.js';
 // てげ好き：テゲサポが教えてくれた「テゲバの好きなところ」を、むかしの掲示板のスレッドのように並べる（>>1 はスレ立て）
-// レス番号・>>番号で「つながる声」（リンク・ポップアップ・つながる声の一覧。返信の機能ではなく、関係のある声をむすぶ）・いいね！（Worker の /api/likes）・言葉でリアルタイムに絞り込み・タグ・並べかえ・表示件数とページ送り
+// レス番号・いいね！（Worker の /api/likes）・言葉でリアルタイムに絞り込み・タグ・並べかえ・表示件数とページ送り
 // 1件ずつ X でポスト（先頭50字を引用。画像なし）。届いた声は確認して整えてから src/data/suki.json に載せる（docs/suki.md）
 const rows = readSuki();
 const tags = tagCounts(rows);
 const pageUrl = `${SITE.url}/tegesuki/`;
 const likesApi = SITE.spots.api ? new URL('/api/likes', SITE.spots.api).href : '';
-const nos = new Set(rows.map(r => r.no));
-// つながる声の一覧：>>12 を書いたレスの番号を、12 の下に並べる
-const links = new Map<number, number[]>();
-for (const r of rows) for (const n of new Set(anchorsOf(r.body))) if (n === 1 || nos.has(n)) links.set(n, [...(links.get(n) || []), r.no]);
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const stamp = (d: string, t = '') => { const [y, m, dd] = d.split('-').map(Number); return `${y}/${String(m).padStart(2, '0')}/${String(dd).padStart(2, '0')}(${WD[new Date(Date.UTC(y, m - 1, dd)).getUTCDay()]})${t ? ' ' + t : ''}`; };
 const first = rows[0]?.date || new Date().toISOString().slice(0, 10);
@@ -62,18 +58,15 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
         <p class="res-h"><span class="res-no">1</span>：<span class="res-nm">テゲスタ！</span><span class="res-mark">★</span>：<span class="res-at">{stamp(first)}</span></p>
         <div class="res-body">テゲバの好きなところを、みんなで語ろう。
 選手のこと、ゴール裏の熱さ、スタジアムの空気、宮崎のこと、忘れられない試合。ひとことでもOK。
-ほかのレスにつなげたいときは「&gt;&gt;番号」を。いいなと思ったレスには「いいね！」を。
+いいなと思ったレスには「いいね！」を。
 届いた声は確認してから載せます。載った声は、テゲサポの記録としてずっと残ります。</div>
-        {links.get(1) && <p class="res-rep">つながる声：{links.get(1)!.map(n => <a class="anc" href={`#r${n}`} data-no={n}>&gt;&gt;{n}</a>)}</p>}
       </li>
       {rows.map(r => (
         <li class="res" id={`r${r.no}`} data-no={r.no} data-date={`${r.date} ${r.time}`} data-len={[...r.body].length} data-tags={r.tags.join('|')}>
           <p class="res-h"><span class="res-no">{r.no}</span>：<span class="res-nm">{nickOf(r)}</span>：<span class="res-at">{stamp(r.date, r.time)}</span></p>
-          <div class="res-body" set:html={bodyHtml(r.body, nos)} />
-          {links.get(r.no) && <p class="res-rep">つながる声：{links.get(r.no)!.map(n => <a class="anc" href={`#r${n}`} data-no={n}>&gt;&gt;{n}</a>)}</p>}
+          <div class="res-body">{r.body}</div>
           <div class="res-act">
             {likesApi && <button type="button" class="res-like" data-like={`r${r.no}`} aria-pressed="false"><span class="lb">いいね！</span><span class="n" data-n></span></button>}
-            <button type="button" class="res-link" data-link={r.no} title="この声につなげて書く（書き込み欄にレス番号が入ります）">つなげる</button>
             <a class="res-x" href={xIntent(sukiPost(r), `${pageUrl}#r${r.no}`, '')} target="_blank" rel="noopener noreferrer">X でポスト</a>
             {r.tags.length > 0 && <span class="res-tags">{r.tags.map(t => <button type="button" data-tagpick={t}>#{t}</button>)}</span>}
           </div>
@@ -96,7 +89,6 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
     <SukiForm id="sukiWrite" />
   </section>
   <p class="note suki-note">届いた声は、テゲスタ！で確認してから載せています。読みやすいように、一部の表現を整えていることがあります。ここに並ぶ声は、テゲバを応援してきたテゲサポの記録として、ずっと大切に残していきます。</p>
-  <div class="res-pop" id="resPop" hidden></div>
 </Base>
 
 <script>
@@ -106,48 +98,12 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
   const items = all.filter(li => !li.hasAttribute('data-pin'));
   const byNo = new Map(all.map(li => [li.dataset.no!, li]));
 
-  // ---- つなげる：>>番号 を書き込み欄へ（返信ではなく「この声につながる声」として書く） ----
+  // ---- レスの #タグ：そのタグでしぼりこむ ----
   list.addEventListener('click', e => {
     const t = e.target as HTMLElement;
-    const lk = t.closest<HTMLButtonElement>('[data-link]');
-    if (lk) { dispatchEvent(new CustomEvent('suki:link', { detail: { no: lk.dataset.link } })); return; }
     const tp = t.closest<HTMLButtonElement>('[data-tagpick]');
     if (tp) { pickTag(tp.dataset.tagpick!); document.querySelector('.bbs')?.scrollIntoView({ block: 'start' }); }
   });
-
-  // ---- >>番号：PC は重ねると、スマホはタップでそのレスを小さく表示（2回目のタップ・もう一度押すとそこへ移動） ----
-  const pop = document.getElementById('resPop')!;
-  let popFor: HTMLElement | null = null, popY = 0;
-  const showPop = (a: HTMLElement) => {
-    const li = byNo.get(a.dataset.no!);
-    if (!li) return;
-    const c = li.cloneNode(true) as HTMLElement;
-    c.removeAttribute('id'); c.hidden = false;
-    c.querySelectorAll('.res-act').forEach(x => x.remove());
-    pop.replaceChildren(c); pop.hidden = false; popFor = a; popY = scrollY;
-    const r = a.getBoundingClientRect(), w = Math.min(520, innerWidth - 24);
-    pop.style.setProperty('--w', `${w}px`);
-    pop.style.setProperty('--x', `${Math.max(12, Math.min(r.left, innerWidth - w - 12))}px`);
-    const below = r.bottom + 8, ph = pop.offsetHeight;
-    pop.style.setProperty('--y', `${below + ph > innerHeight - 70 ? Math.max(8, r.top - ph - 8) : below}px`);
-  };
-  const hidePop = () => { pop.hidden = true; popFor = null; };
-  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  // 先に受け取る（サイト共通の「#リンクでそこへ移動」より前に止めて、1回目のタップは小さく表示するだけにする）
-  document.addEventListener('click', e => {
-    const a = (e.target as HTMLElement).closest<HTMLElement>('a.anc');
-    if (a && !fine && popFor !== a) { e.preventDefault(); e.stopPropagation(); showPop(a); return; }
-    // そのレスへ移動するとき：ほかのページにあれば、先にそのページを開いておく（このあとサイト共通の処理がそこへ移動する）
-    if (a) { hidePop(); reveal(a.dataset.no!); return; }
-    if (!(e.target as HTMLElement).closest('#resPop')) hidePop();
-  }, true);
-  if (fine) {
-    document.addEventListener('mouseover', e => { const a = (e.target as HTMLElement).closest<HTMLElement>('a.anc'); if (a) showPop(a); });
-    document.addEventListener('mouseout', e => { if ((e.target as HTMLElement).closest('a.anc') && !(e.relatedTarget as HTMLElement)?.closest?.('#resPop')) hidePop(); });
-    pop.addEventListener('mouseleave', hidePop);
-  }
-  // 少しスクロールしたら閉じる（タップしたときの小さなずれでは閉じない）
-  addEventListener('scroll', () => { if (!pop.hidden && Math.abs(scrollY - popY) > 60) hidePop(); }, { passive: true });
 
   // ---- いいね！：数は Worker から。押したかどうかはこの端末に覚えておく ----
   const api = (document.querySelector('.bbs') as HTMLElement).dataset.likesApi;

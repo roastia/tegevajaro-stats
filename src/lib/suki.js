@@ -58,14 +58,6 @@ export function readSuki() {
 export const nickOf = r => r.nickname ? `${r.nickname}さん`.replace(/さんさん$/, 'さん') : NICK_DEFAULT;
 
 /** 本文の >>12（つながる先のレス）をすべて拾う */
-export const anchorsOf = body => [...String(body).matchAll(/(?:>>|＞＞)(\d{1,5})/g)].map(m => Number(m[1]));
-
-/** 本文を HTML に：文字はエスケープし、>>12 だけをそのレスへのリンクに（改行は CSS の pre-line でそのまま） */
-const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-export function bodyHtml(body, nos) {
-  return esc(body).replace(/(?:&gt;&gt;|＞＞)(\d{1,5})/g, (m, n) => (n === '1' || nos.has(Number(n)) ? `<a class="anc" href="#r${n}" data-no="${n}">&gt;&gt;${n}</a>` : m));
-}
-
 /** 長い本文を、続きがあるとわかる形で短くする。
  *  50字までに文の終わり（。！？）があればそこまで、なければ読点（、）の前で「…」、どちらもなければ50字で「…」。
  *  あとに「（続きは「てげ好き」で）」を付ける（リンク先で全文を読んでもらう） */

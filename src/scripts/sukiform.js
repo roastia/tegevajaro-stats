@@ -1,6 +1,5 @@
 // てげ好きの書き込みフォーム（src/components/SukiForm.astro）
 // - お題ボタン：本文が空（または前に入れた書き出しのまま）なら書き出しを入れる。書きかけなら、改行して足す
-// - つなげる：スレの「つなげる」ボタンから >>番号 を本文に入れる（window の 'suki:link' イベント）
 // - Turnstile（ボット対策）は、フォームが見えてきてから読み込む
 const TS_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 const whenTs = () => new Promise(res => {
@@ -31,11 +30,6 @@ for (const form of document.querySelectorAll('form[data-suki-form]')) {
     form.querySelectorAll('[data-start]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     put(b.dataset.start); lastStart = b.dataset.start;
   }));
-  addEventListener('suki:link', e => {
-    const a = `>>${e.detail.no} `;
-    if (!ta.value.includes(a.trim())) put(a);
-    form.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  });
 
   // Turnstile：見えてきたら用意する
   const st = { id: undefined, token: '' };

@@ -25,11 +25,8 @@ test('タグの数：多い順、0件は出さない', () => {
   assert.deepEqual(tagCounts(rows).map(t => [t.tag, t.n]), [['応援', 2], ['選手', 1]]);
 });
 
-test('本文の >>12 は、あるレスだけリンクに。ほかの文字はエスケープ', async () => {
-  const { bodyHtml, anchorsOf, matchTheme } = await import('../src/lib/suki.js');
-  assert.equal(bodyHtml('>>2 わかる！<b>', new Set([2])), '<a class="anc" href="#r2" data-no="2">&gt;&gt;2</a> わかる！&lt;b&gt;');
-  assert.equal(bodyHtml('>>9 ない', new Set([2])), '&gt;&gt;9 ない');
-  assert.deepEqual(anchorsOf('>>2 と ＞＞3'), [2, 3]);
+test('試合の日のお題：当日は「今日の試合」、翌日は「昨日の試合」', async () => {
+  const { matchTheme } = await import('../src/lib/suki.js');
   assert.equal(matchTheme('2026-11-21', ['2026-11-21']).t, '今日の試合');
   assert.equal(matchTheme('2026-11-22', ['2026-11-21']).t, '昨日の試合');
   assert.equal(matchTheme('2026-11-23', ['2026-11-21']), null);
