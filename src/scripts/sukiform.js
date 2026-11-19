@@ -1,5 +1,6 @@
 // てげ好きの書き込みフォーム（src/components/SukiForm.astro）
-// - お題ボタン：本文が空（または前に入れた書き出しのまま）なら書き出しを入れる。書きかけなら、改行して足す
+// - お題（ドロップダウン）：本文が空（または前に入れた書き出しのまま）なら書き出しを入れる。書きかけなら、改行して足す。
+//   本文へは移らない（スマホでキーボードが急に出ないように）
 // - Turnstile（ボット対策）は、フォームが見えてきてから読み込む
 const TS_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 const whenTs = () => new Promise(res => {
@@ -23,13 +24,13 @@ for (const form of document.querySelectorAll('form[data-suki-form]')) {
   const put = (text, replace) => {
     const cur = ta.value.trim();
     ta.value = replace || !cur || cur === lastStart.trim() ? text : `${ta.value.replace(/\s+$/, '')}\n${text}`;
-    ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
     count();
   };
-  form.querySelectorAll('[data-start]').forEach(b => b.addEventListener('click', () => {
-    form.querySelectorAll('[data-start]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-    put(b.dataset.start); lastStart = b.dataset.start;
-  }));
+  const theme = form.querySelector('select[data-theme]');
+  theme?.addEventListener('change', () => {
+    if (!theme.value) return;
+    put(theme.value); lastStart = theme.value;
+  });
 
   // Turnstile：見えてきたら用意する
   const st = { id: undefined, token: '' };

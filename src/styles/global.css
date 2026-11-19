@@ -1495,13 +1495,8 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .bbs-empty { margin: 8px 0 0; color: var(--muted); }
 .bbs-write-h { margin: 0 0 8px; font-size: 1rem; font-weight: 800; }
 .suki-note { margin: 4px 4px 0; }
-.suki-themes { display: flex; flex-wrap: wrap; gap: 6px; }
-.suki-themes-h { width: 100%; margin: 0; font-size: .85rem; font-weight: 700; }
-.suki-themes-h span { margin-left: 8px; font-weight: 500; font-size: .76rem; color: var(--muted); }
-.suki-themes button { padding: 5px 12px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--brand) 40%, var(--line)); background: var(--panel); color: var(--fg); font: inherit; font-size: .82rem; cursor: pointer; }
-.suki-themes button[aria-pressed="true"] { background: color-mix(in srgb, var(--brand) 14%, var(--panel)); border-color: var(--brand); }
-.suki-themes button.live { border-color: var(--brand); color: var(--brand-deep); font-weight: 700; }
-.suki-themes button.live b { margin-right: 6px; padding: 0 6px; border-radius: 999px; background: var(--brand); color: #fff; font-size: .7rem; }
+.spot-form .suki-theme { grid-template-columns: auto 1fr; align-items: center; gap: 10px; }
+.spot-form .suki-theme select { grid-column: auto; min-width: 0; }
 .suki-flow { margin-top: 2px; }
 .suki-agree { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 8px; font-size: .86rem; font-weight: 500; line-height: 1.6; }
 .suki-agree input { margin-top: 4px; width: 18px; height: 18px; flex: none; accent-color: var(--brand); }
