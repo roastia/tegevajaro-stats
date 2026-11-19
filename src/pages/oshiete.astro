@@ -1,11 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import SukiForm from '../components/SukiForm.astro';
 import { href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
 // 教えて！：宮崎のおすすめ（/api/spots）・テゲバの情報サイト（/api/links）・テゲスキ！（/api/suki）の受付をまとめたページ
 // #spot・#site・#suki で来たら、そちらを開く。受付は Cloudflare Workers（worker/）と Turnstile。送った内容は確認してから載せる
 const linksApi = SITE.spots.api ? new URL('/api/links', SITE.spots.api).href : '';
-const sukiApi = SITE.spots.api ? new URL('/api/suki', SITE.spots.api).href : '';
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 ---
 <Base current="oshiete" title="教えて！" description="テゲスタ！に、宮崎のおすすめの場所と、テゲバの情報を発信しているチャンネル・サイトを教えてください（非公式サポーターサイト）。">
@@ -95,7 +95,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 
   <section class="card spot-form-card osh-panel osh-suki" id="suki">
     <h2 class="osh-h">テゲバの好きなところ教えて！</h2>
-    <p class="spot-ask">選手のこと、ゴール裏の熱さ、スタジアムの空気、宮崎のこと、忘れられない試合。テゲバの好きなところを、自由に語ってください。届いた声は「<a href={href('tegesuki/')}>テゲスキ！</a>」のページに並びます。</p>
+    <p class="spot-ask">選手のこと、ゴール裏の熱さ、スタジアムの空気、宮崎のこと、忘れられない試合。テゲバの好きなところを、自由に語ってください。ひとことでもOK。届いた声は「<a href={href('tegesuki/')}>テゲスキ！</a>」のスレに並びます。</p>
     <details class="spot-privacy spot-rules">
       <summary>投稿のルール</summary>
       <ul>
@@ -107,20 +107,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
         <li>載った声は、テゲバを応援してきたテゲサポの記録として、ずっと大切に残していきます（あとから消すことはできません）。届けたい思いを、心をこめて書いてください。</li>
       </ul>
     </details>
-    {ready ? (
-      <form class="spot-form" id="sukiForm" novalidate data-api={sukiApi} data-sitekey={SITE.spots.turnstileSiteKey} data-ts="sukiTs" data-action="suki">
-        <label>ニックネーム<span class="opt">任意</span><input name="nickname" maxlength="20" autocomplete="off" placeholder="空なら「テゲサポさん」" /></label>
-        <label>テゲバの好きなところ<span class="req">必須</span><textarea name="body" required maxlength="600" rows="6" aria-describedby="sukiHint" placeholder="例：はじめてテゲスタに行った日、ゴール裏の声に鳥肌が立ちました。それから毎試合…"></textarea></label>
-        <p class="note field-hint" id="sukiHint"><span data-suki-len>0</span>／600字。URL は入れられません。</p>
-        <label class="suki-agree"><input type="checkbox" name="agree" required /><span>この声がテゲスキ！のページに載り、テゲサポの記録として残ること（あとから消すことはできません）、表現を少し整えることがあることに同意します</span></label>
-        <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
-        <div class="ts" id="sukiTs"></div>
-        <button class="spot-send" type="submit">送る</button>
-        <p class="spot-msg" role="status" aria-live="polite"></p>
-      </form>
-    ) : (
-      <p class="spot-wait">受付は準備中です。</p>
-    )}
+    <SukiForm id="sukiForm" />
     <details class="spot-privacy">
       <summary>送った内容の扱い</summary>
       <ul>
@@ -205,21 +192,6 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     if (!/^(https?:\/\/)?[^\s/]+\.[^\s/]{2,}/i.test(url)) return 'URL の形になっていないようです（https:// から始まるアドレスを入れてください）';
     return { url, website: String(f.get('website') || '') };
   });
-
-  const sukiForm = document.getElementById('sukiForm') as HTMLFormElement | null;
-  if (sukiForm) {
-    const len = sukiForm.querySelector<HTMLElement>('[data-suki-len]')!;
-    const ta = sukiForm.querySelector<HTMLTextAreaElement>('textarea[name="body"]')!;
-    ta.addEventListener('input', () => { len.textContent = String([...ta.value.trim()].length); });
-    submit(sukiForm, f => {
-      const body = String(f.get('body') || '').trim(), nickname = String(f.get('nickname') || '').trim();
-      if ([...body].length < 5) return 'テゲバの好きなところを、もう少しくわしく書いてください';
-      if ([...body].length > 600) return '600字までで書いてください';
-      if (!f.get('agree')) return 'サイトに載せることへの同意にチェックを入れてください';
-      return { nickname, body, agree: true, website: String(f.get('website') || '') };
-    });
-    sukiForm.addEventListener('reset', () => { len.textContent = '0'; });
-  }
 
   show(location.hash.slice(1));
 </script>

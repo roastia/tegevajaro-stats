@@ -1443,34 +1443,59 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 /* リンク（#rank-〇〇・#t-〇〇）で来たときは、いったん全部を配置して、ねらった場所にぴったり止める（site.js の reveal） */
 .cv-all .card.rec, .cv-all .share { content-visibility: visible; }
 
-/* ---------- テゲスキ！（src/pages/tegesuki.astro・教えて！の #suki） ---------- */
-.suki-h { margin: 0 0 4px; font-size: 1.5rem; font-weight: 900; color: var(--brand-deep); letter-spacing: .02em; }
-.suki-cta { margin-top: 10px; }
-.suki-count { margin: 0 0 8px; font-size: .9rem; color: var(--muted); }
-.suki-count b { font-size: 1.3rem; color: var(--fg); margin-right: 2px; font-variant-numeric: tabular-nums; }
+/* ---------- テゲスキ！（src/pages/tegesuki.astro・src/components/SukiForm.astro）：むかしの掲示板のスレッド風 ---------- */
+.bbs { --bbs-bg: light-dark(#f2f0e8, #23201f); --bbs-name: light-dark(#1d7a32, #7fd38f); --bbs-anc: light-dark(#1a4fd6, #8fb0ff); background: var(--bbs-bg); }
+.bbs-title { margin: 0; font-size: 1.05rem; line-height: 1.5; font-weight: 800; color: light-dark(#c4142b, #ff8a8a); }
+.bbs-sub { margin: 2px 0 12px; font-size: .82rem; color: var(--muted); }
+.bbs-sub b { color: var(--fg); font-variant-numeric: tabular-nums; }
+.bbs-tools { margin-bottom: 8px; }
 .suki-tags { margin-bottom: 10px; }
 .suki-tags .n { margin-left: 4px; font-size: .72rem; opacity: .7; font-variant-numeric: tabular-nums; }
-.suki-ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.suki-ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 4px; }
 .suki-q { flex: 1 1 11em; min-width: 0; }
-.suki-q input, .suki-sort select { width: 100%; font: inherit; font-size: .92rem; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--fg); }
+.suki-q input, .suki-sort select { width: 100%; font: inherit; font-size: .92rem; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--fg); }
 .suki-sort { flex: 0 0 auto; margin-left: auto; }
-.suki-agree span { flex: 1; min-width: 0; }
 .suki-q input:focus-visible, .suki-sort select:focus-visible { outline: 3px solid var(--brand); outline-offset: 1px; }
 .suki-none { margin: 8px 0; color: var(--muted); font-size: .9rem; }
-.suki-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
-.suki { padding: 14px 16px; border-radius: 14px; background: color-mix(in srgb, var(--brand) 6%, var(--panel)); scroll-margin-top: 80px; }
-.suki.hit { box-shadow: 0 0 0 2px var(--brand); }
-.suki-meta { display: flex; justify-content: space-between; gap: 8px; margin: 0 0 6px; font-size: .8rem; color: var(--muted); }
-.suki-nick { font-weight: 700; color: var(--fg); }
-.suki-body { margin: 0; white-space: pre-line; line-height: 1.8; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; line-clamp: 6; overflow: hidden; }
-.suki.open .suki-body { display: block; -webkit-line-clamp: unset; line-clamp: none; }
-.suki-more { margin-top: 4px; padding: 0; border: 0; background: none; color: var(--brand-deep); font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; }
-.suki-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
-.suki-tagl { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.suki-tagl button { padding: 2px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--brand) 40%, var(--line)); background: var(--panel); color: var(--brand-deep); font: inherit; font-size: .76rem; font-weight: 700; cursor: pointer; }
-.suki-x { margin-left: auto; display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 999px; background: var(--brand); color: #fff; font-size: .8rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
-.suki-x:hover { filter: brightness(1.05); }
-.suki-note { margin-top: 14px; }
-.suki-empty p { margin: 0; }
+.bbs-list { list-style: none; margin: 0; padding: 0; }
+.res { padding: 10px 0 12px; border-top: 1px dotted light-dark(#cfc9b8, #4a4440); scroll-margin-top: 80px; }
+.res:first-child { border-top: 0; }
+.res.hit { background: color-mix(in srgb, #ffe86b 22%, transparent); }
+.res-h { margin: 0; font-size: .84rem; line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; }
+.res-no { color: var(--fg); font-weight: 700; font-variant-numeric: tabular-nums; }
+.res-nm { color: var(--bbs-name); font-weight: 800; }
+.res-mark { color: var(--bbs-name); margin-left: 2px; }
+.res-at { font-variant-numeric: tabular-nums; }
+.res-body { margin: 6px 0 0 1.2em; white-space: pre-line; line-height: 1.85; font-size: .98rem; overflow-wrap: anywhere; color: var(--fg); }
+.res-body .ss { display: inline; }
+a.anc { color: var(--bbs-anc); text-decoration: underline; text-underline-offset: 2px; font-weight: 600; }
+.res-rep { margin: 6px 0 0 1.2em; font-size: .8rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 8px; }
+.res-act { margin: 8px 0 0 1.2em; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.res-act button, .res-x { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; border: 1px solid light-dark(#d8d2c2, #4a4440); background: var(--panel); color: var(--fg); font: inherit; font-size: .78rem; font-weight: 700; text-decoration: none; cursor: pointer; line-height: 1.6; }
+.res-like[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.res-like .n { font-variant-numeric: tabular-nums; }
+.res-like.pop { animation: likepop .35s ease-out; }
+@keyframes likepop { 40% { transform: scale(1.18); } }
+@media (prefers-reduced-motion: reduce) { .res-like.pop { animation: none; } }
+.res-x { color: var(--brand-deep); }
+.res-tags { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.res-act .res-tags button { border: 0; background: none; padding: 0 2px; color: var(--bbs-anc); font-weight: 600; }
+.res-act button:focus-visible, .res-x:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.bbs-empty { margin: 8px 0 0; color: var(--muted); }
+.res-pop { position: fixed; left: var(--x, 12px); top: var(--y, 12px); width: var(--w, 360px); max-height: 50vh; overflow: auto; z-index: 40; padding: 4px 12px; border-radius: 10px;
+  background: light-dark(#fffef8, #2b2725); border: 1px solid light-dark(#cfc9b8, #4a4440); box-shadow: 0 8px 24px rgba(0, 0, 0, .18); }
+.res-pop[hidden] { display: none; }
+.res-pop .res { border-top: 0; }
+.bbs-write-h { margin: 0 0 8px; font-size: 1rem; font-weight: 800; }
+.suki-note { margin: 4px 4px 0; }
+.suki-themes { display: flex; flex-wrap: wrap; gap: 6px; }
+.suki-themes-h { width: 100%; margin: 0; font-size: .85rem; font-weight: 700; }
+.suki-themes-h span { margin-left: 8px; font-weight: 500; font-size: .76rem; color: var(--muted); }
+.suki-themes button { padding: 5px 12px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--brand) 40%, var(--line)); background: var(--panel); color: var(--fg); font: inherit; font-size: .82rem; cursor: pointer; }
+.suki-themes button[aria-pressed="true"] { background: color-mix(in srgb, var(--brand) 14%, var(--panel)); border-color: var(--brand); }
+.suki-themes button.live { border-color: var(--brand); color: var(--brand-deep); font-weight: 700; }
+.suki-themes button.live b { margin-right: 6px; padding: 0 6px; border-radius: 999px; background: var(--brand); color: #fff; font-size: .7rem; }
+.suki-flow { margin-top: 2px; }
 .suki-agree { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 8px; font-size: .86rem; font-weight: 500; line-height: 1.6; }
 .suki-agree input { margin-top: 4px; width: 18px; height: 18px; flex: none; accent-color: var(--brand); }
+.suki-agree span { flex: 1; min-width: 0; }

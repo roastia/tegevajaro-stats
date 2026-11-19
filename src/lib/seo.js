@@ -105,9 +105,9 @@ export const spotsLd = rows => ({ '@context': 'https://schema.org', '@type': 'It
   } })) });
 
 // テゲスキ！：テゲサポの声（好きなところ）の一覧。どんな声が上がっているかを、検索エンジンや AI にも伝える
-export const sukiLd = (rows, url) => ({ '@context': 'https://schema.org', '@type': 'CollectionPage', name: `テゲスキ！ ${SITE.team}の好きなところ（テゲサポの声）`, url,
+export const sukiLd = (rows, url) => ({ '@context': 'https://schema.org', '@type': 'CollectionPage', name: `テゲスキ！ ${SITE.team}の好きなところを語るスレ（テゲサポの声）`, url,
   about: TEAM, inLanguage: 'ja',
   mainEntity: { '@type': 'ItemList', numberOfItems: rows.length,
     itemListElement: rows.map((r, i) => ({ '@type': 'ListItem', position: i + 1, item: {
-      '@type': 'Comment', '@id': `${url}#${r.id}`, url: `${url}#${r.id}`, text: r.body, dateCreated: r.date,
+      '@type': 'Comment', '@id': `${url}#r${r.no}`, url: `${url}#r${r.no}`, text: r.body, dateCreated: r.date,
       author: { '@type': 'Person', name: r.nickname || 'テゲサポ' }, keywords: r.tags.join(','), about: { '@type': 'SportsTeam', name: SITE.team } } })) } });

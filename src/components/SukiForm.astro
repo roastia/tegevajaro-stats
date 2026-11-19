@@ -1,0 +1,36 @@
+---
+// テゲスキ！の書き込みフォーム（スレの下・教えて！の #suki で共用）。動きは src/scripts/sukiform.js、受付は Worker の /api/suki
+// お題ボタン（押すと書き出しが入る）・試合の日と次の日だけのお題・「ひとことでもOK」
+import { SITE } from '../config/site.js';
+import { readCsv } from '../lib/data.js';
+import { href } from '../lib/util.js';
+import { todayJst } from '../lib/bday.js';
+import { SUKI_THEMES, matchTheme } from '../lib/suki.js';
+interface Props { id?: string }
+const { id = 'sukiForm' } = Astro.props;
+const api = SITE.spots.api ? new URL('/api/suki', SITE.spots.api).href : '';
+const ready = !!(api && SITE.spots.turnstileSiteKey);
+const dates = [...new Set([...readCsv('fixtures').map(f => f.date), ...readCsv('matches').map(m => m.date)])].filter(Boolean);
+const live = matchTheme(todayJst().toISOString().slice(0, 10), dates);
+const themes = live ? [live, ...SUKI_THEMES] : SUKI_THEMES;
+---
+{ready ? (
+  <form class="spot-form suki-form" id={id} novalidate data-suki-form data-api={api} data-sitekey={SITE.spots.turnstileSiteKey}>
+    <div class="suki-themes" role="group" aria-label="お題から書く">
+      <p class="suki-themes-h">お題から書く<span>押すと書き出しが入ります</span></p>
+      {themes.map(t => <button type="button" class={t.live ? 'live' : undefined} data-start={t.s}>{t.live && <b>{t.live}</b>}{t.t}</button>)}
+    </div>
+    <label>名前<span class="opt">任意</span><input name="nickname" maxlength="20" autocomplete="off" placeholder="テゲサポさん" /></label>
+    <label>本文<span class="req">必須</span><textarea name="body" required maxlength="600" rows="6" placeholder="ひとことでもOK。上手に書かなくて大丈夫です。&#10;返信するときは >>番号 を入れてください（例：>>12 わかる！）"></textarea></label>
+    <p class="note field-hint"><span data-len>0</span>／600字。ひとことでもOK。URL は入れられません。</p>
+    <label class="suki-agree"><input type="checkbox" name="agree" required /><span>この声がテゲスキ！のページに載り、テゲサポの記録として残ること（あとから消すことはできません）、表現を少し整えることがあることに同意します</span></label>
+    <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+    <div class="ts"></div>
+    <button class="spot-send" type="submit">書き込む</button>
+    <p class="spot-msg" role="status" aria-live="polite"></p>
+    <p class="note suki-flow">届いた声は、確認してから<a href={href('tegesuki/')}>テゲスキ！</a>に載せます（すぐには載りません）。</p>
+  </form>
+) : (
+  <p class="spot-wait">受付は準備中です。</p>
+)}
+<script>import '../scripts/sukiform.js';</script>

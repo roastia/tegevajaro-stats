@@ -1,124 +1,208 @@
 ---
 import Base from '../layouts/Base.astro';
+import SukiForm from '../components/SukiForm.astro';
 import { SITE } from '../config/site.js';
 import { href, xIntent } from '../lib/util.js';
-import { readSuki, nickOf, sukiPost, tagCounts } from '../lib/suki.js';
+import { readSuki, nickOf, sukiPost, tagCounts, bodyHtml, anchorsOf } from '../lib/suki.js';
 import { sukiLd } from '../lib/seo.js';
-// テゲスキ！：テゲサポが教えてくれた「テゲバの好きなところ」。届いた声は確認して整えてから src/data/suki.json に載せる（docs/suki.md）
-// 言葉でリアルタイムに絞り込み・タグで絞り込み・並べかえ。1件ずつ X でポスト（先頭50字を引用。画像なし）
+// テゲスキ！：テゲサポが教えてくれた「テゲバの好きなところ」を、むかしの掲示板のスレッドのように並べる（>>1 はスレ立て）
+// レス番号・>>番号での返信（リンク・ポップアップ・返信の一覧）・いいね！（Worker の /api/likes）・言葉でリアルタイムに絞り込み・タグ・並べかえ
+// 1件ずつ X でポスト（先頭50字を引用。画像なし）。届いた声は確認して整えてから src/data/suki.json に載せる（docs/suki.md）
 const rows = readSuki();
 const tags = tagCounts(rows);
 const pageUrl = `${SITE.url}/tegesuki/`;
-const md = (d: string) => { const [y, m, dd] = d.split('-').map(Number); return `${y}年${m}月${dd}日`; };
+const likesApi = SITE.spots.api ? new URL('/api/likes', SITE.spots.api).href : '';
+const nos = new Set(rows.map(r => r.no));
+// 返信の一覧：>>12 を書いたレスの番号を、12 の下に並べる
+const replies = new Map<number, number[]>();
+for (const r of rows) for (const n of new Set(anchorsOf(r.body))) if (n === 1 || nos.has(n)) replies.set(n, [...(replies.get(n) || []), r.no]);
+const WD = ['日', '月', '火', '水', '木', '金', '土'];
+const stamp = (d: string, t = '') => { const [y, m, dd] = d.split('-').map(Number); return `${y}/${String(m).padStart(2, '0')}/${String(dd).padStart(2, '0')}(${WD[new Date(Date.UTC(y, m - 1, dd)).getUTCDay()]})${t ? ' ' + t : ''}`; };
+const first = rows[0]?.date || new Date().toISOString().slice(0, 10);
 const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags.slice(0, 4).map(t => `${t.tag} ${t.n}件`).join('・')}）` : ''}` : '';
 ---
-<Base current="tegesuki" ld={[sukiLd(rows, pageUrl)]} title="テゲスキ！ テゲバの好きなところ"
-  description={`テゲバジャーロ宮崎の好きなところを、テゲサポのみんなが語る「テゲスキ！」。${summary ? `${summary}。` : ''}選手・応援・スタジアム・宮崎のことまで、テゲバへの声を集めています（非公式サポーターサイト）。`}>
-  <section class="card suki-hero">
-    <h2 class="suki-h">テゲスキ！</h2>
-    <p class="page-lead">テゲバの好きなところ、テゲサポのみんなの声。選手のこと、ゴール裏の熱さ、スタジアムの空気、宮崎のこと。気になる声を見つけたら、自分のひとことを添えて X でポストしよう。</p>
-    <div class="suki-cta"><a class="ask-btn ask-suki" href={href('oshiete/#suki')}>あなたのテゲスキ！を教えて</a></div>
+<Base current="tegesuki" ld={[sukiLd(rows, pageUrl)]} title="テゲスキ！ テゲバの好きなところを語るスレ"
+  description={`テゲバジャーロ宮崎の好きなところを、テゲサポのみんなで語るスレ「テゲスキ！」。${summary ? `${summary}。` : ''}選手・応援・スタジアム・宮崎のことまで、テゲバへの声を集めています（非公式サポーターサイト）。`}>
+  <section class="card bbs" data-likes-api={likesApi}>
+    <h2 class="bbs-title">【テゲバジャーロ宮崎】テゲスキ！ テゲバの好きなところを語るスレ</h2>
+    <p class="bbs-sub"><b data-suki-n>{rows.length + 1}</b> レス<span>・<a href="#write">書き込む</a></span></p>
+
+    {rows.length > 0 && (
+      <div class="bbs-tools">
+        {tags.length > 0 && (
+          <div class="seg suki-tags" role="group" aria-label="タグでしぼる">
+            <button type="button" data-tag="" aria-pressed="true">すべて</button>
+            {tags.map(t => <button type="button" data-tag={t.tag} aria-pressed="false" title={t.desc}>{t.tag}<span class="n">{t.n}</span></button>)}
+          </div>
+        )}
+        <div class="suki-ctl">
+          <label class="suki-q"><span class="visually-hidden">言葉でさがす</span><input type="search" id="sukiQ" placeholder="言葉でさがす（例：ゴール裏）" autocomplete="off" enterkeyhint="search" /></label>
+          <label class="suki-sort"><span class="visually-hidden">並べかえ</span>
+            <select id="sukiSort">
+              <option value="old">古い順（スレの順）</option>
+              <option value="new">新しい順</option>
+              <option value="like">いいね！が多い順</option>
+              <option value="long">長い順</option>
+            </select>
+          </label>
+        </div>
+        <p class="suki-none" id="sukiNone" hidden>当てはまるレスはありません。</p>
+      </div>
+    )}
+
+    <ol class="bbs-list" id="sukiList">
+      <li class="res res-1" id="r1" data-no="1" data-pin>
+        <p class="res-h"><span class="res-no">1</span>：<span class="res-nm">テゲスタ！</span><span class="res-mark">★</span>：<span class="res-at">{stamp(first)}</span></p>
+        <div class="res-body">テゲバの好きなところを、みんなで語ろう。
+選手のこと、ゴール裏の熱さ、スタジアムの空気、宮崎のこと、忘れられない試合。ひとことでもOK。
+返信は「&gt;&gt;番号」で。いいなと思ったレスには「いいね！」を。
+届いた声は確認してから載せます。載った声は、テゲサポの記録としてずっと残ります。</div>
+        {replies.get(1) && <p class="res-rep">返信：{replies.get(1)!.map(n => <a class="anc" href={`#r${n}`} data-no={n}>&gt;&gt;{n}</a>)}</p>}
+      </li>
+      {rows.map(r => (
+        <li class="res" id={`r${r.no}`} data-no={r.no} data-date={`${r.date} ${r.time}`} data-len={[...r.body].length} data-tags={r.tags.join('|')}>
+          <p class="res-h"><span class="res-no">{r.no}</span>：<span class="res-nm">{nickOf(r)}</span>：<span class="res-at">{stamp(r.date, r.time)}</span></p>
+          <div class="res-body" set:html={bodyHtml(r.body, nos)} />
+          {replies.get(r.no) && <p class="res-rep">返信：{replies.get(r.no)!.map(n => <a class="anc" href={`#r${n}`} data-no={n}>&gt;&gt;{n}</a>)}</p>}
+          <div class="res-act">
+            {likesApi && <button type="button" class="res-like" data-like={`r${r.no}`} aria-pressed="false"><span class="lb">いいね！</span><span class="n" data-n></span></button>}
+            <button type="button" class="res-reply" data-reply={r.no}>返信</button>
+            <a class="res-x" href={xIntent(sukiPost(r), `${pageUrl}#r${r.no}`, '')} target="_blank" rel="noopener noreferrer">X でポスト</a>
+            {r.tags.length > 0 && <span class="res-tags">{r.tags.map(t => <button type="button" data-tagpick={t}>#{t}</button>)}</span>}
+          </div>
+        </li>
+      ))}
+    </ol>
+    {rows.length === 0 && <p class="bbs-empty">まだレスはありません。いちばん乗りで、テゲバの好きなところを書き込んでください！</p>}
   </section>
 
-  {rows.length ? (
-    <section class="card suki-list-card">
-      <p class="suki-count"><b data-suki-n>{rows.length}</b>件の声</p>
-      {tags.length > 0 && (
-        <div class="seg suki-tags" role="group" aria-label="タグでしぼる">
-          <button type="button" data-tag="" aria-pressed="true">すべて</button>
-          {tags.map(t => <button type="button" data-tag={t.tag} aria-pressed="false" title={t.desc}>{t.tag}<span class="n">{t.n}</span></button>)}
-        </div>
-      )}
-      <div class="suki-ctl">
-        <label class="suki-q"><span class="visually-hidden">言葉でさがす</span><input type="search" id="sukiQ" placeholder="言葉でさがす（例：ゴール裏）" autocomplete="off" enterkeyhint="search" /></label>
-        <label class="suki-sort"><span class="visually-hidden">並べかえ</span>
-          <select id="sukiSort">
-            <option value="new">新しい順</option>
-            <option value="old">古い順</option>
-            <option value="long">長い順</option>
-            <option value="short">短い順</option>
-          </select>
-        </label>
-      </div>
-      <p class="suki-none" id="sukiNone" hidden>当てはまる声はありません。</p>
-      <ol class="suki-list" id="sukiList">
-        {rows.map(r => (
-          <li class="suki" id={r.id} data-date={r.date} data-n={Number(r.id.slice(1))} data-len={[...r.body].length} data-tags={r.tags.join('|')}>
-            <p class="suki-meta"><span class="suki-nick">{nickOf(r)}</span><time datetime={r.date}>{md(r.date)}</time></p>
-            <p class="suki-body" data-body>{r.body}</p>
-            <button type="button" class="suki-more" hidden>つづきを読む</button>
-            <div class="suki-foot">
-              {r.tags.length > 0 && <ul class="suki-tagl">{r.tags.map(t => <li><button type="button" data-tagpick={t}>{t}</button></li>)}</ul>}
-              <a class="suki-x" href={xIntent(sukiPost(r), `${pageUrl}#${r.id}`, '')} target="_blank" rel="noopener noreferrer">ひとこと添えて X でポスト</a>
-            </div>
-          </li>
-        ))}
-      </ol>
-      <p class="note suki-note">届いた声は、テゲスタ！で確認してから載せています。読みやすいように、一部の表現を整えていることがあります。ここに並ぶ声は、テゲバを応援してきたテゲサポの記録として、ずっと大切に残していきます。</p>
-    </section>
-  ) : (
-    <section class="card suki-empty">
-      <p>まだ声は届いていません。いちばん乗りで、テゲバの好きなところを教えてください！</p>
-    </section>
-  )}
+  <section class="card bbs-write" id="write">
+    <h2 class="bbs-write-h">書き込む</h2>
+    <SukiForm id="sukiWrite" />
+  </section>
+  <p class="note suki-note">届いた声は、テゲスタ！で確認してから載せています。読みやすいように、一部の表現を整えていることがあります。ここに並ぶ声は、テゲバを応援してきたテゲサポの記録として、ずっと大切に残していきます。</p>
+  <div class="res-pop" id="resPop" hidden></div>
 </Base>
 
 <script>
   import { toHiragana } from '../lib/namesearch.js';
-  const list = document.getElementById('sukiList');
-  if (list) {
-    const items = [...list.querySelectorAll<HTMLLIElement>('li.suki')];
-    const norm = (s: string) => toHiragana(s).toLowerCase().replace(/\s+/g, '');
-    const text = new Map(items.map(li => [li, norm(li.textContent || '')]));
-    const q = document.getElementById('sukiQ') as HTMLInputElement;
-    const sort = document.getElementById('sukiSort') as HTMLSelectElement;
-    const none = document.getElementById('sukiNone')!;
-    const count = document.querySelector('[data-suki-n]')!;
-    const tagBtns = [...document.querySelectorAll<HTMLButtonElement>('.suki-tags [data-tag]')];
-    let tag = '';
-    const apply = () => {
-      const terms = q.value.split(/[\s　]+/).map(norm).filter(Boolean);
-      let shown = 0;
-      for (const li of items) {
-        const ok = (!tag || (li.dataset.tags || '').split('|').includes(tag)) && terms.every(t => text.get(li)!.includes(t));
-        li.hidden = !ok; if (ok) shown++;
-      }
-      count.textContent = String(shown);
-      none.hidden = shown > 0;
-    };
-    const order = () => {
-      const k = sort.value;
-      const by: Record<string, (a: HTMLElement, b: HTMLElement) => number> = {
-        new: (a, b) => b.dataset.date!.localeCompare(a.dataset.date!) || Number(b.dataset.n) - Number(a.dataset.n),
-        old: (a, b) => a.dataset.date!.localeCompare(b.dataset.date!) || Number(a.dataset.n) - Number(b.dataset.n),
-        long: (a, b) => Number(b.dataset.len) - Number(a.dataset.len),
-        short: (a, b) => Number(a.dataset.len) - Number(b.dataset.len),
-      };
-      list.append(...[...items].sort(by[k] || by.new));
-    };
-    const pickTag = (t: string) => {
-      tag = t;
-      for (const b of tagBtns) b.setAttribute('aria-pressed', String((b.dataset.tag || '') === t));
-      apply();
-    };
-    q.addEventListener('input', apply);
-    sort.addEventListener('change', order);
-    for (const b of tagBtns) b.addEventListener('click', () => pickTag(b.dataset.tag || ''));
-    list.addEventListener('click', e => {
-      const t = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-tagpick]');
-      if (t) { pickTag(t.dataset.tagpick!); list.closest('section')?.scrollIntoView({ block: 'start' }); return; }
-      const m = (e.target as HTMLElement).closest<HTMLButtonElement>('.suki-more');
-      if (m) { const li = m.closest('li')!; li.classList.add('open'); m.hidden = true; }
-    });
-    // 長い声は6行で折りたたみ、「つづきを読む」で開く（全部の文はページに入っている）
-    const clamp = () => {
-      const long = items.filter(li => { const b = li.querySelector<HTMLElement>('[data-body]')!; return !li.classList.contains('open') && b.scrollHeight > b.clientHeight + 2; });
-      for (const li of items) li.querySelector<HTMLElement>('.suki-more')!.hidden = !long.includes(li);
-    };
-    clamp(); addEventListener('resize', () => requestAnimationFrame(clamp), { passive: true });
-    // #k12 で来たら、その声を開いて見せる
-    const h = location.hash.slice(1);
-    const target = h && document.getElementById(h);
-    if (target && target.classList.contains('suki')) { target.classList.add('open', 'hit'); target.querySelector<HTMLElement>('.suki-more')!.hidden = true; }
+  const list = document.getElementById('sukiList') as HTMLOListElement;
+  const all = [...list.querySelectorAll<HTMLLIElement>('li.res')];
+  const items = all.filter(li => !li.hasAttribute('data-pin'));
+  const byNo = new Map(all.map(li => [li.dataset.no!, li]));
+
+  // ---- 返信：>>番号 を書き込み欄へ ----
+  list.addEventListener('click', e => {
+    const t = e.target as HTMLElement;
+    const rep = t.closest<HTMLButtonElement>('[data-reply]');
+    if (rep) { dispatchEvent(new CustomEvent('suki:reply', { detail: { no: rep.dataset.reply } })); return; }
+    const tp = t.closest<HTMLButtonElement>('[data-tagpick]');
+    if (tp) { pickTag(tp.dataset.tagpick!); document.querySelector('.bbs')?.scrollIntoView({ block: 'start' }); }
+  });
+
+  // ---- >>番号：PC は重ねると、スマホはタップでそのレスを小さく表示（2回目のタップ・もう一度押すとそこへ移動） ----
+  const pop = document.getElementById('resPop')!;
+  let popFor: HTMLElement | null = null, popY = 0;
+  const showPop = (a: HTMLElement) => {
+    const li = byNo.get(a.dataset.no!);
+    if (!li) return;
+    const c = li.cloneNode(true) as HTMLElement;
+    c.removeAttribute('id'); c.hidden = false;
+    c.querySelectorAll('.res-act').forEach(x => x.remove());
+    pop.replaceChildren(c); pop.hidden = false; popFor = a; popY = scrollY;
+    const r = a.getBoundingClientRect(), w = Math.min(520, innerWidth - 24);
+    pop.style.setProperty('--w', `${w}px`);
+    pop.style.setProperty('--x', `${Math.max(12, Math.min(r.left, innerWidth - w - 12))}px`);
+    const below = r.bottom + 8, ph = pop.offsetHeight;
+    pop.style.setProperty('--y', `${below + ph > innerHeight - 70 ? Math.max(8, r.top - ph - 8) : below}px`);
+  };
+  const hidePop = () => { pop.hidden = true; popFor = null; };
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  // 先に受け取る（サイト共通の「#リンクでそこへ移動」より前に止めて、1回目のタップは小さく表示するだけにする）
+  document.addEventListener('click', e => {
+    const a = (e.target as HTMLElement).closest<HTMLElement>('a.anc');
+    if (a && !fine && popFor !== a) { e.preventDefault(); e.stopPropagation(); showPop(a); return; }
+    if (!(e.target as HTMLElement).closest('#resPop')) hidePop();
+  }, true);
+  if (fine) {
+    document.addEventListener('mouseover', e => { const a = (e.target as HTMLElement).closest<HTMLElement>('a.anc'); if (a) showPop(a); });
+    document.addEventListener('mouseout', e => { if ((e.target as HTMLElement).closest('a.anc') && !(e.relatedTarget as HTMLElement)?.closest?.('#resPop')) hidePop(); });
+    pop.addEventListener('mouseleave', hidePop);
   }
+  // 少しスクロールしたら閉じる（タップしたときの小さなずれでは閉じない）
+  addEventListener('scroll', () => { if (!pop.hidden && Math.abs(scrollY - popY) > 60) hidePop(); }, { passive: true });
+
+  // ---- いいね！：数は Worker から。押したかどうかはこの端末に覚えておく ----
+  const api = (document.querySelector('.bbs') as HTMLElement).dataset.likesApi;
+  const likes = new Map<string, number>();
+  const mine = (() => { try { return new Set<string>(JSON.parse(localStorage.getItem('tg:likes') || '[]')); } catch { return new Set<string>(); } })();
+  const save = () => { try { localStorage.setItem('tg:likes', JSON.stringify([...mine])); } catch { /* 覚えられなくても続ける */ } };
+  const paint = () => list.querySelectorAll<HTMLButtonElement>('[data-like]').forEach(b => {
+    const id = b.dataset.like!, n = likes.get(id) || 0;
+    b.setAttribute('aria-pressed', String(mine.has(id)));
+    b.querySelector('[data-n]')!.textContent = n ? String(n) : '';
+  });
+  paint();
+  if (api && items.length) {
+    fetch(api, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(d => { if (d?.counts) { for (const [k, v] of Object.entries(d.counts)) likes.set(k, Number(v)); paint(); if (sort?.value === 'like') order(); } }).catch(() => {});
+    list.addEventListener('click', async e => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-like]');
+      if (!b) return;
+      const id = b.dataset.like!, on = !mine.has(id);
+      if (on) mine.add(id); else mine.delete(id);
+      likes.set(id, Math.max(0, (likes.get(id) || 0) + (on ? 1 : -1))); save(); paint();
+      b.classList.remove('pop'); void b.offsetWidth; if (on) b.classList.add('pop');
+      try {
+        const r = await fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, on }) });
+        const d = await r.json().catch(() => null);
+        if (d && typeof d.n === 'number') { likes.set(id, d.n); paint(); }
+      } catch { /* 数は次に開いたときにそろう */ }
+    });
+  }
+
+  // ---- 言葉でさがす・タグ・並べかえ ----
+  const q = document.getElementById('sukiQ') as HTMLInputElement | null;
+  const sort = document.getElementById('sukiSort') as HTMLSelectElement | null;
+  const none = document.getElementById('sukiNone');
+  const count = document.querySelector('[data-suki-n]')!;
+  const tagBtns = [...document.querySelectorAll<HTMLButtonElement>('.suki-tags [data-tag]')];
+  const norm = (s: string) => toHiragana(s).toLowerCase().replace(/\s+/g, '');
+  const text = new Map(items.map(li => [li, norm(li.querySelector('.res-h')!.textContent! + li.querySelector('.res-body')!.textContent! + (li.dataset.tags || ''))]));
+  let tag = '';
+  const apply = () => {
+    const terms = (q?.value || '').split(/[\s　]+/).map(norm).filter(Boolean);
+    const filtering = !!(tag || terms.length);
+    let shown = 0;
+    for (const li of items) {
+      const ok = (!tag || (li.dataset.tags || '').split('|').includes(tag)) && terms.every(t => text.get(li)!.includes(t));
+      li.hidden = !ok; if (ok) shown++;
+    }
+    const pin = byNo.get('1'); if (pin) pin.hidden = filtering;
+    count.textContent = String(filtering ? shown : shown + 1);
+    if (none) none.hidden = shown > 0 || !filtering;
+  };
+  function order() {
+    const k = sort?.value || 'old';
+    const no = (li: HTMLElement) => Number(li.dataset.no);
+    const by: Record<string, (a: HTMLElement, b: HTMLElement) => number> = {
+      old: (a, b) => no(a) - no(b),
+      new: (a, b) => no(b) - no(a),
+      like: (a, b) => (likes.get(`r${b.dataset.no}`) || 0) - (likes.get(`r${a.dataset.no}`) || 0) || no(a) - no(b),
+      long: (a, b) => Number(b.dataset.len) - Number(a.dataset.len),
+    };
+    const pin = byNo.get('1')!;
+    list.append(pin, ...[...items].sort(by[k] || by.old));
+  }
+  function pickTag(t: string) {
+    tag = t;
+    for (const b of tagBtns) b.setAttribute('aria-pressed', String((b.dataset.tag || '') === t));
+    apply();
+  }
+  q?.addEventListener('input', apply);
+  sort?.addEventListener('change', order);
+  for (const b of tagBtns) b.addEventListener('click', () => pickTag(b.dataset.tag || ''));
+
+  // #r12 で来たら、そのレスを目立たせる
+  const h = location.hash.match(/^#r(\d+)$/);
+  if (h) byNo.get(h[1])?.classList.add('hit');
 </script>
