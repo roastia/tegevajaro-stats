@@ -133,8 +133,7 @@ const inMenu = !TABS.includes(current);
   <dialog class="navsheet" id="navSheet" aria-labelledby="navSheetH"><div class="navsheet-in">
     <div class="navsheet-h"><h2 id="navSheetH">メニュー</h2><button type="button" class="navsheet-x" id="navClose">閉じる</button></div>
     <ul>
-      {/* てげ好きは、この下の「テゲスタ！に教えて」にボタンがあるので、スマホのメニューの一覧には出さない */}
-      {nav.filter(([, id]) => id !== 'tegesuki').map(([p, id, label]) => <li><a class={id === 'spots' ? 'nav-miya' : undefined} href={href(p)} aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
+      {nav.map(([p, id, label]) => <li><a class={id === 'spots' ? 'nav-miya' : undefined} href={href(p)} aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
     </ul>
     <p class="navsheet-ask">テゲスタ！に教えて</p>
     <div class="osh-btns"><a class="ask-btn ask-spot" href={href('oshiete/#spot')}>宮崎のおすすめ</a><a class="ask-btn ask-site" href={href('oshiete/#site')}>テゲバの情報サイト</a><a class="ask-btn ask-suki" href={href('oshiete/#suki')}>てげ好き</a></div>
