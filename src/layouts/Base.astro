@@ -44,7 +44,7 @@ const bdToday = bdayState(bdays).today;
 const nav = [
   ['', 'topics', 'トピック'], ['ranking/', 'ranking', 'ランキング'], ['players/', 'players', '選手'],
   ['goals/', 'goals', 'ハイライト'], ['schedule/', 'schedule', '日程'], ['history/', 'history', '歴史'],
-  ['chants/', 'chants', 'チャント'], ['links/', 'links', 'リンク'], ['spots/', 'spots', 'みやざき'], ['tegesuki/', 'tegesuki', 'テゲスキ！'],
+  ['chants/', 'chants', 'チャント'], ['links/', 'links', 'リンク'], ['spots/', 'spots', 'みやざき'], ['tegesuki/', 'tegesuki', 'てげ好き'],
 ];
 // スマホの下のメニュー：アイコン（線の絵）＋文字
 const TAB_IC = {
@@ -136,7 +136,7 @@ const inMenu = !TABS.includes(current);
       {nav.map(([p, id, label]) => <li><a class={id === 'spots' ? 'nav-miya' : undefined} href={href(p)} aria-current={current === id ? 'page' : undefined}>{label}</a></li>)}
     </ul>
     <p class="navsheet-ask">テゲスタ！に教えて</p>
-    <div class="osh-btns"><a class="ask-btn ask-spot" href={href('oshiete/#spot')}>宮崎のおすすめ</a><a class="ask-btn ask-site" href={href('oshiete/#site')}>テゲバの情報サイト</a><a class="ask-btn ask-suki" href={href('oshiete/#suki')}>テゲスキ！</a></div>
+    <div class="osh-btns"><a class="ask-btn ask-spot" href={href('oshiete/#spot')}>宮崎のおすすめ</a><a class="ask-btn ask-site" href={href('oshiete/#site')}>テゲバの情報サイト</a><a class="ask-btn ask-suki" href={href('oshiete/#suki')}>てげ好き</a></div>
   </div></dialog>
   <div class="wrap">
     <section class="hbd" id="hbd" hidden={!bdToday.length} aria-live="polite" data-key={bdayKey(bdToday)} set:html={hbdHtml(bdToday, plUrls)}></section>
@@ -147,7 +147,7 @@ const inMenu = !TABS.includes(current);
       <aside class="card osh-foot" aria-label="教えて！">
         <p class="osh-foot-h">テゲスタ！に教えてください</p>
         <p class="osh-foot-p">宮崎のおすすめの場所や、テゲバの情報を発信しているチャンネル・サイト、テゲバの好きなところを、ぜひ。</p>
-        <div class="osh-btns"><a class="ask-btn ask-spot" href={href('oshiete/#spot')}>宮崎のおすすめ</a><a class="ask-btn ask-site" href={href('oshiete/#site')}>テゲバの情報サイト</a><a class="ask-btn ask-suki" href={href('oshiete/#suki')}>テゲスキ！</a></div>
+        <div class="osh-btns"><a class="ask-btn ask-spot" href={href('oshiete/#spot')}>宮崎のおすすめ</a><a class="ask-btn ask-site" href={href('oshiete/#site')}>テゲバの情報サイト</a><a class="ask-btn ask-suki" href={href('oshiete/#suki')}>てげ好き</a></div>
       </aside>
     )}
   </main>

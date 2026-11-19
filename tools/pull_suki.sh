@@ -1,5 +1,5 @@
 #!/bin/sh
-# テゲスキ！（テゲバの好きなところ。裏にたまった声）を手元に取り出す。公開しないフォルダ private/ に保存する
+# てげ好き（テゲバの好きなところ。裏にたまった声）を手元に取り出す。公開しないフォルダ private/ に保存する
 # date・time は送信ボタンが押された日時を日本時間にしたもの（created_at は UTC のまま残す）。suki.json にはこの date・time をそのまま写す
 # 事前に：cd worker && npx wrangler@4.150.0 login
 set -e

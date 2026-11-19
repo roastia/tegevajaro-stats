@@ -1,4 +1,4 @@
-# テスト用サイトのテゲスキ！見本レス（約250件）を作る。決まった乱数なので、何度作っても同じになる
+# テスト用サイトのてげ好き見本レス（約250件）を作る。決まった乱数なので、何度作っても同じになる
 # 使い方：python3 tools/gen_suki_sample.py src/data/suki-sample.json（テスト用サイトでだけ使う見本。本番には出ない）
 import json, random, sys, datetime
 R = random.Random(20261119)

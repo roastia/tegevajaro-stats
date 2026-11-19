@@ -5,7 +5,7 @@ import { SITE } from '../config/site.js';
 import { href, xIntent } from '../lib/util.js';
 import { readSuki, nickOf, sukiPost, tagCounts, bodyHtml, anchorsOf } from '../lib/suki.js';
 import { sukiLd } from '../lib/seo.js';
-// テゲスキ！：テゲサポが教えてくれた「テゲバの好きなところ」を、むかしの掲示板のスレッドのように並べる（>>1 はスレ立て）
+// てげ好き：テゲサポが教えてくれた「テゲバの好きなところ」を、むかしの掲示板のスレッドのように並べる（>>1 はスレ立て）
 // レス番号・>>番号で「つながる声」（リンク・ポップアップ・つながる声の一覧。返信の機能ではなく、関係のある声をむすぶ）・いいね！（Worker の /api/likes）・言葉でリアルタイムに絞り込み・タグ・並べかえ・表示件数とページ送り
 // 1件ずつ X でポスト（先頭50字を引用。画像なし）。届いた声は確認して整えてから src/data/suki.json に載せる（docs/suki.md）
 const rows = readSuki();
@@ -21,10 +21,10 @@ const stamp = (d: string, t = '') => { const [y, m, dd] = d.split('-').map(Numbe
 const first = rows[0]?.date || new Date().toISOString().slice(0, 10);
 const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags.slice(0, 4).map(t => `${t.tag} ${t.n}件`).join('・')}）` : ''}` : '';
 ---
-<Base current="tegesuki" ld={[sukiLd(rows, pageUrl)]} title="テゲスキ！ テゲバの好きなところを語るスレ"
-  description={`テゲバジャーロ宮崎の好きなところを、テゲサポのみんなで語るスレ「テゲスキ！」。${summary ? `${summary}。` : ''}選手・応援・スタジアム・宮崎のことまで、テゲバへの声を集めています（非公式サポーターサイト）。`}>
+<Base current="tegesuki" ld={[sukiLd(rows, pageUrl)]} title="てげ好き テゲバの好きなところを語るスレ"
+  description={`テゲバジャーロ宮崎の好きなところを、テゲサポのみんなで語るスレ「てげ好き」。${summary ? `${summary}。` : ''}選手・応援・スタジアム・宮崎のことまで、テゲバへの声を集めています（非公式サポーターサイト）。`}>
   <section class="card bbs" data-likes-api={likesApi}>
-    <h2 class="bbs-title">【テゲバジャーロ宮崎】テゲスキ！ テゲバの好きなところを語るスレ</h2>
+    <h2 class="bbs-title">【テゲバジャーロ宮崎】てげ好き テゲバの好きなところを語るスレ</h2>
     <p class="bbs-sub"><b data-suki-n>{rows.length + 1}</b> レス<span>・<a href="#write">書き込む</a></span></p>
 
     {rows.length > 0 && (

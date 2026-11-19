@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import { readCsv } from '../lib/data.js';
 import { href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
-// 掲載をやめる依頼：おすすめスポット（s〇）・リンク集（l〇）が対象（テゲスキ！の声は記録として残すので対象外）。連絡先は受け取らない。受付はほかと同じ Worker（/api/removal）
+// 掲載をやめる依頼：おすすめスポット（s〇）・リンク集（l〇）が対象（てげ好きの声は記録として残すので対象外）。連絡先は受け取らない。受付はほかと同じ Worker（/api/removal）
 // 対応の方針：理由を問わず、確認できしだい取り下げる（本人確認はしない）。docs/spots.md「掲載をやめる依頼」
 const REASONS = ['自分が投稿した', 'お店・施設・場所の関係者', 'リンク先の運営者', '情報が古い・まちがっている', 'その他'];
 const spots = readCsv('spots').filter(s => s.id && s.name);

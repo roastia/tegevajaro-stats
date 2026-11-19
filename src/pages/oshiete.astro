@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import SukiForm from '../components/SukiForm.astro';
 import { href } from '../lib/util.js';
 import { SITE } from '../config/site.js';
-// 教えて！：宮崎のおすすめ（/api/spots）・テゲバの情報サイト（/api/links）・テゲスキ！（/api/suki）の受付をまとめたページ
+// 教えて！：宮崎のおすすめ（/api/spots）・テゲバの情報サイト（/api/links）・てげ好き（/api/suki）の受付をまとめたページ
 // #spot・#site・#suki で来たら、そちらを開く。受付は Cloudflare Workers（worker/）と Turnstile。送った内容は確認してから載せる
 const linksApi = SITE.spots.api ? new URL('/api/links', SITE.spots.api).href : '';
 const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
@@ -15,7 +15,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
     <div class="seg osh-seg" role="group" aria-label="教えてほしいこと">
       <button type="button" data-topic="spot" aria-controls="spot" aria-pressed="true">宮崎のおすすめ</button>
       <button type="button" data-topic="site" aria-controls="site" aria-pressed="false">テゲバの情報サイト</button>
-      <button type="button" data-topic="suki" aria-controls="suki" aria-pressed="false">テゲスキ！</button>
+      <button type="button" data-topic="suki" aria-controls="suki" aria-pressed="false">てげ好き</button>
     </div>
   </section>
 
@@ -95,11 +95,11 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
 
   <section class="card spot-form-card osh-panel osh-suki" id="suki">
     <h2 class="osh-h">テゲバの好きなところ教えて！</h2>
-    <p class="spot-ask">選手のこと、ゴール裏の熱さ、スタジアムの空気、宮崎のこと、忘れられない試合。テゲバの好きなところを、自由に語ってください。ひとことでもOK。届いた声は「<a href={href('tegesuki/')}>テゲスキ！</a>」のスレに並びます。</p>
+    <p class="spot-ask">選手のこと、ゴール裏の熱さ、スタジアムの空気、宮崎のこと、忘れられない試合。テゲバの好きなところを、自由に語ってください。ひとことでもOK。届いた声は「<a href={href('tegesuki/')}>てげ好き</a>」のスレに並びます。</p>
     <details class="spot-privacy spot-rules">
       <summary>投稿のルール</summary>
       <ul>
-        <li>送ってもらった声は、すぐにはページに載りません。確認してから、テゲスキ！のページに載せます。</li>
+        <li>送ってもらった声は、すぐにはページに載りません。確認してから、てげ好きのページに載せます。</li>
         <li>載せるかどうかは、こちらで判断します（悪口、個人の情報がわかるもの、宣伝などは載せません）。読みやすいように、表現を少し整えることがあります。</li>
         <li>声の内容にあわせて、こちらでタグ（「選手」「応援」など）を付けます。</li>
         <li>載った声は、だれでも一部を引用して X でポストできます。</li>

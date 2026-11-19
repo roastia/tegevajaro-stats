@@ -1443,7 +1443,7 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 /* リンク（#rank-〇〇・#t-〇〇）で来たときは、いったん全部を配置して、ねらった場所にぴったり止める（site.js の reveal） */
 .cv-all .card.rec, .cv-all .share { content-visibility: visible; }
 
-/* ---------- テゲスキ！（src/pages/tegesuki.astro・src/components/SukiForm.astro）：むかしの掲示板のスレッド風 ---------- */
+/* ---------- てげ好き（src/pages/tegesuki.astro・src/components/SukiForm.astro）：むかしの掲示板のスレッド風 ---------- */
 .bbs { --bbs-bg: light-dark(#f2f0e8, #23201f); --bbs-name: light-dark(#1d7a32, #7fd38f); --bbs-anc: light-dark(#1a4fd6, #8fb0ff); background: var(--bbs-bg); }
 .bbs-title { margin: 0; font-size: 1.05rem; line-height: 1.5; font-weight: 800; color: light-dark(#c4142b, #ff8a8a); }
 .bbs-sub { margin: 2px 0 12px; font-size: .82rem; color: var(--muted); }

@@ -89,7 +89,7 @@ export function validateLink(input) {
   return { ok: true, value: { url: u.href } };
 }
 
-// テゲスキ！（テゲバの好きなところ）：ニックネーム（任意・20字）と本文（600字）。改行は残す（3行以上の空きは2行に）。
+// てげ好き（テゲバの好きなところ）：ニックネーム（任意・20字）と本文（600字）。改行は残す（3行以上の空きは2行に）。
 // URL は受け付けない（宣伝よけ）。サイトに載せること・表現を整えることへの同意（agree: true）が必要
 export const SUKI = { nick: 20, body: 600, min: 5 };
 // 本文は全角の「！」「？」などをそのまま残すため NFC（NFKC だと半角になる）
@@ -115,7 +115,7 @@ export function validateSuki(input) {
   return { ok: true, value: { nickname, body } };
 }
 
-// 掲載をやめる依頼：対象（おすすめスポット s〇・リンク集 l〇）と理由。連絡先は受け取らない（テゲスキ！の声は記録として残すので対象外）
+// 掲載をやめる依頼：対象（おすすめスポット s〇・リンク集 l〇）と理由。連絡先は受け取らない（てげ好きの声は記録として残すので対象外）
 export const REMOVAL_REASONS = ['自分が投稿した', 'お店・施設・場所の関係者', 'リンク先の運営者', '情報が古い・まちがっている', 'その他'];
 export function validateRemoval(input) {
   if (!input || typeof input !== 'object') return { ok: false, error: '送信内容を読み取れませんでした' };

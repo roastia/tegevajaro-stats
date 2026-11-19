@@ -1,5 +1,5 @@
 // テゲスタ！ おすすめスポットの投稿受付（Cloudflare Workers + D1 + Turnstile）
-// - 受け付けるのは POST /api/spots（投稿）・POST /api/links（リンク集への情報提供：URL だけ）・POST /api/removal（掲載をやめる依頼）と /api/hearts（ハート：POST で押す・外す、GET で並び順だけ）・/api/yosou（スコア予想：POST で予想、GET で集計）・POST /api/suki（テゲスキ！：テゲバの好きなところ）・/api/likes（テゲスキ！のいいね！）。投稿の中身やハートの数を返す API は作らない（中身は wrangler で取り出す）
+// - 受け付けるのは POST /api/spots（投稿）・POST /api/links（リンク集への情報提供：URL だけ）・POST /api/removal（掲載をやめる依頼）と /api/hearts（ハート：POST で押す・外す、GET で並び順だけ）・/api/yosou（スコア予想：POST で予想、GET で集計）・POST /api/suki（てげ好き：テゲバの好きなところ）・/api/likes（てげ好きのいいね！）。投稿の中身やハートの数を返す API は作らない（中身は wrangler で取り出す）
 // - IP アドレスは保存しない（日ごとの鍵でハッシュ化した値だけを2日間だけ置く）
 // - 連投の対策：Turnstile を毎回必須・同じ回線から1日 IP_DAILY_LIMIT 件まで・同じ日の同じ内容は受けない
 import { validateSubmission, validateLink, validateRemoval, validateHeart, validateYosou, validateSuki, jstDay, ipHash, contentKey, sha256, LIMITS } from './validate.js';
@@ -73,7 +73,7 @@ async function hearts(request, env, okOrigin) {
   return json(200, { ok: true }, okOrigin);
 }
 
-// ---- テゲスキ！のいいね！（ハートと同じしくみ・同じ表。id は声の番号 r〇） ----
+// ---- てげ好きのいいね！（ハートと同じしくみ・同じ表。id は声の番号 r〇） ----
 // GET  /api/likes → { counts: { r2: 3, … } }（数も返す）
 // POST /api/likes { id: 'r12', on } → 押す・外す。同じ回線から同じ声へは1日1回まで数える
 async function likes(request, env, okOrigin) {
@@ -223,7 +223,7 @@ async function links(request, env, okOrigin, allowed) {
   return json(201, { ok: true }, okOrigin);
 }
 
-// ---- テゲスキ！（テゲバの好きなところ）：ニックネーム（任意）と本文だけ。ルールはリンク集と同じ（Turnstile・同じ文は1日1回・回線ごとに1日の上限） ----
+// ---- てげ好き（テゲバの好きなところ）：ニックネーム（任意）と本文だけ。ルールはリンク集と同じ（Turnstile・同じ文は1日1回・回線ごとに1日の上限） ----
 async function suki(request, env, okOrigin, allowed) {
   if (request.method === 'OPTIONS') {
     if (!okOrigin) return new Response(null, { status: 403 });

@@ -1,5 +1,5 @@
 ---
-// テゲスキ！の書き込みフォーム（スレの下・教えて！の #suki で共用）。動きは src/scripts/sukiform.js、受付は Worker の /api/suki
+// てげ好きの書き込みフォーム（スレの下・教えて！の #suki で共用）。動きは src/scripts/sukiform.js、受付は Worker の /api/suki
 // お題ボタン（押すと書き出しが入る）・試合の日と次の日だけのお題・「ひとことでもOK」
 import { SITE } from '../config/site.js';
 import { readCsv } from '../lib/data.js';
@@ -23,12 +23,12 @@ const themes = live ? [live, ...SUKI_THEMES] : SUKI_THEMES;
     <label>名前<span class="opt">任意</span><input name="nickname" maxlength="20" autocomplete="off" placeholder="テゲサポさん" /></label>
     <label>本文<span class="req">必須</span><textarea name="body" required maxlength="600" rows="6" placeholder="ひとことでもOK。上手に書かなくて大丈夫です。&#10;ほかのレスにつなげるときは >>番号 を入れてください（例：>>12 わかる！）"></textarea></label>
     <p class="note field-hint"><span data-len>0</span>／600字。ひとことでもOK。URL は入れられません。</p>
-    <label class="suki-agree"><input type="checkbox" name="agree" required /><span>この声がテゲスキ！のページに載り、テゲサポの記録として残ること（あとから消すことはできません）、表現を少し整えることがあることに同意します</span></label>
+    <label class="suki-agree"><input type="checkbox" name="agree" required /><span>この声がてげ好きのページに載り、テゲサポの記録として残ること（あとから消すことはできません）、表現を少し整えることがあることに同意します</span></label>
     <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
     <div class="ts"></div>
     <button class="spot-send" type="submit">書き込む</button>
     <p class="spot-msg" role="status" aria-live="polite"></p>
-    <p class="note suki-flow">届いた声は、確認してから<a href={href('tegesuki/')}>テゲスキ！</a>に載せます（すぐには載りません）。</p>
+    <p class="note suki-flow">届いた声は、確認してから<a href={href('tegesuki/')}>てげ好き</a>に載せます（すぐには載りません）。</p>
   </form>
 ) : (
   <p class="spot-wait">受付は準備中です。</p>

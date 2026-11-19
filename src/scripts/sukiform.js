@@ -1,4 +1,4 @@
-// テゲスキ！の書き込みフォーム（src/components/SukiForm.astro）
+// てげ好きの書き込みフォーム（src/components/SukiForm.astro）
 // - お題ボタン：本文が空（または前に入れた書き出しのまま）なら書き出しを入れる。書きかけなら、改行して足す
 // - つなげる：スレの「つなげる」ボタンから >>番号 を本文に入れる（window の 'suki:link' イベント）
 // - Turnstile（ボット対策）は、フォームが見えてきてから読み込む
@@ -65,7 +65,7 @@ for (const form of document.querySelectorAll('form[data-suki-form]')) {
       const r = await fetch(form.dataset.api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'omit', referrerPolicy: 'no-referrer',
         body: JSON.stringify({ nickname, body, agree: true, website: String(f.get('website') || ''), turnstile: st.token }) });
       const d = await r.json().catch(() => ({}));
-      if (r.ok && d.ok) { form.reset(); count(); lastStart = ''; say('ありがとうございます！確認してから、テゲスキ！に載せます。', true); }
+      if (r.ok && d.ok) { form.reset(); count(); lastStart = ''; say('ありがとうございます！確認してから、てげ好きに載せます。', true); }
       else say(d.error || '送れませんでした。時間をおいて、もう一度お試しください');
     } catch { say('送れませんでした。電波のよいところで、もう一度お試しください'); }
     finally {

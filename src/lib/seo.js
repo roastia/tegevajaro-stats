@@ -104,8 +104,8 @@ export const spotsLd = rows => ({ '@context': 'https://schema.org', '@type': 'It
     geo: { '@type': 'GeoCoordinates', latitude: Number(s.lat), longitude: Number(s.lng) },
   } })) });
 
-// テゲスキ！：テゲサポの声（好きなところ）の一覧。どんな声が上がっているかを、検索エンジンや AI にも伝える
-export const sukiLd = (rows, url) => ({ '@context': 'https://schema.org', '@type': 'CollectionPage', name: `テゲスキ！ ${SITE.team}の好きなところを語るスレ（テゲサポの声）`, url,
+// てげ好き：テゲサポの声（好きなところ）の一覧。どんな声が上がっているかを、検索エンジンや AI にも伝える
+export const sukiLd = (rows, url) => ({ '@context': 'https://schema.org', '@type': 'CollectionPage', name: `てげ好き ${SITE.team}の好きなところを語るスレ（テゲサポの声）`, url,
   about: TEAM, inLanguage: 'ja',
   mainEntity: { '@type': 'ItemList', numberOfItems: rows.length,
     itemListElement: rows.map((r, i) => ({ '@type': 'ListItem', position: i + 1, item: {

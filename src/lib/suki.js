@@ -1,4 +1,4 @@
-// テゲスキ！（テゲバの好きなところ）：テゲサポの声をスレッドのように並べる。src/data/suki.json（確認して整えた声だけ）を読む
+// てげ好き（テゲバの好きなところ）：テゲサポの声をスレッドのように並べる。src/data/suki.json（確認して整えた声だけ）を読む
 // 1件の形：{ id: 'k12'（受付の番号）, no: 2（レス番号。1 はスレ立て）, date: 'YYYY-MM-DD', time: 'HH:MM'（任意）,
 //            nickname: ''（空なら「テゲサポさん」）, body: '本文（改行あり。>>12 でそのレスにつながる声に）', tags: ['選手', …] }
 // タグは届いた声を読んでこちらで付ける（並びと説明は下の SUKI_TAGS。ここにないタグは使わない）
@@ -19,8 +19,8 @@ export const SUKI_TAGS = [
   ['未来', 'これからのテゲバへの期待'],
 ];
 export const NICK_DEFAULT = 'テゲサポさん';
-export const QUOTE_LEN = 50;   // X でポストするときに引用する長さ（越えたら文の切れ目で切り、「続きはテゲスキ！で」を付ける）
-export const MORE = '（続きはテゲスキ！で）';
+export const QUOTE_LEN = 50;   // X でポストするときに引用する長さ（越えたら文の切れ目で切り、「（続きは「てげ好き」で）」を付ける）
+export const MORE = '（続きは「てげ好き」で）';
 
 // 書くときのお題：押すと本文の欄に書き出しが入る（書き出しのあとを自由に）
 export const SUKI_THEMES = [
@@ -68,7 +68,7 @@ export function bodyHtml(body, nos) {
 
 /** 長い本文を、続きがあるとわかる形で短くする。
  *  50字までに文の終わり（。！？）があればそこまで、なければ読点（、）の前で「…」、どちらもなければ50字で「…」。
- *  あとに「（続きはテゲスキ！で）」を付ける（リンク先で全文を読んでもらう） */
+ *  あとに「（続きは「てげ好き」で）」を付ける（リンク先で全文を読んでもらう） */
 export function sukiQuote(text) {
   const chars = [...text];
   if (chars.length <= QUOTE_LEN) return text;
@@ -81,11 +81,11 @@ export function sukiQuote(text) {
   return cut + '…' + MORE;
 }
 
-/** X でポストする文：本文（長いときは sukiQuote で短く）＋ #テゲスキ ＋いつものハッシュタグ。かぎかっこ・名前は付けない。>>12 は外す */
+/** X でポストする文：本文（長いときは sukiQuote で短く）＋ #てげ好き ＋いつものハッシュタグ。かぎかっこ・名前は付けない。>>12 は外す */
 export function sukiPost(r) {
   // 改行は、句読点のあとならそのままつなぎ、それ以外は空白1つに
   const flat = r.body.replace(/(?:>>|＞＞)\d{1,5}\s*/g, '').replace(/([。！？!?、])\s*\n+\s*/gu, '$1').replace(/\s*\n+\s*/g, ' ').trim();
-  return `${sukiQuote(flat)}\n#テゲスキ ${SITE.hashtags}`;
+  return `${sukiQuote(flat)}\n#てげ好き ${SITE.hashtags}`;
 }
 
 /** タグごとの数（多い順。0件のタグは出さない） */

@@ -73,9 +73,9 @@ test('キックオフを過ぎたら締め切り。3日後に数だけ残して�
   assert.deepEqual(all.matches['2000-01-01'], { total: 3, scores: [{ gf: 1, ga: 0, n: 2 }, { gf: 2, ga: 2, n: 1 }] });
 }));
 
-// ---- テゲスキ！ ----
+// ---- てげ好き ----
 import { validateSuki } from '../src/validate.js';
-test('テゲスキ！の形：同意が必要・5〜600字・URL は不可・改行は残す', () => {
+test('てげ好きの形：同意が必要・5〜600字・URL は不可・改行は残す', () => {
   const ok = validateSuki({ agree: true, nickname: ' テゲ太郎 ', body: 'ゴール裏の\r\n\r\n\r\n声がすき！' });
   assert.deepEqual(ok, { ok: true, value: { nickname: 'テゲ太郎', body: 'ゴール裏の\n\n声がすき！' } });
   assert.equal(validateSuki({ agree: false, body: 'テゲバが大好きです' }).ok, false);
@@ -86,7 +86,7 @@ test('テゲスキ！の形：同意が必要・5〜600字・URL は不可・改
   assert.equal(validateSuki({ agree: true, body: 'テゲバが大好きです', website: 'x' }).ok, false);
 });
 
-test('テゲスキ！の受付：届いた声は公開しない受け箱へ。同じ文は1日1回', async () => {
+test('てげ好きの受付：届いた声は公開しない受け箱へ。同じ文は1日1回', async () => {
   const e = { DB: fakeD1(), ALLOWED_ORIGIN: SITE, IP_HASH_SECRET: 'test', TURNSTILE_SECRET: 's' };
   const orig = globalThis.fetch;
   globalThis.fetch = async () => new Response(JSON.stringify({ success: true, hostname: 'tegestats.com', action: 'suki' }), { status: 200 });
@@ -99,7 +99,7 @@ test('テゲスキ！の受付：届いた声は公開しない受け箱へ。�
   } finally { globalThis.fetch = orig; }
 });
 
-test('テゲスキ！のいいね！：押すと数が増え、同じ回線は1日1回。スポットのハートの並びには混ざらない', async () => {
+test('てげ好きのいいね！：押すと数が増え、同じ回線は1日1回。スポットのハートの並びには混ざらない', async () => {
   const e = { DB: fakeD1(), ALLOWED_ORIGIN: SITE, IP_HASH_SECRET: 'test' };
   const like = (id, on, ip = '1.1.1.1') => worker.fetch(new Request('https://w.example/api/likes', { method: 'POST', headers: { Origin: SITE, 'Content-Type': 'application/json', 'CF-Connecting-IP': ip }, body: JSON.stringify({ id, on }) }), e);
   assert.equal((await (await like('r2', true)).json()).n, 1);
