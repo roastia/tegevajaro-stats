@@ -65,12 +65,12 @@ export function bodyHtml(body, nos) {
   return esc(body).replace(/(?:&gt;&gt;|＞＞)(\d{1,5})/g, (m, n) => (n === '1' || nos.has(Number(n)) ? `<a class="anc" href="#r${n}" data-no="${n}">&gt;&gt;${n}</a>` : m));
 }
 
-/** X でポストする文：先頭50字を引用（長いときは「～」）。>>12 は外す。ポストする人は、この前に自分のひとことを書き足す */
+/** X でポストする文：本文の先頭50字（長いときは「～」）＋ #テゲスキ ＋いつものハッシュタグ。かぎかっこ・名前は付けない。>>12 は外す */
 export function sukiPost(r) {
   const flat = r.body.replace(/(?:>>|＞＞)\d{1,5}\s*/g, '').replace(/\s*\n+\s*/g, ' ').trim();
   const chars = [...flat];
   const q = chars.length > QUOTE_LEN ? chars.slice(0, QUOTE_LEN).join('').replace(/[、。,.!！?？\s]+$/u, '') + '～' : flat;
-  return `「${q}」— ${nickOf(r)}のテゲスキ！\n${SITE.hashtags}`;
+  return `${q}\n#テゲスキ ${SITE.hashtags}`;
 }
 
 /** タグごとの数（多い順。0件のタグは出さない） */
