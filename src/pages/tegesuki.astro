@@ -21,7 +21,8 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
   description={`テゲバジャーロ宮崎の好きなところを、テゲサポのみんなで語るスレ「てげ好き」。${summary ? `${summary}。` : ''}選手・応援・スタジアム・宮崎のことまで、テゲバへの声を集めています（非公式サポーターサイト）。`}>
   <section class="card bbs" data-likes-api={likesApi}>
     <h2 class="bbs-title">【テゲバジャーロ宮崎】てげ好き テゲバの好きなところを語るスレ</h2>
-    <p class="bbs-sub"><b data-suki-n>{rows.length + 1}</b> レス<span>・<a href="#write">書き込む</a></span></p>
+    <!-- 書き込み欄はスレの下（読んでから書きたくなるように）。上には、そこへ移るボタンを置く -->
+    <div class="bbs-sub"><p><b data-suki-n>{rows.length + 1}</b> レス</p><a class="ask-btn ask-site" href="#write">声を書き込む</a></div>
 
     {rows.length > 0 && (
       <div class="bbs-tools">
