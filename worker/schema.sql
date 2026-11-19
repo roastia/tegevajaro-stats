@@ -77,3 +77,12 @@ CREATE TABLE IF NOT EXISTS yosou_tally (
   n     INTEGER NOT NULL,
   PRIMARY KEY (match, gf, ga)
 );
+
+-- テゲスキ！（テゲバの好きなところ。公開しない受け箱）。ニックネーム（任意）と本文だけ。確認して整えてから src/data/suki.csv に載せる
+CREATE TABLE IF NOT EXISTS suki_submissions (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at TEXT    NOT NULL,              -- ISO 8601（UTC）
+  nickname   TEXT    NOT NULL DEFAULT '',
+  body       TEXT    NOT NULL,
+  status     TEXT    NOT NULL DEFAULT 'pending'  -- pending / approved / rejected
+);

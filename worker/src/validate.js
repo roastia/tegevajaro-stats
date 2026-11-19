@@ -89,13 +89,39 @@ export function validateLink(input) {
   return { ok: true, value: { url: u.href } };
 }
 
-// 掲載をやめる依頼：対象（おすすめスポット s〇・リンク集 l〇）と理由。連絡先は受け取らない
-export const REMOVAL_REASONS = ['自分が投稿した', 'お店・施設・場所の関係者', 'リンク先の運営者', '情報が古い・まちがっている', 'その他'];
+// テゲスキ！（テゲバの好きなところ）：ニックネーム（任意・20字）と本文（600字）。改行は残す（3行以上の空きは2行に）。
+// URL は受け付けない（宣伝よけ）。サイトに載せること・表現を整えることへの同意（agree: true）が必要
+export const SUKI = { nick: 20, body: 600, min: 5 };
+// 本文は全角の「！」「？」などをそのまま残すため NFC（NFKC だと半角になる）
+const cleanText = (s, max) => String(s ?? '')
+  .normalize('NFC')
+  .replace(/\r\n?/g, '\n')
+  .replace(/[\u0000-\u0009\u000B-\u001F\u007F-\u009F​-‏‪-‮⁦-⁩﻿]/g, ' ')
+  .replace(/[ \t\u3000]+/g, m => (m.includes('\u3000') ? '\u3000' : ' '))
+  .split('\n').map(l => l.trim()).join('\n')
+  .replace(/\n{3,}/g, '\n\n')
+  .trim()
+  .slice(0, max + 1);
+export function validateSuki(input) {
+  if (!input || typeof input !== 'object') return { ok: false, error: '送信内容を読み取れませんでした' };
+  if (String(input.website ?? '').trim() !== '') return { ok: false, error: '送信できませんでした' };
+  if (input.agree !== true) return { ok: false, error: 'サイトに載せることへの同意にチェックを入れてください' };
+  const nickname = clean(input.nickname, SUKI.nick);
+  const body = cleanText(input.body, SUKI.body);
+  if (nickname.length > SUKI.nick) return { ok: false, error: `ニックネームは${SUKI.nick}文字までです` };
+  if ([...body].length < SUKI.min) return { ok: false, error: 'テゲバの好きなところを、もう少しくわしく書いてください' };
+  if ([...body].length > SUKI.body) return { ok: false, error: `${SUKI.body}文字までで書いてください` };
+  if (URL_RE.test(body) || URL_RE.test(nickname)) return { ok: false, error: 'URL は入れられません' };
+  return { ok: true, value: { nickname, body } };
+}
+
+// 掲載をやめる依頼：対象（おすすめスポット s〇・リンク集 l〇・テゲスキ！ k〇）と理由。連絡先は受け取らない
+export const REMOVAL_REASONS = ['自分が投稿した', 'お店・施設・場所の関係者', 'リンク先の運営者', '情報が古い・まちがっている', 'その他'];  // テゲスキ！の声も「自分が投稿した」などで
 export function validateRemoval(input) {
   if (!input || typeof input !== 'object') return { ok: false, error: '送信内容を読み取れませんでした' };
   if (String(input.website ?? '').trim() !== '') return { ok: false, error: '送信できませんでした' };
   const item = typeof input.item === 'string' ? input.item : '';
-  if (!/^[sl]\d{1,4}$/.test(item)) return { ok: false, error: '掲載をやめてほしいものを選んでください' };
+  if (!/^[slk]\d{1,4}$/.test(item)) return { ok: false, error: '掲載をやめてほしいものを選んでください' };
   const reason = typeof input.reason === 'string' ? input.reason : '';
   if (!REMOVAL_REASONS.includes(reason)) return { ok: false, error: '理由を選んでください' };
   const note = clean(input.note, 200);

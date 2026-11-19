@@ -1,8 +1,8 @@
 // テゲスタ！ おすすめスポットの投稿受付（Cloudflare Workers + D1 + Turnstile）
-// - 受け付けるのは POST /api/spots（投稿）・POST /api/links（リンク集への情報提供：URL だけ）・POST /api/removal（掲載をやめる依頼）と /api/hearts（ハート：POST で押す・外す、GET で並び順だけ）・/api/yosou（スコア予想：POST で予想、GET で集計）。投稿の中身やハートの数を返す API は作らない（中身は wrangler で取り出す）
+// - 受け付けるのは POST /api/spots（投稿）・POST /api/links（リンク集への情報提供：URL だけ）・POST /api/removal（掲載をやめる依頼）と /api/hearts（ハート：POST で押す・外す、GET で並び順だけ）・/api/yosou（スコア予想：POST で予想、GET で集計）・POST /api/suki（テゲスキ！：テゲバの好きなところ）。投稿の中身やハートの数を返す API は作らない（中身は wrangler で取り出す）
 // - IP アドレスは保存しない（日ごとの鍵でハッシュ化した値だけを2日間だけ置く）
 // - 連投の対策：Turnstile を毎回必須・同じ回線から1日 IP_DAILY_LIMIT 件まで・同じ日の同じ内容は受けない
-import { validateSubmission, validateLink, validateRemoval, validateHeart, validateYosou, jstDay, ipHash, contentKey, sha256, LIMITS } from './validate.js';
+import { validateSubmission, validateLink, validateRemoval, validateHeart, validateYosou, validateSuki, jstDay, ipHash, contentKey, sha256, LIMITS } from './validate.js';
 
 const SECURITY_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -183,6 +183,48 @@ async function links(request, env, okOrigin, allowed) {
   return json(201, { ok: true }, okOrigin);
 }
 
+// ---- テゲスキ！（テゲバの好きなところ）：ニックネーム（任意）と本文だけ。ルールはリンク集と同じ（Turnstile・同じ文は1日1回・回線ごとに1日の上限） ----
+async function suki(request, env, okOrigin, allowed) {
+  if (request.method === 'OPTIONS') {
+    if (!okOrigin) return new Response(null, { status: 403 });
+    return new Response(null, { status: 204, headers: {
+      'Access-Control-Allow-Origin': okOrigin, 'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400', Vary: 'Origin' } });
+  }
+  if (request.method !== 'POST') return json(405, { ok: false, error: 'method not allowed' }, okOrigin);
+  if (!okOrigin) return json(403, { ok: false, error: '送信できませんでした' });
+  if (!(request.headers.get('Content-Type') || '').startsWith('application/json')) return json(415, { ok: false, error: '送信できませんでした' }, okOrigin);
+  if (Number(request.headers.get('Content-Length') || 0) > LIMITS.body) return json(413, { ok: false, error: '内容が長すぎます' }, okOrigin);
+  let input;
+  try {
+    const text = await request.text();
+    if (text.length > LIMITS.body) return json(413, { ok: false, error: '内容が長すぎます' }, okOrigin);
+    input = JSON.parse(text);
+  } catch { return json(400, { ok: false, error: '送信内容を読み取れませんでした' }, okOrigin); }
+  const v = validateSuki(input);
+  if (!v.ok) return json(400, { ok: false, error: v.error }, okOrigin);
+  const ip = request.headers.get('CF-Connecting-IP') || '';
+  if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, allowed.map(o => new URL(o).hostname), 'suki'))) {
+    return json(403, { ok: false, error: '確認に失敗しました。ページを開き直してもう一度お試しください' }, okOrigin);
+  }
+  const day = jstDay();
+  const dup = await sha256('suki|' + v.value.body.replace(/\s+/g, ''));
+  if (await env.DB.prepare('SELECT 1 FROM dup_hashes WHERE day = ? AND hash = ?').bind(day, dup).first()) {
+    return json(409, { ok: false, error: '同じ内容が、今日すでに届いています。ありがとうございます！' }, okOrigin);
+  }
+  const max = Math.max(1, Number(env.IP_DAILY_LIMIT) || 10);
+  const hash = await ipHash(ip + '|suki', env.IP_HASH_SECRET, day);
+  const cnt = await env.DB.prepare(
+    'INSERT INTO ip_counts (day, ip_hash, n) VALUES (?, ?, 1) ON CONFLICT(day, ip_hash) DO UPDATE SET n = n + 1 WHERE n < ? RETURNING n'
+  ).bind(day, hash, max).first();
+  if (!cnt) return json(429, { ok: false, error: `この回線からの送信は、今日はいっぱいです（1日${max}件まで）。また明日お願いします` }, okOrigin);
+  await env.DB.batch([
+    env.DB.prepare('INSERT OR IGNORE INTO dup_hashes (day, hash) VALUES (?, ?)').bind(day, dup),
+    env.DB.prepare('INSERT INTO suki_submissions (created_at, nickname, body) VALUES (?, ?, ?)').bind(new Date().toISOString(), v.value.nickname, v.value.body),
+  ]);
+  return json(201, { ok: true }, okOrigin);
+}
+
 // ---- 掲載をやめる依頼（対象と理由だけ。連絡先は受け取らない。ルールはほかの受付と同じ） ----
 async function removal(request, env, okOrigin, allowed) {
   if (request.method === 'OPTIONS') {
@@ -235,6 +277,7 @@ export default {
     if (url.pathname === '/api/hearts') return hearts(request, env, okOrigin);
     if (url.pathname === '/api/yosou') return yosou(request, env, okOrigin, allowed);
     if (url.pathname === '/api/links') return links(request, env, okOrigin, allowed);
+    if (url.pathname === '/api/suki') return suki(request, env, okOrigin, allowed);
     if (url.pathname === '/api/removal') return removal(request, env, okOrigin, allowed);
     if (url.pathname !== '/api/spots') return json(404, { ok: false, error: 'not found' });
 
