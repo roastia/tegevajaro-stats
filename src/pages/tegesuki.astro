@@ -1,0 +1,124 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../config/site.js';
+import { href, xIntent } from '../lib/util.js';
+import { readSuki, nickOf, sukiPost, tagCounts } from '../lib/suki.js';
+import { sukiLd } from '../lib/seo.js';
+// テゲスキ！：テゲサポが教えてくれた「テゲバの好きなところ」。届いた声は確認して整えてから src/data/suki.json に載せる（docs/suki.md）
+// 言葉でリアルタイムに絞り込み・タグで絞り込み・並べかえ。1件ずつ X でポスト（先頭50字を引用。画像なし）
+const rows = readSuki();
+const tags = tagCounts(rows);
+const pageUrl = `${SITE.url}/tegesuki/`;
+const md = (d: string) => { const [y, m, dd] = d.split('-').map(Number); return `${y}年${m}月${dd}日`; };
+const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags.slice(0, 4).map(t => `${t.tag} ${t.n}件`).join('・')}）` : ''}` : '';
+---
+<Base current="tegesuki" ld={[sukiLd(rows, pageUrl)]} title="テゲスキ！ テゲバの好きなところ"
+  description={`テゲバジャーロ宮崎の好きなところを、テゲサポのみんなが語る「テゲスキ！」。${summary ? `${summary}。` : ''}選手・応援・スタジアム・宮崎のことまで、テゲバへの声を集めています（非公式サポーターサイト）。`}>
+  <section class="card suki-hero">
+    <h2 class="suki-h">テゲスキ！</h2>
+    <p class="page-lead">テゲバの好きなところ、テゲサポのみんなの声。選手のこと、ゴール裏の熱さ、スタジアムの空気、宮崎のこと。気になる声を見つけたら、自分のひとことを添えて X でポストしよう。</p>
+    <div class="suki-cta"><a class="ask-btn ask-suki" href={href('oshiete/#suki')}>あなたのテゲスキ！を教えて</a></div>
+  </section>
+
+  {rows.length ? (
+    <section class="card suki-list-card">
+      <p class="suki-count"><b data-suki-n>{rows.length}</b>件の声</p>
+      {tags.length > 0 && (
+        <div class="seg suki-tags" role="group" aria-label="タグでしぼる">
+          <button type="button" data-tag="" aria-pressed="true">すべて</button>
+          {tags.map(t => <button type="button" data-tag={t.tag} aria-pressed="false" title={t.desc}>{t.tag}<span class="n">{t.n}</span></button>)}
+        </div>
+      )}
+      <div class="suki-ctl">
+        <label class="suki-q"><span class="visually-hidden">言葉でさがす</span><input type="search" id="sukiQ" placeholder="言葉でさがす（例：ゴール裏）" autocomplete="off" enterkeyhint="search" /></label>
+        <label class="suki-sort"><span class="visually-hidden">並べかえ</span>
+          <select id="sukiSort">
+            <option value="new">新しい順</option>
+            <option value="old">古い順</option>
+            <option value="long">長い順</option>
+            <option value="short">短い順</option>
+          </select>
+        </label>
+      </div>
+      <p class="suki-none" id="sukiNone" hidden>当てはまる声はありません。</p>
+      <ol class="suki-list" id="sukiList">
+        {rows.map(r => (
+          <li class="suki" id={r.id} data-date={r.date} data-n={Number(r.id.slice(1))} data-len={[...r.body].length} data-tags={r.tags.join('|')}>
+            <p class="suki-meta"><span class="suki-nick">{nickOf(r)}</span><time datetime={r.date}>{md(r.date)}</time></p>
+            <p class="suki-body" data-body>{r.body}</p>
+            <button type="button" class="suki-more" hidden>つづきを読む</button>
+            <div class="suki-foot">
+              {r.tags.length > 0 && <ul class="suki-tagl">{r.tags.map(t => <li><button type="button" data-tagpick={t}>{t}</button></li>)}</ul>}
+              <a class="suki-x" href={xIntent(sukiPost(r), `${pageUrl}#${r.id}`, '')} target="_blank" rel="noopener noreferrer">ひとこと添えて X でポスト</a>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p class="note suki-note">届いた声は、テゲスタ！で確認してから載せています。読みやすいように、一部の表現を整えていることがあります。載せた声を消してほしいときは<a href={href('removal/')}>こちら</a>から。</p>
+    </section>
+  ) : (
+    <section class="card suki-empty">
+      <p>まだ声は届いていません。いちばん乗りで、テゲバの好きなところを教えてください！</p>
+    </section>
+  )}
+</Base>
+
+<script>
+  import { toHiragana } from '../lib/namesearch.js';
+  const list = document.getElementById('sukiList');
+  if (list) {
+    const items = [...list.querySelectorAll<HTMLLIElement>('li.suki')];
+    const norm = (s: string) => toHiragana(s).toLowerCase().replace(/\s+/g, '');
+    const text = new Map(items.map(li => [li, norm(li.textContent || '')]));
+    const q = document.getElementById('sukiQ') as HTMLInputElement;
+    const sort = document.getElementById('sukiSort') as HTMLSelectElement;
+    const none = document.getElementById('sukiNone')!;
+    const count = document.querySelector('[data-suki-n]')!;
+    const tagBtns = [...document.querySelectorAll<HTMLButtonElement>('.suki-tags [data-tag]')];
+    let tag = '';
+    const apply = () => {
+      const terms = q.value.split(/[\s　]+/).map(norm).filter(Boolean);
+      let shown = 0;
+      for (const li of items) {
+        const ok = (!tag || (li.dataset.tags || '').split('|').includes(tag)) && terms.every(t => text.get(li)!.includes(t));
+        li.hidden = !ok; if (ok) shown++;
+      }
+      count.textContent = String(shown);
+      none.hidden = shown > 0;
+    };
+    const order = () => {
+      const k = sort.value;
+      const by: Record<string, (a: HTMLElement, b: HTMLElement) => number> = {
+        new: (a, b) => b.dataset.date!.localeCompare(a.dataset.date!) || Number(b.dataset.n) - Number(a.dataset.n),
+        old: (a, b) => a.dataset.date!.localeCompare(b.dataset.date!) || Number(a.dataset.n) - Number(b.dataset.n),
+        long: (a, b) => Number(b.dataset.len) - Number(a.dataset.len),
+        short: (a, b) => Number(a.dataset.len) - Number(b.dataset.len),
+      };
+      list.append(...[...items].sort(by[k] || by.new));
+    };
+    const pickTag = (t: string) => {
+      tag = t;
+      for (const b of tagBtns) b.setAttribute('aria-pressed', String((b.dataset.tag || '') === t));
+      apply();
+    };
+    q.addEventListener('input', apply);
+    sort.addEventListener('change', order);
+    for (const b of tagBtns) b.addEventListener('click', () => pickTag(b.dataset.tag || ''));
+    list.addEventListener('click', e => {
+      const t = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-tagpick]');
+      if (t) { pickTag(t.dataset.tagpick!); list.closest('section')?.scrollIntoView({ block: 'start' }); return; }
+      const m = (e.target as HTMLElement).closest<HTMLButtonElement>('.suki-more');
+      if (m) { const li = m.closest('li')!; li.classList.add('open'); m.hidden = true; }
+    });
+    // 長い声は6行で折りたたみ、「つづきを読む」で開く（全部の文はページに入っている）
+    const clamp = () => {
+      const long = items.filter(li => { const b = li.querySelector<HTMLElement>('[data-body]')!; return !li.classList.contains('open') && b.scrollHeight > b.clientHeight + 2; });
+      for (const li of items) li.querySelector<HTMLElement>('.suki-more')!.hidden = !long.includes(li);
+    };
+    clamp(); addEventListener('resize', () => requestAnimationFrame(clamp), { passive: true });
+    // #k12 で来たら、その声を開いて見せる
+    const h = location.hash.slice(1);
+    const target = h && document.getElementById(h);
+    if (target && target.classList.contains('suki')) { target.classList.add('open', 'hit'); target.querySelector<HTMLElement>('.suki-more')!.hidden = true; }
+  }
+</script>

@@ -2,11 +2,13 @@
 import { SITE } from '../config/site.js';
 import { getData, readCsv } from '../lib/data.js';
 import { facts, faqItems } from '../lib/seo.js';
+import { readSuki, tagCounts } from '../lib/suki.js';
 
 export const GET = () => {
   const d = getData();
   const fixtures = readCsv('fixtures');
   const { sr } = facts(d, fixtures);
+  const suki = readSuki(), sukiN = suki.length;
   const page = (p, name, what) => `- [${name}](${SITE.url}/${p}): ${what}`;
   const body = [
     `# ${SITE.name}（${SITE.tagline}）`,
@@ -29,9 +31,17 @@ export const GET = () => {
     page('links/', 'リンク', 'テゲバを応援・発信している団体やYouTubeチャンネル'),
     page('spots/', 'みやざき情報', 'スタジアムへのアクセスと、テゲサポおすすめの宮崎のスポット'),
     page('oshiete/', '教えて！', '宮崎のおすすめの場所と、テゲバの情報を発信しているチャンネル・サイトの受付'),
+    page('tegesuki/', 'テゲスキ！', `テゲサポが語る「テゲバの好きなところ」の声${sukiN ? `（${sukiN}件）` : ''}。選手・応援・スタジアム・宮崎などのタグつき`),
     page('yosou/', 'みんなのスコア予想', '次の試合のスコアを、テゲサポのみんなで予想する（試合のあとは答え合わせ）'),
     page('updates/', '更新履歴', 'いつ何を更新したか'),
     '',
+    // テゲサポの声：どんな声が多いか（タグ別の数）と、新しい声をいくつか（全文は /tegesuki/）
+    ...(sukiN ? [
+      '## テゲサポの声（テゲスキ！）',
+      `- ${sukiN}件の声。多い話題：${tagCounts(suki).map(t => `${t.tag} ${t.n}件`).join('・') || 'なし'}`,
+      ...suki.slice(0, 5).map(r => { const b = [...r.body.replace(/\s+/g, ' ')]; return `- 「${b.slice(0, 80).join('')}${b.length > 80 ? '…' : ''}」（${r.date}）`; }),
+      '',
+    ] : []),
     '## よくある質問',
     ...faqItems(d, fixtures).map(x => `- ${x.q} ${x.a}`),
     '',
