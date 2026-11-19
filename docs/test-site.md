@@ -15,7 +15,7 @@
 | データベース（D1） | tegesta-spots | **test-tegesta-db** |
 | Turnstile | 本番のキー | Cloudflare のテスト用キー（いつも通る） |
 
-- てげ好きにまだ声がないあいだは、見本のレス約250件（`src/data/suki-sample.json`。`tools/gen_suki_sample.py` で作る。長文・短文・つながる声をまぜる）を並べる（本番には出ない）。
+- てげ好きにまだ声がないあいだは、見本のレス約250件（`src/data/suki-sample.json`。`tools/gen_suki_sample.py` で作る。長文・中くらい・短文をまぜる）を並べる（本番には出ない）。
 - テスト用サイトは git push しなくても出せる（Mac から直接 Cloudflare Pages に送る）。
 
 ## はじめの1回だけ（Mac のターミナル）

@@ -151,19 +151,6 @@ LONG_CLOSE = [
  '長くなってしまいましたが、テゲバのことが大好きだということが伝わればうれしいです。',
  'いつか満員のスタジアムで、みんなで喜び合える日を楽しみにしています。',
 ]
-# つながる声の書き出し（返事ではなく、前の声をきっかけに自分の話をする）
-LINK_OPEN = {
- '選手': '>>{n} の選手の話を読んで、自分の好きなところも書きたくなりました。',
- 'ゴール': '>>{n} のゴールの話を読んで、自分も書きたくなりました。',
- '応援': '>>{n} の応援の話に、自分の気持ちも重ねて書きます。',
- 'スタジアム': '>>{n} のスタジアムの話に続けて、わたしの好きなところも書きます。',
- '思い出': '>>{n} の思い出につながる話です。',
- '遠征': '>>{n} の遠征の話を読んで、自分の遠征のことも書きます。',
- '宮崎': '>>{n} と同じく、宮崎とテゲバのつながりを感じる話です。',
- 'クラブ': '>>{n} にあったクラブを支える人たちの話、自分も同じことを感じています。',
- '家族・仲間': '>>{n} の家族の話から、うちのことも書いてみます。',
- '未来': '>>{n} と同じように、わたしもこれからのテゲバを楽しみにしています。',
-}
 NICK = ['テゲ太郎', 'みやざきの風', '日向っ子', 'ゴール裏一年生', '都城サポ', 'チキン南蛮党', 'えびの高原', '延岡のじいちゃん', '遠征組', '青島の朝',
         '西都の母', '日南のサーファー', '大学生サポ', '小林のファーマー', '門川の釣り人', '高千穂の峰', '串間のいとこ', 'ピンクの法被', '新富の風',
         '綾の山', '高鍋の牛', '国富のパパ', '日向夏', '宮崎駅前', 'ナイター好き', 'バックスタンド', '雨でも行く人', 'テゲバ一家', '週末サポ', 'はじめて観戦']
@@ -219,22 +206,7 @@ for i in range(N):
     no = i + 2
     tags = R.sample(TAGS, R.choice([1, 1, 2, 2, 2, 3]))
     k = kinds[i]
-    # つながる声（約2割）：前のレスをきっかけに、同じテーマで自分の話を書く
-    target = R.choice(rows[max(0, i - 60):]) if i > 3 and R.random() < .2 else None
-    if target:
-        t0 = target['tags'][0]
-        tags = ([t0] + [x for x in tags if x != t0])[:3]
     text = {'short': short, 'medium': medium, 'long': long}[k](tags)
-    if target:
-        head = LINK_OPEN[t0].format(n=target['no'])
-        if R.random() < .15 and len(rows) > 10:
-            other = R.choice(rows[:i - 1])
-            if other['no'] != target['no']:
-                head = f">>{target['no']} >>{other['no']} を読んで、自分も書きたくなりました。"
-        sep = '\n' if k != 'long' else '\n\n'
-        text = head + sep + text
-        if len(text) > 600:
-            text = text[:600].rsplit('。', 1)[0] + '。'
     d = start + datetime.timedelta(days=days[i])
     t = f"{R.randint(6, 23):02d}:{R.randint(0, 59):02d}"
     nick = '' if R.random() < .45 else '見本の' + R.choice(NICK)
@@ -243,4 +215,4 @@ for i in range(N):
 out = sys.argv[1]
 open(out, 'w').write('[\n' + ',\n'.join(' ' + json.dumps(r, ensure_ascii=False) for r in rows) + '\n]\n')
 L = [len(r['body']) for r in rows]
-print(len(rows), 'long>=500:', sum(l >= 500 for l in L), 'max', max(L), 'min', min(L), 'links', sum('>>' in r['body'] for r in rows))
+print(len(rows), 'long>=500:', sum(l >= 500 for l in L), 'max', max(L), 'min', min(L))
