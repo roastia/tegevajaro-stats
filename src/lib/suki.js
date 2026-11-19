@@ -19,7 +19,8 @@ export const SUKI_TAGS = [
   ['未来', 'これからのテゲバへの期待'],
 ];
 export const NICK_DEFAULT = 'テゲサポさん';
-export const QUOTE_LEN = 50;   // X でポストするときに引用する長さ（越えたら「～」で切る）
+export const QUOTE_LEN = 50;   // X でポストするときに引用する長さ（越えたら文の切れ目で切り、「続きはテゲスキ！で」を付ける）
+export const MORE = '（続きはテゲスキ！で）';
 
 // 書くときのお題：押すと本文の欄に書き出しが入る（書き出しのあとを自由に）
 export const SUKI_THEMES = [
@@ -65,12 +66,26 @@ export function bodyHtml(body, nos) {
   return esc(body).replace(/(?:&gt;&gt;|＞＞)(\d{1,5})/g, (m, n) => (n === '1' || nos.has(Number(n)) ? `<a class="anc" href="#r${n}" data-no="${n}">&gt;&gt;${n}</a>` : m));
 }
 
-/** X でポストする文：本文の先頭50字（長いときは「～」）＋ #テゲスキ ＋いつものハッシュタグ。かぎかっこ・名前は付けない。>>12 は外す */
+/** 長い本文を、続きがあるとわかる形で短くする。
+ *  50字までに文の終わり（。！？）があればそこまで、なければ読点（、）の前で「…」、どちらもなければ50字で「…」。
+ *  あとに「（続きはテゲスキ！で）」を付ける（リンク先で全文を読んでもらう） */
+export function sukiQuote(text) {
+  const chars = [...text];
+  if (chars.length <= QUOTE_LEN) return text;
+  const head = chars.slice(0, QUOTE_LEN).join('');
+  const min = Math.floor(QUOTE_LEN * 0.3);   // 短すぎる切り方（最初の数文字だけ）はしない
+  const lastEnd = Math.max(...[...head.matchAll(/[。！？!?]/gu)].map(m => [...head.slice(0, m.index)].length + 1), 0);
+  if (lastEnd >= min) return [...head].slice(0, lastEnd).join('') + MORE;
+  const lastComma = Math.max(...[...head.matchAll(/[、，,]/gu)].map(m => [...head.slice(0, m.index)].length), 0);
+  const cut = lastComma >= min ? [...head].slice(0, lastComma).join('') : head.replace(/[、。,.!！?？\s]+$/u, '');
+  return cut + '…' + MORE;
+}
+
+/** X でポストする文：本文（長いときは sukiQuote で短く）＋ #テゲスキ ＋いつものハッシュタグ。かぎかっこ・名前は付けない。>>12 は外す */
 export function sukiPost(r) {
-  const flat = r.body.replace(/(?:>>|＞＞)\d{1,5}\s*/g, '').replace(/\s*\n+\s*/g, ' ').trim();
-  const chars = [...flat];
-  const q = chars.length > QUOTE_LEN ? chars.slice(0, QUOTE_LEN).join('').replace(/[、。,.!！?？\s]+$/u, '') + '～' : flat;
-  return `${q}\n#テゲスキ ${SITE.hashtags}`;
+  // 改行は、句読点のあとならそのままつなぎ、それ以外は空白1つに
+  const flat = r.body.replace(/(?:>>|＞＞)\d{1,5}\s*/g, '').replace(/([。！？!?、])\s*\n+\s*/gu, '$1').replace(/\s*\n+\s*/g, ' ').trim();
+  return `${sukiQuote(flat)}\n#テゲスキ ${SITE.hashtags}`;
 }
 
 /** タグごとの数（多い順。0件のタグは出さない） */

@@ -1,19 +1,22 @@
 // テゲスキ！：X でポストする文（先頭50字の引用）と、タグの数え方
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { sukiPost, tagCounts, nickOf, QUOTE_LEN } from '../src/lib/suki.js';
+import { sukiPost, sukiQuote, tagCounts, nickOf, QUOTE_LEN, MORE } from '../src/lib/suki.js';
 import { flatPost } from '../src/lib/util.js';
 
-test('X でポスト：先頭50字（長いときは「～」）＋ #テゲスキ とハッシュタグ。かぎかっこ・名前は付けない', () => {
-  const long = { id: 'k1', no: 2, date: '2026-11-20', nickname: 'テゲ太郎', body: 'あ'.repeat(30) + '\n' + 'い'.repeat(40), tags: [] };
-  const t = sukiPost(long);
-  const q = t.split('\n')[0];
-  assert.equal([...q].length, QUOTE_LEN + 1);
-  assert.ok(q.endsWith('～'));
-  assert.ok(!/[「」]/.test(t) && !t.includes('テゲ太郎'));
-  assert.match(flatPost(t, ''), /～ #テゲスキ #テゲバジャーロ宮崎/);
-  const short = { ...long, nickname: '', body: '>>3\nテゲスタが大好き！' };
-  assert.match(flatPost(sukiPost(short), ''), /^テゲスタが大好き！ #テゲスキ #テゲバジャーロ宮崎/);
+test('X でポスト：長いときは文の切れ目で切って「続きはテゲスキ！で」＋ #テゲスキ とハッシュタグ。かぎかっこ・名前は付けない', () => {
+  const base = { id: 'k1', no: 2, date: '2026-11-20', nickname: 'テゲ太郎', tags: [] };
+  // 50字までに文の終わりがある → そこまで
+  const a = sukiPost({ ...base, body: 'チャントを覚えて歌えるようになったら、試合がもっと楽しくなりました。まだ全部は覚えてないけど、隣の人が教えてくれます。' });
+  assert.match(flatPost(a, ''), /^チャントを覚えて歌えるようになったら、試合がもっと楽しくなりました。（続きはテゲスキ！で） #テゲスキ #テゲバジャーロ宮崎/);
+  assert.ok(!/[「」]/.test(a.replace(MORE, '')) && !a.includes('テゲ太郎'));
+  // 文の終わりがない → 読点の前で「…」
+  const b = sukiQuote('あ'.repeat(30) + '、' + 'い'.repeat(40));
+  assert.equal(b, 'あ'.repeat(30) + '…' + MORE);
+  // どちらもない → 50字で「…」
+  assert.equal(sukiQuote('う'.repeat(80)), 'う'.repeat(QUOTE_LEN) + '…' + MORE);
+  // 短いときはそのまま（>>番号は外す）
+  assert.match(flatPost(sukiPost({ ...base, nickname: '', body: '>>3\nテゲスタが大好き！' }), ''), /^テゲスタが大好き！ #テゲスキ #テゲバジャーロ宮崎/);
   assert.equal(nickOf({ nickname: 'みやざきさん' }), 'みやざきさん');
 });
 
