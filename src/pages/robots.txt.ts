@@ -4,7 +4,7 @@ import { SITE } from '../config/site.js';
 
 const BOTS = ['Googlebot', 'Google-Extended', 'Bingbot', 'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot', 'Applebot', 'Applebot-Extended'];
 
-export const GET = () => new Response(
+export const GET = () => new Response(SITE.test ? 'User-agent: *\nDisallow: /\n' :
   BOTS.map(b => `User-agent: ${b}\nAllow: /\n`).join('\n') +
   `\nUser-agent: *\nAllow: /\n\nSitemap: ${SITE.url}/sitemap.xml\n`, {
   headers: { 'Content-Type': 'text/plain; charset=utf-8' },

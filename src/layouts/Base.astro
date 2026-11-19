@@ -70,7 +70,7 @@ const inMenu = !TABS.includes(current);
   <meta name="theme-color" content="#C8375F" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   {SITE.googleSiteVerification && <meta name="google-site-verification" content={SITE.googleSiteVerification} />}
-  <meta name="robots" content={noindex ? 'noindex' : 'max-snippet:-1, max-image-preview:large'} />
+  <meta name="robots" content={noindex || SITE.test ? 'noindex, nofollow' : 'max-snippet:-1, max-image-preview:large'} />
   <script type="application/ld+json" is:inline set:html={JSON.stringify([...ld, ...extraLd]).replace(/</g, '\\u003c')}></script>
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="ja_JP" />
@@ -88,6 +88,7 @@ const inMenu = !TABS.includes(current);
   {SITE.cfBeacon && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: SITE.cfBeacon })}></script>}
 </head>
 <body>
+  {SITE.test && <p class="test-band">テスト用サイトです（公開前の確認用）。ここで送った声・予想・いいね！は本番には載りません。</p>}
   <script type="application/json" id="pl-urls" is:inline set:html={JSON.stringify(plUrls).replace(/</g, '\\u003c')}></script>
   <header class="site-head">
     <div class="wrap">

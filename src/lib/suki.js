@@ -43,7 +43,10 @@ export function matchTheme(today, matchDates) {
 
 export function readSuki() {
   let rows = [];
-  try { rows = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/data/suki.json'), 'utf8')); } catch { rows = []; }
+  const load = f => { try { return JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/data', f), 'utf8')); } catch { return []; } };
+  rows = load('suki.json');
+  // テスト用サイトで、まだ声が1件もないときは見本（src/data/suki-sample.json）を並べて見た目を確かめる。本番では使わない
+  if (SITE.test && !rows.length) rows = load('suki-sample.json');
   const tagSet = new Set(SUKI_TAGS.map(t => t[0]));
   return rows
     .filter(r => r && /^k\d+$/.test(r.id) && Number.isInteger(r.no) && r.no >= 2 && /^\d{4}-\d{2}-\d{2}$/.test(r.date) && typeof r.body === 'string' && r.body.trim())

@@ -18,6 +18,9 @@ const json = (status, body, origin) => new Response(JSON.stringify(body), {
 });
 
 // hosts：Turnstile を解いたページのホスト名がこの中にあるかも確かめる（ほかのサイトで取ったトークンを使い回させない）
+// Turnstile の確認で受け入れるホスト名。テスト用の Worker（TEST_MODE=1）では、テスト用キーが返す example.com も受け入れる
+const tsHosts = (allowed, env) => [...allowed.map(o => new URL(o).hostname), ...(env.TEST_MODE === '1' ? ['example.com'] : [])];
+
 async function verifyTurnstile(token, secret, ip, hosts, action = 'spot') {
   if (!token || typeof token !== 'string' || token.length > 2048) return false;
   const form = new FormData();
@@ -198,7 +201,7 @@ async function links(request, env, okOrigin, allowed) {
   const v = validateLink(input);
   if (!v.ok) return json(400, { ok: false, error: v.error }, okOrigin);
   const ip = request.headers.get('CF-Connecting-IP') || '';
-  if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, allowed.map(o => new URL(o).hostname), 'link'))) {
+  if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, tsHosts(allowed, env), 'link'))) {
     return json(403, { ok: false, error: '確認に失敗しました。ページを開き直してもう一度お試しください' }, okOrigin);
   }
   const day = jstDay();
@@ -241,7 +244,7 @@ async function suki(request, env, okOrigin, allowed) {
   const v = validateSuki(input);
   if (!v.ok) return json(400, { ok: false, error: v.error }, okOrigin);
   const ip = request.headers.get('CF-Connecting-IP') || '';
-  if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, allowed.map(o => new URL(o).hostname), 'suki'))) {
+  if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, tsHosts(allowed, env), 'suki'))) {
     return json(403, { ok: false, error: '確認に失敗しました。ページを開き直してもう一度お試しください' }, okOrigin);
   }
   const day = jstDay();
@@ -283,7 +286,7 @@ async function removal(request, env, okOrigin, allowed) {
   const v = validateRemoval(input);
   if (!v.ok) return json(400, { ok: false, error: v.error }, okOrigin);
   const ip = request.headers.get('CF-Connecting-IP') || '';
-  if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, allowed.map(o => new URL(o).hostname), 'removal'))) {
+  if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, tsHosts(allowed, env), 'removal'))) {
     return json(403, { ok: false, error: '確認に失敗しました。ページを開き直してもう一度お試しください' }, okOrigin);
   }
   const day = jstDay();
@@ -343,7 +346,7 @@ export default {
     if (!v.ok) return json(400, { ok: false, error: v.error }, okOrigin);
 
     const ip = request.headers.get('CF-Connecting-IP') || '';
-    if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, allowed.map(o => new URL(o).hostname)))) {
+    if (!(await verifyTurnstile(input.turnstile, env.TURNSTILE_SECRET, ip, tsHosts(allowed, env)))) {
       return json(403, { ok: false, error: '確認に失敗しました。ページを開き直してもう一度お試しください' }, okOrigin);
     }
 

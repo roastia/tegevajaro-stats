@@ -1499,3 +1499,6 @@ a.anc { color: var(--bbs-anc); text-decoration: underline; text-underline-offset
 .suki-agree { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 8px; font-size: .86rem; font-weight: 500; line-height: 1.6; }
 .suki-agree input { margin-top: 4px; width: 18px; height: 18px; flex: none; accent-color: var(--brand); }
 .suki-agree span { flex: 1; min-width: 0; }
+
+/* テスト用サイトの帯（npm run build:test のときだけ出る） */
+.test-band { margin: 0; padding: 6px 16px; background: var(--fg); color: var(--bg); font-size: .8rem; font-weight: 700; text-align: center; }

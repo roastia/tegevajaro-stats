@@ -1,6 +1,12 @@
+// テスト用サイト（npm run build:test）のときだけ true。本番に出す前に、新しい機能を tegesta-test.pages.dev で確かめる（docs/test-site.md）
+// ブラウザでは import.meta.env、astro.config.mjs（Node）では process.env から読む
+const ENV = import.meta.env || (typeof process !== 'undefined' ? process.env : {});
+const TEST = ENV.PUBLIC_TEGESTA_TEST === '1';
+
 // サイト全体の設定。試合ごとの更新では、ここの「時点」の項目も書き換える（CLAUDE.md 参照）。
 export const SITE = {
   name: 'テゲスタ！',
+  test: TEST,
   tagline: 'テゲバのスタッツ',
   short: 'テゲスタ！',
   // テゲスタ！のURL（まだ仮）。ポストに付くリンクとポスト用画像のページに使う。
@@ -27,9 +33,11 @@ export const SITE = {
   // おすすめスポットの投稿受付（Cloudflare Workers。worker/README.md の手順で用意してから入れる）
   // 空のあいだは投稿フォームが「準備中」になる
   // アクセス解析：Cloudflare Web Analytics（Cookie を使わない）のトークン（公開してよい値）。空にすると読み込まない
-  cfBeacon: '3953572eef154b1fb9d1de10f39b4c4a',
+  cfBeacon: TEST ? '' : '3953572eef154b1fb9d1de10f39b4c4a',  // テスト用サイトは数えない
   spots: {
-    api: 'https://tegesta-spots.tegestats.workers.dev/api/spots',
-    turnstileSiteKey: '0x4AAAAAAF01OOzpZSjTEVm4',  // Cloudflare Turnstile のサイトキー（公開してよい値）
+    // テスト用サイトは、本番と別の Worker・データベースに送る（本番の投稿・予想・いいね！の数を汚さない）
+    api: TEST ? 'https://tegesta-spots-test.tegestats.workers.dev/api/spots' : 'https://tegesta-spots.tegestats.workers.dev/api/spots',
+    // Cloudflare Turnstile のサイトキー（公開してよい値）。テスト用は Cloudflare が用意している「いつも通る」テスト用キー
+    turnstileSiteKey: TEST ? '1x00000000000000000000AA' : '0x4AAAAAAF01OOzpZSjTEVm4',
   },
 };

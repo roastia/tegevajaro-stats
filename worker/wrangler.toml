@@ -26,3 +26,24 @@ crons = ["10 4 * * *"]
 # 秘密の値は wrangler.toml に書かず、次のコマンドで登録する：
 #   npx wrangler secret put TURNSTILE_SECRET   （Turnstile のシークレットキー）
 #   npx wrangler secret put IP_HASH_SECRET     （長いランダムな文字列。openssl rand -hex 32 などで作る）
+
+# ---- テスト用（npx wrangler@4.150.0 deploy --env test）。手順は docs/test-site.md ----
+# 本番と別の Worker（tegesta-spots-test）・別のデータベース（tegesta-spots-test）を使う
+[env.test]
+name = "tegesta-spots-test"
+workers_dev = true
+preview_urls = false
+
+[env.test.vars]
+ALLOWED_ORIGIN = "https://tegesta-test.pages.dev,http://localhost:4321"
+IP_DAILY_LIMIT = "100"
+TEST_MODE = "1"
+
+[[env.test.d1_databases]]
+binding = "DB"
+database_name = "tegesta-spots-test"
+# `npx wrangler@4.150.0 d1 create tegesta-spots-test` で出た database_id をここに貼る
+database_id = "ここに貼る"
+
+[env.test.triggers]
+crons = ["10 4 * * *"]

@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:test": "PUBLIC_TEGESTA_TEST=1 astro build",
+    "deploy:test": "PUBLIC_TEGESTA_TEST=1 astro build && npx wrangler@4.150.0 pages deploy dist-test --project-name tegesta-test --branch main",
     "preview": "astro preview",
     "test": "node --test tests/*.test.js worker/test/*.test.js",
     "roster": "node tools/check_roster.mjs",

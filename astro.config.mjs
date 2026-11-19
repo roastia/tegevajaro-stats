@@ -16,6 +16,8 @@ const CF_RUM = 'https://cloudflareinsights.com';
 export default defineConfig({
   site: 'https://tegestats.com',
   base: '/',
+  // テスト用サイトは dist-test に作る（本番の dist と混ざらないように）
+  outDir: SITE.test ? './dist-test' : './dist',
   trailingSlash: 'always',
   build: { format: 'directory' },
   markdown: { syntaxHighlight: false },
