@@ -1495,8 +1495,9 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .bbs-empty { margin: 8px 0 0; color: var(--muted); }
 .bbs-write-h { margin: 0 0 8px; font-size: 1rem; font-weight: 800; }
 .suki-note { margin: 4px 4px 0; }
-.spot-form .suki-theme { grid-template-columns: auto 1fr; align-items: center; gap: 10px; }
-.spot-form .suki-theme select { grid-column: auto; min-width: 0; }
+.spot-form .suki-theme { gap: 6px; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--brand) 6%, var(--panel)); }
+.spot-form .suki-theme > span { font-size: .82rem; font-weight: 500; color: var(--muted); }
+.spot-form .suki-theme select { font-size: 16px; background: var(--panel); }
 .suki-flow { margin-top: 2px; }
 .suki-agree { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 8px; font-size: .86rem; font-weight: 500; line-height: 1.6; }
 .suki-agree input { margin-top: 4px; width: 18px; height: 18px; flex: none; accent-color: var(--brand); }

@@ -16,9 +16,10 @@ const themes = live ? [live, ...SUKI_THEMES] : SUKI_THEMES;
 ---
 {ready ? (
   <form class="spot-form suki-form" id={id} novalidate data-suki-form data-api={api} data-sitekey={SITE.spots.turnstileSiteKey}>
-    <label class="suki-theme">お題から書く
+    {/* 入力欄ではなく、書くことに迷ったときの手助け（見出しを太字にしない・必須／任意の印も付けない） */}
+    <label class="suki-theme"><span>なにを書こうか迷ったら、お題を使ってみてください</span>
       <select data-theme>
-        <option value="">選ぶと書き出しが入ります</option>
+        <option value="">お題を選ぶ（書き出しが入ります）</option>
         {themes.map(t => <option value={t.s}>{t.live ? `【${t.live}】${t.t}` : t.t}</option>)}
       </select>
     </label>
