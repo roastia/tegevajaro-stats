@@ -39,6 +39,8 @@ npx wrangler@4.150.0 pages secret put TEST_SITE_PASSWORD --project-name test-teg
 
 ## 確かめたいとき（毎回）
 
+「画像でポスト」の画像は、前に作ったものと中身が同じなら作り直さない（`node_modules/.cache/tegesta-share`）。はじめの1回は2分ほど、2回目からは中身が変わった画像だけ作るので数秒〜十数秒。
+
 ```sh
 cd ~/Documents/tegevajaro-stats && npm run deploy:test
 ```

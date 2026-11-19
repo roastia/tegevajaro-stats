@@ -3,6 +3,8 @@
 // 下の帯に「テゲスタ！ テゲバのスタッツ・非公式サポーターサイト・時点・データ元」を入れる。写真・エンブレムは使わない
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { SITE } from '../config/site.js';
@@ -200,12 +202,46 @@ export function shareTree(item, asOf = SITE.roundLabel) {
     body, foot);
 }
 
+// ---- 作った画像を手元にとっておく（ビルドを速くする） ----
+// 画像1枚を作るのに約1秒かかり、ビルドの時間の大半を占める。中身（画像の組み立て）・このファイル・字体が前回と同じなら、
+// 前に作った JPEG をそのまま使う。置き場所は node_modules/.cache/tegesta-share（git には入らない。消しても作り直すだけ）
+const CACHE_DIR = path.resolve(process.cwd(), 'node_modules/.cache/tegesta-share');
+const CACHE_DAYS = 30;   // これより長く使われなかった画像は消す
+let codeKey, pruned = false;
+const sha = (...xs) => { const h = crypto.createHash('sha256'); for (const x of xs) h.update(x); return h.digest('hex'); };
+function cacheKey(tree) {
+  codeKey ||= sha(
+    fs.readFileSync(fileURLToPath(import.meta.url)),
+    ...fs.readdirSync(FONT_DIR).sort().map(n => `${n}:${fs.statSync(path.join(FONT_DIR, n)).size}`),
+  );
+  return sha(codeKey, JSON.stringify(tree));
+}
+function prune() {
+  if (pruned) return;
+  pruned = true;
+  const old = Date.now() - CACHE_DAYS * 86400e3;
+  try { for (const n of fs.readdirSync(CACHE_DIR)) { const f = path.join(CACHE_DIR, n); if (fs.statSync(f).mtimeMs < old) fs.rmSync(f, { force: true }); } } catch { /* まだない */ }
+}
+
 export async function renderShareJpg(item) {
-  const svg = await satori(shareTree(item), { width: W, height: H, fonts: loadFonts() });
+  const tree = shareTree(item);
+  let file;
+  try {
+    // import.meta.url がビルドの中で読めないときは、とっておかずに毎回作る
+    file = path.join(CACHE_DIR, `${cacheKey(tree)}.jpg`);
+    prune();
+    const hit = fs.readFileSync(file);
+    const now = new Date();
+    fs.utimesSync(file, now, now);   // 使った印（古いものを消すときの目安）
+    return hit;
+  } catch { /* なければ作る */ }
+  const svg = await satori(tree, { width: W, height: H, fonts: loadFonts() });
   const png = new Resvg(svg, { fitTo: { mode: 'width', value: W } }).render().asPng();
   // 布の写真の質感を残したまま軽くするため JPEG にする（sharp は Astro が使っている部品）
   const { default: sharp } = await import('sharp');
-  return await sharp(png).jpeg({ quality: 86, mozjpeg: true, chromaSubsampling: '4:4:4' }).toBuffer();
+  const jpg = await sharp(png).jpeg({ quality: 86, mozjpeg: true, chromaSubsampling: '4:4:4' }).toBuffer();
+  if (file) try { fs.mkdirSync(CACHE_DIR, { recursive: true }); fs.writeFileSync(file, jpg); } catch { /* とっておけなくてもよい */ }
+  return jpg;
 }
 
 /** 画像のファイル名（/share/t-〇〇.jpg・/share/r-〇〇.jpg） */
