@@ -1,5 +1,5 @@
 // テゲスタ！ おすすめスポットの投稿受付（Cloudflare Workers + D1 + Turnstile）
-// - 受け付けるのは POST /api/spots（投稿）・POST /api/links（リンク集への情報提供：URL だけ）・POST /api/removal（掲載をやめる依頼）と /api/hearts（ハート：POST で押す・外す、GET で並び順だけ）・/api/yosou（スコア予想：POST で予想、GET で集計）・POST /api/suki（テゲスキ！：テゲバの好きなところ）。投稿の中身やハートの数を返す API は作らない（中身は wrangler で取り出す）
+// - 受け付けるのは POST /api/spots（投稿）・POST /api/links（リンク集への情報提供：URL だけ）・POST /api/removal（掲載をやめる依頼）と /api/hearts（ハート：POST で押す・外す、GET で並び順だけ）・/api/yosou（スコア予想：POST で予想、GET で集計）・POST /api/suki（テゲスキ！：テゲバの好きなところ）・/api/likes（テゲスキ！のいいね！）。投稿の中身やハートの数を返す API は作らない（中身は wrangler で取り出す）
 // - IP アドレスは保存しない（日ごとの鍵でハッシュ化した値だけを2日間だけ置く）
 // - 連投の対策：Turnstile を毎回必須・同じ回線から1日 IP_DAILY_LIMIT 件まで・同じ日の同じ内容は受けない
 import { validateSubmission, validateLink, validateRemoval, validateHeart, validateYosou, validateSuki, jstDay, ipHash, contentKey, sha256, LIMITS } from './validate.js';
@@ -44,7 +44,7 @@ async function hearts(request, env, okOrigin) {
   }
   if (!okOrigin) return json(403, { ok: false });
   if (request.method === 'GET') {
-    const { results } = await env.DB.prepare('SELECT spot FROM hearts WHERE n > 0 ORDER BY n DESC, spot ASC LIMIT 500').all();
+    const { results } = await env.DB.prepare("SELECT spot FROM hearts WHERE spot LIKE 's%' AND n > 0 ORDER BY n DESC, spot ASC LIMIT 500").all();
     return new Response(JSON.stringify({ order: results.map(r => r.spot) }), { status: 200, headers: {
       ...SECURITY_HEADERS, 'Cache-Control': 'public, max-age=60', 'Access-Control-Allow-Origin': okOrigin, Vary: 'Origin' } });
   }
@@ -68,6 +68,43 @@ async function hearts(request, env, okOrigin) {
     if (r.meta.changes) await env.DB.prepare('UPDATE hearts SET n = MAX(0, n - 1) WHERE spot = ?').bind(id).run();
   }
   return json(200, { ok: true }, okOrigin);
+}
+
+// ---- テゲスキ！のいいね！（ハートと同じしくみ・同じ表。id は声の番号 r〇） ----
+// GET  /api/likes → { counts: { r2: 3, … } }（数も返す）
+// POST /api/likes { id: 'r12', on } → 押す・外す。同じ回線から同じ声へは1日1回まで数える
+async function likes(request, env, okOrigin) {
+  if (request.method === 'OPTIONS') {
+    if (!okOrigin) return new Response(null, { status: 403 });
+    return new Response(null, { status: 204, headers: {
+      'Access-Control-Allow-Origin': okOrigin, 'Access-Control-Allow-Methods': 'GET, POST',
+      'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400', Vary: 'Origin' } });
+  }
+  if (!okOrigin) return json(403, { ok: false });
+  if (request.method === 'GET') {
+    const { results } = await env.DB.prepare("SELECT spot, n FROM hearts WHERE spot LIKE 'r%' AND n > 0 LIMIT 5000").all();
+    return new Response(JSON.stringify({ counts: Object.fromEntries(results.map(r => [r.spot, r.n])) }), { status: 200, headers: {
+      ...SECURITY_HEADERS, 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': okOrigin, Vary: 'Origin' } });
+  }
+  if (request.method !== 'POST') return json(405, { ok: false }, okOrigin);
+  if (!(request.headers.get('Content-Type') || '').startsWith('application/json')) return json(415, { ok: false }, okOrigin);
+  let input;
+  try { const text = await request.text(); if (text.length > 200) return json(413, { ok: false }, okOrigin); input = JSON.parse(text); }
+  catch { return json(400, { ok: false }, okOrigin); }
+  const v = validateHeart(input, 'r', 5);
+  if (!v.ok) return json(400, { ok: false }, okOrigin);
+  const { id, on } = v.value;
+  const day = jstDay();
+  const hash = await ipHash(request.headers.get('CF-Connecting-IP') || '', env.IP_HASH_SECRET, day);
+  if (on) {
+    const r = await env.DB.prepare('INSERT OR IGNORE INTO heart_marks (day, ip_hash, spot) VALUES (?, ?, ?)').bind(day, hash, id).run();
+    if (r.meta.changes) await env.DB.prepare('INSERT INTO hearts (spot, n) VALUES (?, 1) ON CONFLICT(spot) DO UPDATE SET n = n + 1').bind(id).run();
+  } else {
+    const r = await env.DB.prepare('DELETE FROM heart_marks WHERE day = ? AND ip_hash = ? AND spot = ?').bind(day, hash, id).run();
+    if (r.meta.changes) await env.DB.prepare('UPDATE hearts SET n = MAX(0, n - 1) WHERE spot = ?').bind(id).run();
+  }
+  const row = await env.DB.prepare('SELECT n FROM hearts WHERE spot = ?').bind(id).first();
+  return json(200, { ok: true, n: row ? row.n : 0 }, okOrigin);
 }
 
 // ---- スコア予想（みんなの予想。ログインなし・名前なし） ----
@@ -275,6 +312,7 @@ export default {
     const okOrigin = allowed.includes(origin) ? origin : '';
 
     if (url.pathname === '/api/hearts') return hearts(request, env, okOrigin);
+    if (url.pathname === '/api/likes') return likes(request, env, okOrigin);
     if (url.pathname === '/api/yosou') return yosou(request, env, okOrigin, allowed);
     if (url.pathname === '/api/links') return links(request, env, okOrigin, allowed);
     if (url.pathname === '/api/suki') return suki(request, env, okOrigin, allowed);

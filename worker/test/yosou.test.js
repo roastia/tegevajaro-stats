@@ -98,3 +98,17 @@ test('テゲスキ！の受付：届いた声は公開しない受け箱へ。�
     assert.deepEqual(e.DB.raw.prepare('SELECT nickname, body, status FROM suki_submissions').all().map(r => ({ ...r })), [{ nickname: '', body: 'テゲスタの雰囲気がすき', status: 'pending' }]);
   } finally { globalThis.fetch = orig; }
 });
+
+test('テゲスキ！のいいね！：押すと数が増え、同じ回線は1日1回。スポットのハートの並びには混ざらない', async () => {
+  const e = { DB: fakeD1(), ALLOWED_ORIGIN: SITE, IP_HASH_SECRET: 'test' };
+  const like = (id, on, ip = '1.1.1.1') => worker.fetch(new Request('https://w.example/api/likes', { method: 'POST', headers: { Origin: SITE, 'Content-Type': 'application/json', 'CF-Connecting-IP': ip }, body: JSON.stringify({ id, on }) }), e);
+  assert.equal((await (await like('r2', true)).json()).n, 1);
+  assert.equal((await (await like('r2', true)).json()).n, 1);          // 同じ回線・同じ日はふえない
+  assert.equal((await (await like('r2', true, '2.2.2.2')).json()).n, 2);
+  assert.equal((await (await like('r2', false)).json()).n, 1);         // 外す
+  assert.equal((await like('s2x', true)).status, 400);
+  const counts = await (await worker.fetch(new Request('https://w.example/api/likes', { headers: { Origin: SITE } }), e)).json();
+  assert.deepEqual(counts, { counts: { r2: 1 } });
+  const order = await (await worker.fetch(new Request('https://w.example/api/hearts', { headers: { Origin: SITE } }), e)).json();
+  assert.deepEqual(order, { order: [] });
+});

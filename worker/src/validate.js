@@ -56,10 +56,10 @@ export async function ipHash(ip, secret, day) {
 }
 
 // ハート：おすすめスポットの id（spots.csv の s1・s2 …）と、押した（true）か外した（false）か
-export function validateHeart(input) {
+export function validateHeart(input, prefix = 's', digits = 4) {
   if (!input || typeof input !== 'object') return { ok: false };
   const id = typeof input.id === 'string' ? input.id : '';
-  if (!/^s\d{1,4}$/.test(id) || typeof input.on !== 'boolean') return { ok: false };
+  if (!new RegExp(`^${prefix}\\d{1,${digits}}$`).test(id) || typeof input.on !== 'boolean') return { ok: false };
   return { ok: true, value: { id, on: input.on } };
 }
 

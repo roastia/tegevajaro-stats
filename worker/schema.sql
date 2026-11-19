@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS dup_hashes (
 
 -- ハート（みやざき情報のおすすめスポット）。ログインなしで押せる。数は公開しない（並び順だけ返す）
 CREATE TABLE IF NOT EXISTS hearts (
-  spot TEXT    PRIMARY KEY,           -- spots.csv の id（s1・s2 …）
+  spot TEXT    PRIMARY KEY,           -- spots.csv の id（s1・s2 …）。テゲスキ！のいいね！も同じ表（声の番号 r2・r3 …）
   n    INTEGER NOT NULL DEFAULT 0
 );
 -- 同じ回線（IP）から同じスポットへは1日1回まで。IP はハッシュだけ、2日たったら消す
