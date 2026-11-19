@@ -1,4 +1,4 @@
-// テスト用サイト（npm run build:test）のときだけ true。本番に出す前に、新しい機能を tegesta-test.pages.dev で確かめる（docs/test-site.md）
+// テスト用サイト（npm run build:test）のときだけ true。本番に出す前に、新しい機能を test-tegesta.pages.dev（パスワードつき）で確かめる（docs/test-site.md）
 // ブラウザでは import.meta.env、astro.config.mjs（Node）では process.env から読む
 const ENV = import.meta.env || (typeof process !== 'undefined' ? process.env : {});
 const TEST = ENV.PUBLIC_TEGESTA_TEST === '1';
@@ -36,7 +36,7 @@ export const SITE = {
   cfBeacon: TEST ? '' : '3953572eef154b1fb9d1de10f39b4c4a',  // テスト用サイトは数えない
   spots: {
     // テスト用サイトは、本番と別の Worker・データベースに送る（本番の投稿・予想・いいね！の数を汚さない）
-    api: TEST ? 'https://tegesta-spots-test.tegestats.workers.dev/api/spots' : 'https://tegesta-spots.tegestats.workers.dev/api/spots',
+    api: TEST ? 'https://test-tegesta-api.tegestats.workers.dev/api/spots' : 'https://tegesta-spots.tegestats.workers.dev/api/spots',
     // Cloudflare Turnstile のサイトキー（公開してよい値）。テスト用は Cloudflare が用意している「いつも通る」テスト用キー
     turnstileSiteKey: TEST ? '1x00000000000000000000AA' : '0x4AAAAAAF01OOzpZSjTEVm4',
   },

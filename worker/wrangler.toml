@@ -28,21 +28,21 @@ crons = ["10 4 * * *"]
 #   npx wrangler secret put IP_HASH_SECRET     （長いランダムな文字列。openssl rand -hex 32 などで作る）
 
 # ---- テスト用（npx wrangler@4.150.0 deploy --env test）。手順は docs/test-site.md ----
-# 本番と別の Worker（tegesta-spots-test）・別のデータベース（tegesta-spots-test）を使う
+# 名前はどれも test- で始める：Worker は test-tegesta-api、データベースは test-tegesta-db（本番の tegesta-spots とは別）
 [env.test]
-name = "tegesta-spots-test"
+name = "test-tegesta-api"
 workers_dev = true
 preview_urls = false
 
 [env.test.vars]
-ALLOWED_ORIGIN = "https://tegesta-test.pages.dev,http://localhost:4321"
+ALLOWED_ORIGIN = "https://test-tegesta.pages.dev,http://localhost:4321"
 IP_DAILY_LIMIT = "100"
 TEST_MODE = "1"
 
 [[env.test.d1_databases]]
 binding = "DB"
-database_name = "tegesta-spots-test"
-# `npx wrangler@4.150.0 d1 create tegesta-spots-test` で出た database_id をここに貼る
+database_name = "test-tegesta-db"
+# `npx wrangler@4.150.0 d1 create test-tegesta-db` で出た database_id をここに貼る
 database_id = "ここに貼る"
 
 [env.test.triggers]
