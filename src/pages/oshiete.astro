@@ -104,7 +104,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
         <li>声の内容にあわせて、こちらでタグ（「選手」「応援」など）を付けます。</li>
         <li>載った声は、だれでも一部を引用して X でポストできます。</li>
         <li>同じ回線（Wi-Fi など）からの送信は1日10件まで、同じ内容は1回だけ受け付けます。</li>
-        <li>載せた声を消してほしいときは、<a href={href('removal/')}>こちら</a>からご連絡ください。</li>
+        <li>載った声は、テゲバを応援してきたテゲサポの記録として、ずっと大切に残していきます（あとから消すことはできません）。届けたい思いを、心をこめて書いてください。</li>
       </ul>
     </details>
     {ready ? (
@@ -112,7 +112,7 @@ const ready = !!(SITE.spots.api && SITE.spots.turnstileSiteKey);
         <label>ニックネーム<span class="opt">任意</span><input name="nickname" maxlength="20" autocomplete="off" placeholder="空なら「テゲサポさん」" /></label>
         <label>テゲバの好きなところ<span class="req">必須</span><textarea name="body" required maxlength="600" rows="6" aria-describedby="sukiHint" placeholder="例：はじめてテゲスタに行った日、ゴール裏の声に鳥肌が立ちました。それから毎試合…"></textarea></label>
         <p class="note field-hint" id="sukiHint"><span data-suki-len>0</span>／600字。URL は入れられません。</p>
-        <label class="suki-agree"><input type="checkbox" name="agree" required /><span>この声がテゲスキ！のページに載ること、表現を少し整えることがあることに同意します</span></label>
+        <label class="suki-agree"><input type="checkbox" name="agree" required /><span>この声がテゲスキ！のページに載り、テゲサポの記録として残ること（あとから消すことはできません）、表現を少し整えることがあることに同意します</span></label>
         <div class="hp" aria-hidden="true"><label>ウェブサイト<input name="website" tabindex="-1" autocomplete="off" /></label></div>
         <div class="ts" id="sukiTs"></div>
         <button class="spot-send" type="submit">送る</button>
