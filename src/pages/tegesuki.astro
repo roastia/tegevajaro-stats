@@ -83,6 +83,8 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
     </nav>
     {rows.length === 0 && <p class="bbs-empty">まだレスはありません。いちばん乗りで、テゲバの好きなところを書き込んでください！</p>}
   </section>
+  <!-- 一覧の先頭（さがす・並べかえ）へ戻る。一覧を下まで読み進めたときだけ、画面の右下に出る -->
+  <button type="button" class="to-top" id="sukiTop" hidden>一覧の先頭へ</button>
 
   <section class="card bbs-write" id="write">
     <h2 class="bbs-write-h">書き込む</h2>
@@ -256,6 +258,19 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
     (q?.closest('.bbs-tools') || list).scrollIntoView({ block: 'start' });
   });
   order();
+
+  // ---- 一覧の先頭へ：さがす欄が画面の上に消えていて、まだ一覧の中を読んでいるときだけ出す ----
+  const toTop = document.getElementById('sukiTop')!;
+  const tools = document.querySelector<HTMLElement>('.bbs-tools') || list;
+  let rqTop = 0;
+  const updTop = () => {
+    rqTop = 0;
+    const listBottom = list.getBoundingClientRect().bottom;
+    toTop.hidden = !(tools.getBoundingClientRect().bottom < -innerHeight * 0.5 && listBottom > innerHeight * 0.4);
+  };
+  addEventListener('scroll', () => { if (!rqTop) rqTop = requestAnimationFrame(updTop); }, { passive: true });
+  toTop.addEventListener('click', () => { tools.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); });
+  updTop();
 
   // #r12 で来たら、そのレスのあるページを開いて目立たせる
   const go = () => { const h = location.hash.match(/^#r(\d+)$/); if (h) { reveal(h[1]); byNo.get(h[1])?.scrollIntoView({ block: 'start' }); } };

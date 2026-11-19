@@ -1323,13 +1323,13 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .osh-site .osh-h { color: var(--ink); }
 
 /* すべて閉じる：開いているまとまりをまとめて閉じるボタン。スクロールしたときだけ画面の右下に（スマホは下のメニューの上） */
-.close-all { position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 29; font: inherit; font-size: .82rem; font-weight: 700;
+.close-all, .to-top { position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 29; font: inherit; font-size: .82rem; font-weight: 700;
   color: var(--ink); background: var(--panel, #fff); border: 1px solid color-mix(in srgb, var(--brand) 45%, var(--line)); border-radius: 999px; padding: 8px 16px; line-height: 1.2;
   box-shadow: 0 4px 14px rgba(60, 20, 35, .14); cursor: pointer; }
-.close-all[hidden] { display: none; }
-.close-all:hover { background: #FFF1F4; }
-.close-all:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
-@media (max-width: 640px) { .close-all { right: 14px; bottom: calc(60px + 14px + env(safe-area-inset-bottom)); } }
+.close-all[hidden], .to-top[hidden] { display: none; }
+.close-all:hover, .to-top:hover { background: #FFF1F4; }
+.close-all:focus-visible, .to-top:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+@media (max-width: 640px) { .close-all, .to-top { right: 14px; bottom: calc(60px + 14px + env(safe-area-inset-bottom)); } }
 
 /* ---------- みんなのスコア予想（src/components/Yosou.astro・src/pages/yosou.astro） ---------- */
 .yosou { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
