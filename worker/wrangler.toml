@@ -43,7 +43,7 @@ TEST_MODE = "1"
 binding = "DB"
 database_name = "test-tegesta-db"
 # `npx wrangler@4.150.0 d1 create test-tegesta-db` で出た database_id をここに貼る
-database_id = "ここに貼る"
+database_id = "ee1364ee-b5dc-4afd-90bf-6725c60416a3"
 
 [env.test.triggers]
 crons = ["10 4 * * *"]
