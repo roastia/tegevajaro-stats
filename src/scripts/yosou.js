@@ -46,12 +46,14 @@ function bars(ol, data, mine, label = 'あなた') {
     const me = mine && s.gf === mine.gf && s.ga === mine.ga;
     if (me) li.className = 'me';
     if (i === 0) li.classList.add('top');
+    // 「あなた」「結果」の印はスコアの下に小さく置く（バーの長さに影響させない）
     const sc = document.createElement('span'); sc.className = 'sc'; sc.textContent = `${s.gf}-${s.ga}`;
+    if (me) { const t = document.createElement('span'); t.className = 'you'; t.textContent = label; sc.append(t); }
     const bar = document.createElement('span'); bar.className = 'bar';
     bar.style.setProperty('--w', `${Math.max(4, Math.round((s.n / max) * 100))}%`);
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = `${s.n}票`;
     const p = document.createElement('span'); p.className = 'p'; p.textContent = `${pct(s.n, data.total)}%`;
-    li.append(sc, bar, p);
-    if (me) { const t = document.createElement('span'); t.className = 'you'; t.textContent = label; li.append(t); }
+    li.append(sc, bar, n, p);
     ol.append(li);
   });
 }
