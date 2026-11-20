@@ -13,7 +13,8 @@
     "roster": "node tools/check_roster.mjs",
     "spots:pull": "sh tools/pull_spots.sh",
     "links:pull": "sh tools/pull_links.sh",
-    "suki:pull": "sh tools/pull_suki.sh",
+    "suki:pull": "sh tools/pull_suki.sh && node tools/suki.mjs new",
+    "suki:publish": "git push && node tools/suki.mjs mark",
     "removals:pull": "sh tools/pull_removals.sh",
     "spots:names": "node tools/spot_names.mjs",
     "snapshot": "node tools/rank_snapshot.mjs"

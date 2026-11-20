@@ -1,12 +1,18 @@
 # てげ好き（テゲバの好きなところ）の受付と掲載
 
 ## 流れ
-1. テゲサポが /tegesuki/ の下の「書き込む」か「教えて！」の #suki から送る（どちらも `src/components/SukiForm.astro`。お題ボタンで書き出しが入る。試合の日・翌日は「今日の試合」「昨日の試合」のお題が先頭に出る）（ニックネーム任意・本文600字まで・同意のチェック・Turnstile）。
+1. テゲサポが /tegesuki/ の下の「書き込む」か「教えて！」の #suki から送る（どちらも `src/components/SukiForm.astro`。お題をドロップダウンで選ぶと書き出しが入る。試合の日・翌日は「今日の試合」「昨日の試合」のお題が先頭に出る）（ニックネーム任意・本文600字まで・同意のチェック・Turnstile）。
    受付は Worker の `POST /api/suki` → D1 の `suki_submissions`（公開しない受け箱）。
-2. 手元に取り出す：`npm run suki:pull` → `private/suki-inbox.json`（Git には入らない）。
-3. Claude が1件ずつ「そのまま載せる／少し直す（直した文の案）／外す」とタグの案を一覧で出す。
-4. OK が出たものだけ `src/data/suki.json` に、載せる順に番号（no）を付けて足して push。毎日のビルドで /tegesuki/ のスレに並ぶ。
-5. 載せた・外したの印は D1 の status を `approved`・`rejected` に（メモ。サイトの表示には使わない）。
+2. 取り出す（ユーザーが Mac で）：`npm run suki:pull` → `private/suki-inbox.json`（Git には入らない）。まだ処理していない声だけが1行ずつ表示される。
+3. Claude が `node tools/suki.mjs new` の1行表示だけを読み、1件ずつ「載せる（タグ）／少し直す（直した文）／外す」を短く出す。
+4. OK が出たら、Claude が Mac で `node tools/suki.mjs add 8:選手,応援 9:ゴール --skip 10` を実行（番号・日時の転記・形のチェック・コミットまで自動）。本文を直すときは先に `private/suki-fix.json` に `{"8": "直した本文"}` を置く。
+5. 公開（ユーザーが Mac で）：`npm run suki:publish` → push と、D1 の status を `approved`・`rejected` にする印付け（メモ。サイトの表示には使わない）。
+
+### 手間（トークン）を減らす決まり
+- 受け箱のファイル全体や suki.json を読まない。`new` の1行表示だけで判断する。
+- データだけの変更なので、ふだんはビルドや画面の確認をしない（形のチェックは `add` が行う。サイトのビルドは push 後に GitHub が行う）。
+- 事実の確かめ（検索）は、スコア・日付・記録など、まちがうと困る具体的なことが書かれているときだけ。
+- 返事は「#番号 判断 タグ（直すときは直した文）」の短い一覧と、OK のあとの公開コマンドだけ。
 
 ## 載せる形（src/data/suki.json）
 ```json
