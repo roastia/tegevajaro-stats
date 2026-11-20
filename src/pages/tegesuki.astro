@@ -36,8 +36,8 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
           <label class="suki-q"><span class="visually-hidden">言葉でさがす</span><input type="search" id="sukiQ" placeholder="言葉でさがす（例：ゴール裏）" autocomplete="off" enterkeyhint="search" /></label>
           <label class="suki-sort"><span class="visually-hidden">並べかえ</span>
             <select id="sukiSort">
-              <option value="old">古い順</option>
               <option value="new">新しい順</option>
+              <option value="old">古い順</option>
               <option value="like">いいね！が多い順</option>
               <option value="long">長い順</option>
             </select>
@@ -62,7 +62,8 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
 いいなと思ったレスには「いいね！」を。
 届いた声は確認してから載せます。載った声は、テゲサポの記録としてずっと残ります。</div>
       </li>
-      {rows.map(r => (
+      {/* はじめは新しい順（スクリプトが動く前から同じ並びにしておく） */}
+      {[...rows].reverse().map(r => (
         <li class="res" id={`r${r.no}`} data-no={r.no} data-date={`${r.date} ${r.time}`} data-len={[...r.body].length} data-tags={r.tags.join('|')}>
           <p class="res-h"><span class="res-no">{r.no}</span>：<span class="res-nm">{nickOf(r)}</span>：<span class="res-at">{stamp(r.date, r.time)}</span></p>
           <div class="res-body">{r.body}</div>
@@ -165,7 +166,7 @@ const summary = rows.length ? `${rows.length}件の声${tags.length ? `（${tags
   const filtering = () => !!(tag || terms().length);
   function compute() {
     const ts = terms();
-    const sorted = [...items].sort(by[sort?.value || 'old'] || by.old);
+    const sorted = [...items].sort(by[sort?.value || 'new'] || by.new);
     matched = sorted.filter(li => (!tag || (li.dataset.tags || '').split('|').includes(tag)) && ts.every(t => text.get(li)!.includes(t)));
     list.append(pin, ...sorted);
   }
