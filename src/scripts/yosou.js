@@ -160,18 +160,25 @@ function setupCard(card) {
   if (mine || closed()) { $('[data-form]').hidden = true; $('[data-res]').hidden = false; }
   card.classList.add('ys-ready');
   if (mine || closed()) {
-    load().then(d => showRes(d, mine)).catch(() => msg('みんなの予想を読み込めませんでした'));
+    // 前に見た数があれば、まずそれで描いておく（読み込みを待つあいだに枠の高さが変わって、ちらつかないように）。届いたら新しい数に描きかえる
+    const seen = ls.get(`tg:yosouSeen:${key}`);
+    if (seen && Array.isArray(seen.scores)) showRes(seen, mine);
+    load().then(d => { ls.set(`tg:yosouSeen:${key}`, { total: d.total, scores: d.scores }); showRes(d, mine); })
+      .catch(() => { if (!seen) msg('みんなの予想を読み込めませんでした'); });
   }
 
   // 前節の予想の答え合わせ（勝ち・引き分けのときだけ）。カードが見えてきてから読む（読まれないページで受付に問い合わせない）
   const last = card.dataset.last ? JSON.parse(card.dataset.last) : null;
+  // 答え合わせの1行は、前に見たものがあればすぐ出しておく（あとから行が増えて、まわりがずれないように）
+  const lastKey = last && `tg:yosouLast:${last.key}`;
+  const showLast = t => { const el = $('[data-lastline]'); el.textContent = t; el.hidden = !t; };
+  if (lastKey) { const t = ls.get(lastKey); if (typeof t === 'string') showLast(t); }
   const answer = () => {
     fetch(`${api}?match=${encodeURIComponent(last.key)}`).then(r => r.ok ? r.json() : null).then(d => {
       if (!d || !d.total) return;
       const exact = d.scores.filter(s => s.gf === last.gf && s.ga === last.ga).reduce((t, s) => t + s.n, 0);
-      const el = $('[data-lastline]');
-      el.textContent = `前節 ${last.opp}戦 ${last.gf}-${last.ga}：ぴったり的中 ${pct(exact, d.total)}%（${d.total}人）`;
-      el.hidden = false;
+      const t = `前節 ${last.opp}戦 ${last.gf}-${last.ga}：ぴったり的中 ${pct(exact, d.total)}%（${d.total}人）`;
+      ls.set(lastKey, t); showLast(t);
     }).catch(() => {});
   };
   if (last && last.gf >= last.ga) {

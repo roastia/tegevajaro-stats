@@ -1339,7 +1339,9 @@ main > .page-lead:not(:first-child), main > .note:not(:first-child) { margin-top
 .yosou[data-state]:not(.ys-ready) .ys-form { display: none !important; }
 .yosou[data-state]:not(.ys-ready) .ys-res[hidden] { display: flex !important; }
 .yosou[data-state] .ys-sum:empty { min-height: 1.5em; }
-.yosou[data-state] .ys-bars:empty { min-height: 7.6rem; }
+.yosou[data-state="voted"] .ys-mine b:empty::before { content: '\2007'; }
+.yosou[data-hl] .ys-last[hidden] { display: block !important; visibility: hidden; min-height: 1.75em; flex-basis: 100%; }
+.yosou[data-state] .ys-bars:empty { min-height: calc(var(--ys-rows, 5) * 1.49rem + .7rem); }
 .yosou[data-state="closed"] .ys-mine, .yosou[data-state="closed"] .ys-share { display: none; }
 .ys-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .ys-kicker { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 1rem; font-weight: 800; color: var(--brand-deep); }
