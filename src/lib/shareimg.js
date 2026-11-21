@@ -237,9 +237,11 @@ export async function renderShareJpg(item) {
   } catch { /* なければ作る */ }
   const svg = await satori(tree, { width: W, height: H, fonts: loadFonts() });
   const png = new Resvg(svg, { fitTo: { mode: 'width', value: W } }).render().asPng();
-  // 布の写真の質感を残したまま軽くするため JPEG にする（sharp は Astro が使っている部品）
+  // 布の写真の質感を残したまま軽くするため JPEG にする（sharp は Astro が使っている部品）。
+  // どのアプリでも受け取れるよう、いちばん一般的な形（ベースライン・4:2:0）にする。
+  // 以前の「プログレッシブ・4:4:4」は、Android の X アプリで共有すると送信に失敗することがあったため
   const { default: sharp } = await import('sharp');
-  const jpg = await sharp(png).jpeg({ quality: 86, mozjpeg: true, chromaSubsampling: '4:4:4' }).toBuffer();
+  const jpg = await sharp(png).jpeg({ quality: 86, progressive: false, chromaSubsampling: '4:2:0', optimiseCoding: true }).toBuffer();   // mozjpeg を使うとプログレッシブになるので使わない
   if (file) try { fs.mkdirSync(CACHE_DIR, { recursive: true }); fs.writeFileSync(file, jpg); } catch { /* とっておけなくてもよい */ }
   return jpg;
 }
